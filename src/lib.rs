@@ -9,7 +9,7 @@
 
 use nota_codec::{NotaEnum, NotaRecord, NotaSum, NotaTryTransparent};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
-use signal_core::{SignalVerb, signal_channel};
+use signal_core::signal_channel;
 use std::fmt;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -509,11 +509,17 @@ pub enum OperationKind {
     GenerationQuery,
 }
 
+// Per signal-core's `signal_channel!` macro: each request variant
+// is preceded by the SignalVerb it instantiates, and the macro
+// auto-emits the `Request::signal_verb()` mapping witness (no manual
+// impl needed). DeploymentSubmission ⇒ Assert (writes a deployment
+// fact), CacheRetentionRequest ⇒ Mutate (transitions a generation's
+// retention state), GenerationQuery ⇒ Match (typed pattern read).
 signal_channel! {
     request Request {
-        DeploymentSubmission(DeploymentSubmission),
-        CacheRetentionRequest(CacheRetentionRequest),
-        GenerationQuery(GenerationQuery),
+        Assert DeploymentSubmission(DeploymentSubmission),
+        Mutate CacheRetentionRequest(CacheRetentionRequest),
+        Match  GenerationQuery(GenerationQuery),
     }
     reply Reply {
         DeploymentAccepted(DeploymentAccepted),
@@ -532,14 +538,6 @@ impl Request {
             Self::DeploymentSubmission(_) => OperationKind::DeploymentSubmission,
             Self::CacheRetentionRequest(_) => OperationKind::CacheRetentionRequest,
             Self::GenerationQuery(_) => OperationKind::GenerationQuery,
-        }
-    }
-
-    pub fn sema_verb(&self) -> SignalVerb {
-        match self {
-            Self::DeploymentSubmission(_) => SignalVerb::Assert,
-            Self::CacheRetentionRequest(_) => SignalVerb::Mutate,
-            Self::GenerationQuery(_) => SignalVerb::Match,
         }
     }
 }

@@ -68,11 +68,10 @@ fn generation() -> Generation {
 }
 
 fn round_trip_request(request: Request) -> Request {
-    let expected_verb = request.sema_verb();
-    let frame = Frame::new(FrameBody::Request(CoreRequest::operation(
-        expected_verb,
-        request,
-    )));
+    let expected_verb = request.signal_verb();
+    // signal-core's macro emits `into_signal_request` on the Request enum;
+    // it auto-derives the verb from the variant via `signal_verb()`.
+    let frame = Frame::new(FrameBody::Request(request.into_signal_request()));
     let bytes = frame.encode_length_prefixed().expect("encode frame");
     let decoded = Frame::decode_length_prefixed(&bytes).expect("decode frame");
 
@@ -149,7 +148,7 @@ fn generation_query_round_trips_through_length_prefixed_frame() {
 }
 
 #[test]
-fn request_variants_have_expected_sema_verbs() {
+fn request_variants_have_expected_signal_verbs() {
     let deployment_request = Request::DeploymentSubmission(DeploymentSubmission {
         cluster: cluster(),
         node: node(),
@@ -170,11 +169,11 @@ fn request_variants_have_expected_sema_verbs() {
     });
 
     assert_eq!(
-        deployment_request.sema_verb(),
+        deployment_request.signal_verb(),
         signal_core::SignalVerb::Assert
     );
-    assert_eq!(cache_request.sema_verb(), signal_core::SignalVerb::Mutate);
-    assert_eq!(query_request.sema_verb(), signal_core::SignalVerb::Match);
+    assert_eq!(cache_request.signal_verb(), signal_core::SignalVerb::Mutate);
+    assert_eq!(query_request.signal_verb(), signal_core::SignalVerb::Match);
 }
 
 #[test]
