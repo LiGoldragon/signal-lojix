@@ -18,7 +18,4 @@ You MUST read [~/primary/repos/lore/AGENTS.md](../../../lore/AGENTS.md) — the 
   validation newtypes. No behavior, no storage, no actors, no I/O.
   Precedent: `signal-persona-mind`, `signal-persona-message`.
 
-- **Spec is in `ARCHITECTURE.md` and in
-  `~/primary/reports/system-assistant/04-dedicated-cloud-host-plan-second-revision.md`
-  §P5.4.** Both must agree; ARCHITECTURE.md is the local source of
-  truth.
+- **Spec.** `ARCHITECTURE.md` is the local source of truth.
