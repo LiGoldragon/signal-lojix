@@ -2,21 +2,20 @@ You MUST read [~/primary/repos/lore/AGENTS.md](../../../lore/AGENTS.md) — the 
 
 # signal-lojix — agent carve-outs
 
-- **Status: skeleton (2026-05-13).** No `Cargo.toml`, no `src/`, no
-  `flake.nix`, no `skills.md` body beyond a stub. The repo exists to
-  lock the namespace and host the architecture spec. Do not begin
-  implementation here without explicit direction from the user; the
-  implementation kickoff is gated on `lojix-daemon` work starting.
+- **Status: first contract slice (2026-05-14).** The
+  `horizon-re-engineering` branch has a Rust contract crate with deploy,
+  cache-retention, and generation-query records plus Nix-backed tests.
 
-- **Future infrastructure.** Per
+- **Replacement infrastructure.** Per
   `~/primary/protocols/active-repositories.md` §"Replacement Stack
   (Future Infrastructure)", this repo replaces parts of the current
-  `lojix-cli` once `lojix-daemon` ships. Do not assume current cluster
-  deploys flow through it.
+  `lojix-cli` once `lojix` ships. Do not assume current cluster deploys
+  flow through it.
 
-- **Pure contract.** When implementation lands, only typed records and
-  validation newtypes. No behavior, no storage, no actors, no I/O.
-  Precedent: `signal-persona-mind`, `signal-persona-message`.
+- **Pure contract.** Only typed records, validation newtypes, NOTA
+  projection, rkyv archive shape, and contract tests belong here. No
+  storage, no actors, no subprocesses, no socket lifecycle, no daemon
+  code. Precedent: `signal-persona-mind`, `signal-persona-message`.
 
 - **Spec is in `ARCHITECTURE.md` and in
   `~/primary/reports/system-assistant/04-dedicated-cloud-host-plan-second-revision.md`
