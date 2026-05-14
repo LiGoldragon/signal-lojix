@@ -42,9 +42,6 @@ not this contract.
 
 ## 2 · Planned Surface
 
-Per `~/primary/reports/system-assistant/04-dedicated-cloud-host-plan-second-revision.md`
-§P5.4:
-
 ```
 // deployment surface
 DeploymentSubmission      // client → daemon: "deploy this request"
