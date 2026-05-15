@@ -1,5 +1,8 @@
 use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
-use signal_core::{FrameBody, Request as CoreRequest};
+use signal_core::{
+    ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply as CoreReply, RequestPayload,
+    SessionEpoch, SignalVerb, StreamEventIdentifier, SubReply, SubscriptionTokenInner,
+};
 use signal_lojix::*;
 
 fn cluster() -> ClusterName {
@@ -67,33 +70,95 @@ fn generation() -> Generation {
     }
 }
 
+fn deployment_observation() -> DeploymentObservation {
+    DeploymentObservation {
+        phase: DeploymentPhase::DeploymentBuilt(DeploymentBuilt {
+            deployment: deployment(),
+            result: BuildResult::EvaluatedDerivation(EvaluatedDerivation {
+                derivation_path: derivation_path(),
+            }),
+        }),
+    }
+}
+
+fn cache_retention_observation() -> CacheRetentionObservation {
+    CacheRetentionObservation {
+        mutation: mutation(),
+        generation: generation_id(),
+        state: CacheRetentionState::Pinned,
+    }
+}
+
+fn exchange() -> ExchangeIdentifier {
+    ExchangeIdentifier::new(
+        SessionEpoch::new(1),
+        ExchangeLane::Connector,
+        LaneSequence::first(),
+    )
+}
+
+fn stream_event() -> StreamEventIdentifier {
+    StreamEventIdentifier::new(
+        SessionEpoch::new(1),
+        ExchangeLane::Acceptor,
+        LaneSequence::first(),
+    )
+}
+
 fn round_trip_request(request: Request) -> Request {
     let expected_verb = request.signal_verb();
-    // signal-core's macro emits `into_signal_request` on the Request enum;
-    // it auto-derives the verb from the variant via `signal_verb()`.
-    let frame = Frame::new(FrameBody::Request(request.into_signal_request()));
+    let frame = LojixFrame::new(LojixFrameBody::Request {
+        exchange: exchange(),
+        request: request.into_request(),
+    });
     let bytes = frame.encode_length_prefixed().expect("encode frame");
-    let decoded = Frame::decode_length_prefixed(&bytes).expect("decode frame");
+    let decoded = LojixFrame::decode_length_prefixed(&bytes).expect("decode frame");
 
     match decoded.into_body() {
-        FrameBody::Request(CoreRequest::Operation { verb, payload }) => {
-            assert_eq!(verb, expected_verb);
-            payload
+        LojixFrameBody::Request { request, .. } => {
+            let operation = request.operations().head();
+            assert_eq!(operation.verb, expected_verb);
+            operation.payload.clone()
         }
-        other => panic!("expected request operation, got {other:?}"),
+        other => panic!("expected request frame, got {other:?}"),
     }
 }
 
 fn round_trip_reply(reply: Reply) -> Reply {
-    let frame = Frame::new(FrameBody::Reply(signal_core::Reply::operation(
-        reply.clone(),
-    )));
+    let frame = LojixFrame::new(LojixFrameBody::Reply {
+        exchange: exchange(),
+        reply: CoreReply::completed(NonEmpty::single(SubReply::Ok {
+            verb: SignalVerb::Assert,
+            payload: reply.clone(),
+        })),
+    });
     let bytes = frame.encode_length_prefixed().expect("encode frame");
-    let decoded = Frame::decode_length_prefixed(&bytes).expect("decode frame");
+    let decoded = LojixFrame::decode_length_prefixed(&bytes).expect("decode frame");
 
     match decoded.into_body() {
-        FrameBody::Reply(signal_core::Reply::Operation(decoded_reply)) => decoded_reply,
-        other => panic!("expected reply operation, got {other:?}"),
+        LojixFrameBody::Reply { reply, .. } => match reply {
+            CoreReply::Accepted { per_operation, .. } => match per_operation.into_head() {
+                SubReply::Ok { payload, .. } => payload,
+                other => panic!("expected accepted reply payload, got {other:?}"),
+            },
+            other => panic!("expected accepted reply, got {other:?}"),
+        },
+        other => panic!("expected reply frame, got {other:?}"),
+    }
+}
+
+fn round_trip_event(event: Event) -> Event {
+    let frame = LojixFrame::new(LojixFrameBody::SubscriptionEvent {
+        event_identifier: stream_event(),
+        token: SubscriptionTokenInner::new(1),
+        event,
+    });
+    let bytes = frame.encode_length_prefixed().expect("encode frame");
+    let decoded = LojixFrame::decode_length_prefixed(&bytes).expect("decode frame");
+
+    match decoded.into_body() {
+        LojixFrameBody::SubscriptionEvent { event, .. } => event,
+        other => panic!("expected subscription event frame, got {other:?}"),
     }
 }
 
@@ -148,6 +213,41 @@ fn generation_query_round_trips_through_length_prefixed_frame() {
 }
 
 #[test]
+fn observation_subscription_requests_round_trip_through_length_prefixed_frame() {
+    let deployment_subscription =
+        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
+            cluster: Some(cluster()),
+            node: Some(node()),
+            deployment: Some(deployment()),
+        });
+    let cache_subscription =
+        Request::CacheRetentionObservationSubscription(CacheRetentionObservationSubscription {
+            generation: Some(generation_id()),
+        });
+    let deployment_retraction =
+        Request::DeploymentObservationRetraction(DeploymentObservationToken::new(1));
+    let cache_retraction =
+        Request::CacheRetentionObservationRetraction(CacheRetentionObservationToken::new(2));
+
+    assert_eq!(
+        round_trip_request(deployment_subscription.clone()),
+        deployment_subscription
+    );
+    assert_eq!(
+        round_trip_request(cache_subscription.clone()),
+        cache_subscription
+    );
+    assert_eq!(
+        round_trip_request(deployment_retraction.clone()),
+        deployment_retraction
+    );
+    assert_eq!(
+        round_trip_request(cache_retraction.clone()),
+        cache_retraction
+    );
+}
+
+#[test]
 fn request_variants_have_expected_signal_verbs() {
     let deployment_request = Request::DeploymentSubmission(DeploymentSubmission {
         cluster: cluster(),
@@ -167,6 +267,20 @@ fn request_variants_have_expected_signal_verbs() {
         node: None,
         kind: None,
     });
+    let deployment_subscription =
+        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
+            cluster: None,
+            node: None,
+            deployment: None,
+        });
+    let cache_subscription =
+        Request::CacheRetentionObservationSubscription(CacheRetentionObservationSubscription {
+            generation: None,
+        });
+    let deployment_retraction =
+        Request::DeploymentObservationRetraction(DeploymentObservationToken::new(1));
+    let cache_retraction =
+        Request::CacheRetentionObservationRetraction(CacheRetentionObservationToken::new(2));
 
     assert_eq!(
         deployment_request.signal_verb(),
@@ -174,6 +288,66 @@ fn request_variants_have_expected_signal_verbs() {
     );
     assert_eq!(cache_request.signal_verb(), signal_core::SignalVerb::Mutate);
     assert_eq!(query_request.signal_verb(), signal_core::SignalVerb::Match);
+    assert_eq!(
+        deployment_subscription.signal_verb(),
+        signal_core::SignalVerb::Subscribe
+    );
+    assert_eq!(
+        cache_subscription.signal_verb(),
+        signal_core::SignalVerb::Subscribe
+    );
+    assert_eq!(
+        deployment_retraction.signal_verb(),
+        signal_core::SignalVerb::Retract
+    );
+    assert_eq!(
+        cache_retraction.signal_verb(),
+        signal_core::SignalVerb::Retract
+    );
+}
+
+#[test]
+fn stream_relation_witnesses_are_generated_by_the_channel_macro() {
+    let deployment_subscription =
+        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
+            cluster: None,
+            node: None,
+            deployment: None,
+        });
+    let cache_subscription =
+        Request::CacheRetentionObservationSubscription(CacheRetentionObservationSubscription {
+            generation: None,
+        });
+    let deployment_retraction =
+        Request::DeploymentObservationRetraction(DeploymentObservationToken::new(1));
+    let cache_retraction =
+        Request::CacheRetentionObservationRetraction(CacheRetentionObservationToken::new(2));
+
+    assert_eq!(
+        deployment_subscription.opened_stream(),
+        Some(LojixStreamKind::DeploymentObservationStream)
+    );
+    assert_eq!(
+        cache_subscription.opened_stream(),
+        Some(LojixStreamKind::CacheRetentionObservationStream)
+    );
+    assert_eq!(
+        deployment_retraction.closed_stream(),
+        Some(LojixStreamKind::DeploymentObservationStream)
+    );
+    assert_eq!(
+        cache_retraction.closed_stream(),
+        Some(LojixStreamKind::CacheRetentionObservationStream)
+    );
+
+    assert_eq!(
+        Event::DeploymentObservation(deployment_observation()).stream_kind(),
+        LojixStreamKind::DeploymentObservationStream
+    );
+    assert_eq!(
+        Event::CacheRetentionObservation(cache_retention_observation()).stream_kind(),
+        LojixStreamKind::CacheRetentionObservationStream
+    );
 }
 
 #[test]
@@ -185,18 +359,20 @@ fn deployment_replies_round_trip_through_length_prefixed_frame() {
         reason: DeploymentRejectionReason::BuilderUnavailable,
         detail: Some(FailureText::from_text("builder is not reachable").expect("failure text")),
     });
-    let observed = Reply::DeploymentObservation(DeploymentObservation {
-        phase: DeploymentPhase::DeploymentBuilt(DeploymentBuilt {
-            deployment: deployment(),
-            result: BuildResult::EvaluatedDerivation(EvaluatedDerivation {
-                derivation_path: derivation_path(),
-            }),
-        }),
-    });
+    let opened =
+        Reply::DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened {
+            token: DeploymentObservationToken::new(1),
+            observations: vec![deployment_observation()],
+        });
+    let closed =
+        Reply::DeploymentObservationSubscriptionClosed(DeploymentObservationSubscriptionClosed {
+            token: DeploymentObservationToken::new(1),
+        });
 
     assert_eq!(round_trip_reply(accepted.clone()), accepted);
     assert_eq!(round_trip_reply(rejected.clone()), rejected);
-    assert_eq!(round_trip_reply(observed.clone()), observed);
+    assert_eq!(round_trip_reply(opened.clone()), opened);
+    assert_eq!(round_trip_reply(closed.clone()), closed);
 }
 
 #[test]
@@ -208,15 +384,31 @@ fn cache_retention_replies_round_trip_through_length_prefixed_frame() {
         reason: CacheRetentionRejectionReason::PolicyConflict,
         detail: None,
     });
-    let observed = Reply::CacheRetentionObservation(CacheRetentionObservation {
-        mutation: mutation(),
-        generation: generation_id(),
-        state: CacheRetentionState::Pinned,
-    });
+    let opened = Reply::CacheRetentionObservationSubscriptionOpened(
+        CacheRetentionObservationSubscriptionOpened {
+            token: CacheRetentionObservationToken::new(2),
+            observations: vec![cache_retention_observation()],
+        },
+    );
+    let closed = Reply::CacheRetentionObservationSubscriptionClosed(
+        CacheRetentionObservationSubscriptionClosed {
+            token: CacheRetentionObservationToken::new(2),
+        },
+    );
 
     assert_eq!(round_trip_reply(accepted.clone()), accepted);
     assert_eq!(round_trip_reply(rejected.clone()), rejected);
-    assert_eq!(round_trip_reply(observed.clone()), observed);
+    assert_eq!(round_trip_reply(opened.clone()), opened);
+    assert_eq!(round_trip_reply(closed.clone()), closed);
+}
+
+#[test]
+fn observation_events_round_trip_through_subscription_event_frame() {
+    let deployment_event = Event::DeploymentObservation(deployment_observation());
+    let cache_event = Event::CacheRetentionObservation(cache_retention_observation());
+
+    assert_eq!(round_trip_event(deployment_event.clone()), deployment_event);
+    assert_eq!(round_trip_event(cache_event.clone()), cache_event);
 }
 
 #[test]
@@ -242,6 +434,25 @@ fn sum_records_round_trip_through_nota_text() {
             reason: FailureText::from_text("activation failed").expect("failure text"),
         }),
         "(DeploymentFailed deploy_aab \"activation failed\")",
+    );
+}
+
+#[test]
+fn subscription_records_round_trip_through_nota_text() {
+    round_trip_nota(
+        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
+            cluster: Some(cluster()),
+            node: Some(node()),
+            deployment: None,
+        }),
+        "(DeploymentObservationSubscription goldragon ouranos None)",
+    );
+    round_trip_nota(
+        Reply::DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened {
+            token: DeploymentObservationToken::new(1),
+            observations: vec![deployment_observation()],
+        }),
+        "(DeploymentObservationSubscriptionOpened (DeploymentObservationToken 1) [(DeploymentObservation (DeploymentBuilt deploy_aab (EvaluatedDerivation \"/nix/store/00000000000000000000000000000000-criomos.drv\")))])",
     );
 }
 

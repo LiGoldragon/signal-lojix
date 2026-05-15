@@ -11,8 +11,16 @@
     crane.url = "github:ipetkov/crane";
   };
 
-  outputs = { self, nixpkgs, flake-utils, fenix, crane }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      fenix,
+      crane,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs { inherit system; };
         toolchain = fenix.packages.${system}.fromToolchainFile {
@@ -28,44 +36,71 @@
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
       in
       {
-        packages.default = craneLib.buildPackage (commonArgs // {
-          inherit cargoArtifacts;
-        });
+        packages.default = craneLib.buildPackage (
+          commonArgs
+          // {
+            inherit cargoArtifacts;
+          }
+        );
 
         checks = {
-          build = craneLib.cargoBuild (commonArgs // {
-            inherit cargoArtifacts;
-          });
-          test = craneLib.cargoTest (commonArgs // {
-            inherit cargoArtifacts;
-          });
-          test-round-trip = craneLib.cargoTest (commonArgs // {
-            inherit cargoArtifacts;
-            cargoTestExtraArgs = "--test round_trip";
-          });
-          test-contract-crate-has-no-runtime-dependencies = craneLib.cargoTest (commonArgs // {
-            inherit cargoArtifacts;
-            cargoTestExtraArgs = "--test round_trip contract_crate_has_no_runtime_dependencies";
-          });
-          test-sema-verb-mapping = craneLib.cargoTest (commonArgs // {
-            inherit cargoArtifacts;
-            cargoTestExtraArgs = "--test round_trip request_variants_have_expected_sema_verbs";
-          });
-          test-doc = craneLib.cargoTest (commonArgs // {
-            inherit cargoArtifacts;
-            cargoTestExtraArgs = "--doc";
-          });
-          doc = craneLib.cargoDoc (commonArgs // {
-            inherit cargoArtifacts;
-            RUSTDOCFLAGS = "-D warnings";
-          });
+          build = craneLib.cargoBuild (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+            }
+          );
+          test = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+            }
+          );
+          test-round-trip = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoTestExtraArgs = "--test round_trip";
+            }
+          );
+          test-contract-crate-has-no-runtime-dependencies = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoTestExtraArgs = "--test round_trip contract_crate_has_no_runtime_dependencies";
+            }
+          );
+          test-signal-verb-mapping = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoTestExtraArgs = "--test round_trip request_variants_have_expected_signal_verbs";
+            }
+          );
+          test-doc = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoTestExtraArgs = "--doc";
+            }
+          );
+          doc = craneLib.cargoDoc (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              RUSTDOCFLAGS = "-D warnings";
+            }
+          );
           fmt = craneLib.cargoFmt {
             inherit src;
           };
-          clippy = craneLib.cargoClippy (commonArgs // {
-            inherit cargoArtifacts;
-            cargoClippyExtraArgs = "--all-targets -- -D warnings";
-          });
+          clippy = craneLib.cargoClippy (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoClippyExtraArgs = "--all-targets -- -D warnings";
+            }
+          );
         };
 
         devShells.default = pkgs.mkShell {
@@ -76,5 +111,6 @@
             toolchain
           ];
         };
-      });
+      }
+    );
 }

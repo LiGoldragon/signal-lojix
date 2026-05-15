@@ -6,9 +6,7 @@ orchestrator.
 ## Status
 
 - First contract slice lives on the `horizon-re-engineering` branch.
-- The canonical shape is in `ARCHITECTURE.md` §"Channel Surface" and
-  `~/primary/reports/system-assistant/04-dedicated-cloud-host-plan-second-revision.md`
-  §P5.4.
+- The canonical shape is in `ARCHITECTURE.md` §"Channel Surface".
 
 ## Required Reading
 
@@ -24,13 +22,16 @@ orchestrator.
 
 ## Owned Surface
 
-- `Request` / `Reply` root enums emitted by `signal_core::signal_channel!`.
+- `Request` / `Reply` / `Event` root enums emitted by
+  `signal_core::signal_channel!`.
 - Deployment records: `DeploymentSubmission`, `DeploymentAccepted`,
   `DeploymentRejected`, and `DeploymentObservation`.
 - Cache-retention records: `CacheRetentionRequest`,
   `CacheRetentionAccepted`, `CacheRetentionRejected`, and
   `CacheRetentionObservation`.
 - Generation query records: `GenerationQuery` and `GenerationListing`.
+- Deployment and cache-retention observation subscription records,
+  stream-open replies, stream-close replies, and stream events.
 - Boundary newtypes such as `ClusterName`, `NodeName`, `DeploymentId`,
   `GenerationId`, `StorePath`, and `DerivationPath`.
 
@@ -42,5 +43,6 @@ orchestrator.
   (`NotaRecord`, `NotaEnum`, or `NotaSum`).
 - Sum variants use the variant-name equals payload-type-name pattern.
 - Request variants own their `SignalVerb` mapping through
-  `Request::sema_verb()`.
+  `Request::signal_verb()`.
+- Observations are pushed stream events, not ordinary reply variants.
 - `nix flake check` is the review gate.

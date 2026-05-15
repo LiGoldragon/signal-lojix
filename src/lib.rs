@@ -437,6 +437,39 @@ pub struct DeploymentObservation {
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct DeploymentObservationSubscription {
+    pub cluster: Option<ClusterName>,
+    pub node: Option<NodeName>,
+    pub deployment: Option<DeploymentId>,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct DeploymentObservationToken {
+    pub value: u64,
+}
+
+impl DeploymentObservationToken {
+    pub const fn new(value: u64) -> Self {
+        Self { value }
+    }
+
+    pub const fn value(&self) -> u64 {
+        self.value
+    }
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct DeploymentObservationSubscriptionOpened {
+    pub token: DeploymentObservationToken,
+    pub observations: Vec<DeploymentObservation>,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct DeploymentObservationSubscriptionClosed {
+    pub token: DeploymentObservationToken,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
 pub struct PinGeneration {}
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
@@ -491,6 +524,37 @@ pub struct CacheRetentionObservation {
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct CacheRetentionObservationSubscription {
+    pub generation: Option<GenerationId>,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct CacheRetentionObservationToken {
+    pub value: u64,
+}
+
+impl CacheRetentionObservationToken {
+    pub const fn new(value: u64) -> Self {
+        Self { value }
+    }
+
+    pub const fn value(&self) -> u64 {
+        self.value
+    }
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct CacheRetentionObservationSubscriptionOpened {
+    pub token: CacheRetentionObservationToken,
+    pub observations: Vec<CacheRetentionObservation>,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct CacheRetentionObservationSubscriptionClosed {
+    pub token: CacheRetentionObservationToken,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
 pub struct GenerationQuery {
     pub cluster: Option<ClusterName>,
     pub node: Option<NodeName>,
@@ -507,28 +571,58 @@ pub enum OperationKind {
     DeploymentSubmission,
     CacheRetentionRequest,
     GenerationQuery,
+    DeploymentObservationSubscription,
+    CacheRetentionObservationSubscription,
+    DeploymentObservationRetraction,
+    CacheRetentionObservationRetraction,
 }
 
-// Per signal-core's `signal_channel!` macro: each request variant
-// is preceded by the SignalVerb it instantiates, and the macro
-// auto-emits the `Request::signal_verb()` mapping witness (no manual
-// impl needed). DeploymentSubmission ⇒ Assert (writes a deployment
-// fact), CacheRetentionRequest ⇒ Mutate (transitions a generation's
-// retention state), GenerationQuery ⇒ Match (typed pattern read).
+// Per signal-core's `signal_channel!` macro: each request variant is
+// preceded by the SignalVerb it instantiates, and the macro auto-emits
+// the `Request::signal_verb()` mapping witness. Observations are push
+// events, so they live in the event block rather than in ordinary
+// request/reply exchange payloads.
 signal_channel! {
-    request Request {
-        Assert DeploymentSubmission(DeploymentSubmission),
-        Mutate CacheRetentionRequest(CacheRetentionRequest),
-        Match  GenerationQuery(GenerationQuery),
-    }
-    reply Reply {
-        DeploymentAccepted(DeploymentAccepted),
-        DeploymentRejected(DeploymentRejected),
-        DeploymentObservation(DeploymentObservation),
-        CacheRetentionAccepted(CacheRetentionAccepted),
-        CacheRetentionRejected(CacheRetentionRejected),
-        CacheRetentionObservation(CacheRetentionObservation),
-        GenerationListing(GenerationListing),
+    channel Lojix {
+        request Request {
+            Assert DeploymentSubmission(DeploymentSubmission),
+            Mutate CacheRetentionRequest(CacheRetentionRequest),
+            Match GenerationQuery(GenerationQuery),
+            Subscribe DeploymentObservationSubscription(DeploymentObservationSubscription)
+                opens DeploymentObservationStream,
+            Subscribe CacheRetentionObservationSubscription(CacheRetentionObservationSubscription)
+                opens CacheRetentionObservationStream,
+            Retract DeploymentObservationRetraction(DeploymentObservationToken),
+            Retract CacheRetentionObservationRetraction(CacheRetentionObservationToken),
+        }
+        reply Reply {
+            DeploymentAccepted(DeploymentAccepted),
+            DeploymentRejected(DeploymentRejected),
+            CacheRetentionAccepted(CacheRetentionAccepted),
+            CacheRetentionRejected(CacheRetentionRejected),
+            GenerationListing(GenerationListing),
+            DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened),
+            DeploymentObservationSubscriptionClosed(DeploymentObservationSubscriptionClosed),
+            CacheRetentionObservationSubscriptionOpened(CacheRetentionObservationSubscriptionOpened),
+            CacheRetentionObservationSubscriptionClosed(CacheRetentionObservationSubscriptionClosed),
+        }
+        event Event {
+            DeploymentObservation(DeploymentObservation) belongs DeploymentObservationStream,
+            CacheRetentionObservation(CacheRetentionObservation)
+                belongs CacheRetentionObservationStream,
+        }
+        stream DeploymentObservationStream {
+            token DeploymentObservationToken;
+            opened DeploymentObservationSubscriptionOpened;
+            event DeploymentObservation;
+            close DeploymentObservationRetraction;
+        }
+        stream CacheRetentionObservationStream {
+            token CacheRetentionObservationToken;
+            opened CacheRetentionObservationSubscriptionOpened;
+            event CacheRetentionObservation;
+            close CacheRetentionObservationRetraction;
+        }
     }
 }
 
@@ -538,6 +632,18 @@ impl Request {
             Self::DeploymentSubmission(_) => OperationKind::DeploymentSubmission,
             Self::CacheRetentionRequest(_) => OperationKind::CacheRetentionRequest,
             Self::GenerationQuery(_) => OperationKind::GenerationQuery,
+            Self::DeploymentObservationSubscription(_) => {
+                OperationKind::DeploymentObservationSubscription
+            }
+            Self::CacheRetentionObservationSubscription(_) => {
+                OperationKind::CacheRetentionObservationSubscription
+            }
+            Self::DeploymentObservationRetraction(_) => {
+                OperationKind::DeploymentObservationRetraction
+            }
+            Self::CacheRetentionObservationRetraction(_) => {
+                OperationKind::CacheRetentionObservationRetraction
+            }
         }
     }
 }

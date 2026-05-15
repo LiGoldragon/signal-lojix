@@ -2,7 +2,7 @@
 
 *Typed Signal contract for the lojix deploy orchestrator.*
 
-> **Status (2026-05-14):** first contract slice on
+> **Status (2026-05-15):** first contract slice on
 > `horizon-re-engineering`. The crate defines typed deploy,
 > cache-retention, and generation-query records, declares the
 > `signal-core` channel, and exposes Nix-backed round-trip and
@@ -41,24 +41,52 @@ this contract.
 
 ## 2 · Channel Surface
 
-Per `~/primary/reports/system-assistant/04-dedicated-cloud-host-plan-second-revision.md`
-§P5.4, the implemented channel has one `signal_channel!` declaration:
+The implemented channel has one `signal_channel!` declaration. It is a
+streaming channel because deployment and cache-retention observations are
+daemon-pushed events, not delayed request/reply payloads:
 
 ```rust
 signal_channel! {
-    request Request {
-        DeploymentSubmission(DeploymentSubmission),
-        CacheRetentionRequest(CacheRetentionRequest),
-        GenerationQuery(GenerationQuery),
-    }
-    reply Reply {
-        DeploymentAccepted(DeploymentAccepted),
-        DeploymentRejected(DeploymentRejected),
-        DeploymentObservation(DeploymentObservation),
-        CacheRetentionAccepted(CacheRetentionAccepted),
-        CacheRetentionRejected(CacheRetentionRejected),
-        CacheRetentionObservation(CacheRetentionObservation),
-        GenerationListing(GenerationListing),
+    channel Lojix {
+        request Request {
+            Assert DeploymentSubmission(DeploymentSubmission),
+            Mutate CacheRetentionRequest(CacheRetentionRequest),
+            Match GenerationQuery(GenerationQuery),
+            Subscribe DeploymentObservationSubscription(DeploymentObservationSubscription)
+                opens DeploymentObservationStream,
+            Subscribe CacheRetentionObservationSubscription(CacheRetentionObservationSubscription)
+                opens CacheRetentionObservationStream,
+            Retract DeploymentObservationRetraction(DeploymentObservationToken),
+            Retract CacheRetentionObservationRetraction(CacheRetentionObservationToken),
+        }
+        reply Reply {
+            DeploymentAccepted(DeploymentAccepted),
+            DeploymentRejected(DeploymentRejected),
+            CacheRetentionAccepted(CacheRetentionAccepted),
+            CacheRetentionRejected(CacheRetentionRejected),
+            GenerationListing(GenerationListing),
+            DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened),
+            DeploymentObservationSubscriptionClosed(DeploymentObservationSubscriptionClosed),
+            CacheRetentionObservationSubscriptionOpened(CacheRetentionObservationSubscriptionOpened),
+            CacheRetentionObservationSubscriptionClosed(CacheRetentionObservationSubscriptionClosed),
+        }
+        event Event {
+            DeploymentObservation(DeploymentObservation) belongs DeploymentObservationStream,
+            CacheRetentionObservation(CacheRetentionObservation)
+                belongs CacheRetentionObservationStream,
+        }
+        stream DeploymentObservationStream {
+            token DeploymentObservationToken;
+            opened DeploymentObservationSubscriptionOpened;
+            event DeploymentObservation;
+            close DeploymentObservationRetraction;
+        }
+        stream CacheRetentionObservationStream {
+            token CacheRetentionObservationToken;
+            opened CacheRetentionObservationSubscriptionOpened;
+            event CacheRetentionObservation;
+            close CacheRetentionObservationRetraction;
+        }
     }
 }
 ```
@@ -88,18 +116,18 @@ record:
 - `DispatcherChoosesBuilder`
 - `NamedBuilder { node }`
 
-The daemon replies with `DeploymentAccepted`, `DeploymentRejected`,
-or `DeploymentObservation`. Observations carry `DeploymentPhase`,
-whose variants name the visible lifecycle stages: submitted,
-building, built, closure-copying, activation-running,
-activation-succeeded, and failed.
+The daemon replies with `DeploymentAccepted` or `DeploymentRejected`.
+Observations are pushed as `Event::DeploymentObservation` stream
+events. They carry `DeploymentPhase`, whose variants name the visible
+lifecycle stages: submitted, building, built, closure-copying,
+activation-running, activation-succeeded, and failed.
 
 ### 3.2 Cache Retention
 
 `CacheRetentionRequest` carries a `GenerationId` plus a typed
 `CacheRetentionAction`: pin, unpin, or retire. Replies are
-`CacheRetentionAccepted`, `CacheRetentionRejected`, and
-`CacheRetentionObservation`.
+`CacheRetentionAccepted` and `CacheRetentionRejected`. Observations are
+pushed as `Event::CacheRetentionObservation` stream events.
 
 ### 3.3 Generation Query
 
@@ -118,9 +146,10 @@ store path, and state.
   convention, matching the `signal-persona-*` precedent.
 - Domain newtypes validate at construction.
 - Naming follows `~/primary/skills/naming.md`.
-- Request variants expose a contract-owned `sema_verb()` mapping:
+- Request variants expose a contract-owned `signal_verb()` mapping:
   deployment submission is `Assert`, cache retention is `Mutate`, and
-  generation query is `Match`.
+  generation query is `Match`; observation subscriptions are
+  `Subscribe`; observation retractions are `Retract`.
 
 ## 5 · Tests
 
@@ -128,8 +157,11 @@ store path, and state.
 
 - `test-round-trip` — request/reply families round-trip through a
   length-prefixed `signal-core` frame.
-- `test-sema-verb-mapping` — request variants carry the expected
+- `test-signal-verb-mapping` — request variants carry the expected
   `signal-core::SignalVerb`.
+- `stream_relation_witnesses_are_generated_by_the_channel_macro` —
+  subscriptions open the declared stream, retractions close it, and
+  events report the stream they belong to.
 - `test-contract-crate-has-no-runtime-dependencies` — the manifest
   does not depend on actor, storage, DBus, or async-runtime crates.
 - `fmt`, `clippy`, `doc`, and doc tests.
