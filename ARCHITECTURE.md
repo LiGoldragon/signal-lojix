@@ -147,8 +147,10 @@ operator identity, and owned cluster. It uses
 either NOTA or rkyv configuration files.
 
 `LojixCliConfiguration` is the typed control-plane record for the thin
-`lojix` client. It names the daemon socket and reply rendering mode. It
-uses `nota_config::impl_nota_only_configuration!`; interactive CLI
+`lojix` client. It names the daemon socket and reply rendering mode.
+The only implemented rendering mode is `Compact`, matching today's
+single-reply CLI behavior. It uses
+`nota_config::impl_nota_only_configuration!`; interactive CLI
 configuration is human-readable NOTA, not rkyv.
 
 These records are configuration only. Deploy plans, generation queries,

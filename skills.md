@@ -9,7 +9,8 @@ orchestrator.
 - The canonical shape is in `ARCHITECTURE.md` §"Channel Surface".
 - The typed startup configuration slice is active: daemon configuration
   is NOTA+rkyv via `impl_rkyv_configuration!`; CLI configuration is
-  NOTA-only via `impl_nota_only_configuration!`.
+  NOTA-only via `impl_nota_only_configuration!` and currently renders
+  compact NOTA replies.
 
 ## Required Reading
 

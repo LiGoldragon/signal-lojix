@@ -277,8 +277,6 @@ impl SocketMode {
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ReplyRendering {
     Compact,
-    Pretty,
-    EventStreamLines,
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
