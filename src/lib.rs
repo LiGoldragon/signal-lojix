@@ -7,7 +7,7 @@
 //! Runtime actors, storage tables, subprocess execution, and socket
 //! lifecycle live in the `lojix` implementation crate.
 
-use nota_codec::{NotaEnum, NotaRecord, NotaSum, NotaTryTransparent};
+use nota_codec::{NotaEnum, NotaRecord, NotaSum, NotaTransparent, NotaTryTransparent};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_core::signal_channel;
 use std::fmt;
@@ -243,9 +243,72 @@ validated_identifier!(GenerationId, "generation id");
 validated_single_line_text!(ProposalSource, "proposal source");
 validated_single_line_text!(FlakeReference, "flake reference");
 validated_single_line_text!(FailureText, "failure text");
+validated_single_line_text!(WirePath, "wire path");
+validated_single_line_text!(OperatorIdentity, "operator identity");
+validated_identifier!(UnixGroup, "unix group");
 
 validated_store_path!(StorePath, "store path", "");
 validated_store_path!(DerivationPath, "derivation path", ".drv");
+
+#[derive(
+    Archive,
+    RkyvSerialize,
+    RkyvDeserialize,
+    NotaTransparent,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+)]
+pub struct SocketMode(u32);
+
+impl SocketMode {
+    pub const fn new(value: u32) -> Self {
+        Self(value)
+    }
+
+    pub const fn into_u32(self) -> u32 {
+        self.0
+    }
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReplyRendering {
+    Compact,
+    Pretty,
+    EventStreamLines,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct PeerDaemonBinding {
+    pub cluster: ClusterName,
+    pub node: NodeName,
+    pub daemon_socket_path: WirePath,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct LojixDaemonConfiguration {
+    pub daemon_socket_path: WirePath,
+    pub daemon_socket_mode: SocketMode,
+    pub daemon_socket_group: Option<UnixGroup>,
+    pub state_directory: WirePath,
+    pub gc_root_directory: WirePath,
+    pub peer_daemons: Vec<PeerDaemonBinding>,
+    pub operator_identity: OperatorIdentity,
+    pub owned_cluster: ClusterName,
+}
+
+nota_config::impl_rkyv_configuration!(LojixDaemonConfiguration);
+
+#[derive(NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct LojixCliConfiguration {
+    pub daemon_socket_path: WirePath,
+    pub reply_rendering: ReplyRendering,
+}
+
+nota_config::impl_nota_only_configuration!(LojixCliConfiguration);
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SystemAction {

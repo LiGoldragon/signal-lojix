@@ -2,9 +2,10 @@ You MUST read [~/primary/repos/lore/AGENTS.md](../../../lore/AGENTS.md) — the 
 
 # signal-lojix — agent carve-outs
 
-- **Status: first contract slice (2026-05-14).** The
+- **Status: contract + typed configuration slice (2026-05-16).** The
   `horizon-re-engineering` branch has a Rust contract crate with deploy,
-  cache-retention, and generation-query records plus Nix-backed tests.
+  cache-retention, generation-query, observation-stream, and
+  `nota-config` startup configuration records plus Nix-backed tests.
 
 - **Replacement infrastructure.** Per
   `~/primary/protocols/active-repositories.md` §"Replacement Stack

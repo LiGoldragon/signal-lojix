@@ -2,9 +2,10 @@
 
 *Typed Signal contract for the lojix deploy orchestrator.*
 
-> **Status (2026-05-15):** first contract slice on
+> **Status (2026-05-16):** contract + typed configuration slice on
 > `horizon-re-engineering`. The crate defines typed deploy,
-> cache-retention, and generation-query records, declares the
+> cache-retention, generation-query, observation-stream, and
+> `nota-config` startup configuration records, declares the
 > `signal-core` channel, and exposes Nix-backed round-trip and
 > boundary tests.
 
@@ -16,9 +17,9 @@ between operator clients and the long-lived `lojix-daemon` binary in
 the `lojix` repo over the daemon's Unix socket.
 
 This repo owns records, validation newtypes, rkyv round trips, NOTA
-round trips, and channel shape. It does not own the daemon
-implementation, CLI behavior, storage tables, actors, socket lifecycle,
-or the actual deploy pipeline.
+round trips, typed startup configuration records, and channel shape. It
+does not own the daemon implementation, CLI behavior, storage tables,
+actors, socket lifecycle, or the actual deploy pipeline.
 
 > **Scope (eventual vs today).** This contract sits on today's stack:
 > `signal-core` wire, rkyv archives, and `sema-engine` storage in
@@ -136,6 +137,23 @@ cluster, node, and generation-kind filters. `GenerationListing`
 carries `Generation` records: generation id, cluster, node, kind,
 store path, and state.
 
+### 3.4 Startup Configuration
+
+`LojixDaemonConfiguration` is the typed control-plane record for
+`lojix-daemon`. It names the daemon socket path and mode, optional Unix
+group, state directory, GC-root directory, peer daemon bindings,
+operator identity, and owned cluster. It uses
+`nota_config::impl_rkyv_configuration!`, so supervised launchers may pass
+either NOTA or rkyv configuration files.
+
+`LojixCliConfiguration` is the typed control-plane record for the thin
+`lojix` client. It names the daemon socket and reply rendering mode. It
+uses `nota_config::impl_nota_only_configuration!`; interactive CLI
+configuration is human-readable NOTA, not rkyv.
+
+These records are configuration only. Deploy plans, generation queries,
+and cache-retention mutations remain data-plane `Request` payloads.
+
 ## 4 · Boundary Rules
 
 - Pure contract crate. No storage. No actors. No subprocesses. No
@@ -150,6 +168,9 @@ store path, and state.
   deployment submission is `Assert`, cache retention is `Mutate`, and
   generation query is `Match`; observation subscriptions are
   `Subscribe`; observation retractions are `Retract`.
+- Startup configuration records live here because this is the contract
+  crate for Lojix binaries. The daemon record supports rkyv; the CLI
+  record is NOTA-only.
 
 ## 5 · Tests
 
@@ -162,6 +183,12 @@ store path, and state.
 - `stream_relation_witnesses_are_generated_by_the_channel_macro` —
   subscriptions open the declared stream, retractions close it, and
   events report the stream they belong to.
+- `daemon_configuration_round_trips_through_nota_text` and
+  `daemon_configuration_decodes_from_rkyv_bytes` — the daemon's typed
+  startup record works through both configuration transports.
+- `cli_configuration_round_trips_through_nota_text` and
+  `cli_configuration_rejects_rkyv_bytes` — the CLI startup record stays
+  human-readable and NOTA-only.
 - `test-contract-crate-has-no-runtime-dependencies` — the manifest
   does not depend on actor, storage, DBus, or async-runtime crates.
 - `fmt`, `clippy`, `doc`, and doc tests.

@@ -7,6 +7,9 @@ orchestrator.
 
 - First contract slice lives on the `horizon-re-engineering` branch.
 - The canonical shape is in `ARCHITECTURE.md` §"Channel Surface".
+- The typed startup configuration slice is active: daemon configuration
+  is NOTA+rkyv via `impl_rkyv_configuration!`; CLI configuration is
+  NOTA-only via `impl_nota_only_configuration!`.
 
 ## Required Reading
 
@@ -32,8 +35,12 @@ orchestrator.
 - Generation query records: `GenerationQuery` and `GenerationListing`.
 - Deployment and cache-retention observation subscription records,
   stream-open replies, stream-close replies, and stream events.
+- Startup configuration records: `LojixDaemonConfiguration`,
+  `LojixCliConfiguration`, `PeerDaemonBinding`, `SocketMode`, and
+  `ReplyRendering`.
 - Boundary newtypes such as `ClusterName`, `NodeName`, `DeploymentId`,
-  `GenerationId`, `StorePath`, and `DerivationPath`.
+  `GenerationId`, `StorePath`, `DerivationPath`, `WirePath`,
+  `UnixGroup`, and `OperatorIdentity`.
 
 ## Hard Rules
 
@@ -45,4 +52,7 @@ orchestrator.
 - Request variants own their `SignalVerb` mapping through
   `Request::signal_verb()`.
 - Observations are pushed stream events, not ordinary reply variants.
+- Configuration records stay control-plane only. Requests carry deploy
+  and query data; configuration carries sockets, paths, identity, and
+  rendering policy.
 - `nix flake check` is the review gate.

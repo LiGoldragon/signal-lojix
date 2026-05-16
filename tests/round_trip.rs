@@ -48,6 +48,14 @@ fn flake_reference() -> FlakeReference {
         .expect("flake reference")
 }
 
+fn wire_path(value: &str) -> WirePath {
+    WirePath::from_text(value).expect("wire path")
+}
+
+fn operator_identity() -> OperatorIdentity {
+    OperatorIdentity::from_text("operator").expect("operator identity")
+}
+
 fn builder_selection() -> BuilderSelection {
     BuilderSelection::NamedBuilder(NamedBuilder { node: node() })
 }
@@ -457,11 +465,68 @@ fn subscription_records_round_trip_through_nota_text() {
 }
 
 #[test]
+fn daemon_configuration_round_trips_through_nota_text() {
+    round_trip_nota(
+        LojixDaemonConfiguration {
+            daemon_socket_path: wire_path("/tmp/lojix-daemon.sock"),
+            daemon_socket_mode: SocketMode::new(0o660),
+            daemon_socket_group: None,
+            state_directory: wire_path("/tmp/lojix-state"),
+            gc_root_directory: wire_path("/tmp/lojix-gcroots"),
+            peer_daemons: Vec::new(),
+            operator_identity: operator_identity(),
+            owned_cluster: cluster(),
+        },
+        "(LojixDaemonConfiguration \"/tmp/lojix-daemon.sock\" 432 None \"/tmp/lojix-state\" \"/tmp/lojix-gcroots\" [] operator goldragon)",
+    );
+}
+
+#[test]
+fn cli_configuration_round_trips_through_nota_text() {
+    round_trip_nota(
+        LojixCliConfiguration {
+            daemon_socket_path: wire_path("/tmp/lojix-daemon.sock"),
+            reply_rendering: ReplyRendering::Compact,
+        },
+        "(LojixCliConfiguration \"/tmp/lojix-daemon.sock\" Compact)",
+    );
+}
+
+#[test]
+fn daemon_configuration_decodes_from_rkyv_bytes() {
+    let configuration = LojixDaemonConfiguration {
+        daemon_socket_path: wire_path("/tmp/lojix-daemon.sock"),
+        daemon_socket_mode: SocketMode::new(0o600),
+        daemon_socket_group: None,
+        state_directory: wire_path("/tmp/lojix-state"),
+        gc_root_directory: wire_path("/tmp/lojix-gcroots"),
+        peer_daemons: Vec::new(),
+        operator_identity: operator_identity(),
+        owned_cluster: cluster(),
+    };
+    let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&configuration).expect("rkyv encode");
+    let decoded =
+        <LojixDaemonConfiguration as nota_config::ConfigurationRecord>::from_rkyv_bytes(&bytes)
+            .expect("rkyv decode");
+    assert_eq!(decoded, configuration);
+}
+
+#[test]
+fn cli_configuration_rejects_rkyv_bytes() {
+    let err =
+        <LojixCliConfiguration as nota_config::ConfigurationRecord>::from_rkyv_bytes(b"not-rkyv")
+            .expect_err("cli configuration is nota-only");
+    assert!(matches!(err, nota_config::Error::RkyvNotSupported(_)));
+}
+
+#[test]
 fn validation_newtypes_reject_invalid_boundary_text() {
     assert!(ClusterName::from_text("").is_err());
     assert!(NodeName::from_text("not a node").is_err());
     assert!(FailureText::from_text("two\nlines").is_err());
     assert!(StorePath::from_text("/tmp/not-store").is_err());
+    assert!(WirePath::from_text("two\nlines").is_err());
+    assert!(UnixGroup::from_text("not a group").is_err());
     assert!(
         DerivationPath::from_text("/nix/store/00000000000000000000000000000000-criomos").is_err()
     );
