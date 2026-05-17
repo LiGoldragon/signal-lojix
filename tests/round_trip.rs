@@ -471,13 +471,14 @@ fn daemon_configuration_round_trips_through_nota_text() {
             daemon_socket_path: wire_path("/tmp/lojix-daemon.sock"),
             daemon_socket_mode: SocketMode::new(0o660),
             daemon_socket_group: None,
+            horizon_configuration_source: wire_path("/tmp/horizon.nota"),
             state_directory: wire_path("/tmp/lojix-state"),
             gc_root_directory: wire_path("/tmp/lojix-gcroots"),
             peer_daemons: Vec::new(),
             operator_identity: operator_identity(),
             owned_cluster: cluster(),
         },
-        "(LojixDaemonConfiguration \"/tmp/lojix-daemon.sock\" 432 None \"/tmp/lojix-state\" \"/tmp/lojix-gcroots\" [] operator goldragon)",
+        "(LojixDaemonConfiguration \"/tmp/lojix-daemon.sock\" 432 None \"/tmp/horizon.nota\" \"/tmp/lojix-state\" \"/tmp/lojix-gcroots\" [] operator goldragon)",
     );
 }
 
@@ -498,6 +499,7 @@ fn daemon_configuration_decodes_from_rkyv_bytes() {
         daemon_socket_path: wire_path("/tmp/lojix-daemon.sock"),
         daemon_socket_mode: SocketMode::new(0o600),
         daemon_socket_group: None,
+        horizon_configuration_source: wire_path("/tmp/horizon.nota"),
         state_directory: wire_path("/tmp/lojix-state"),
         gc_root_directory: wire_path("/tmp/lojix-gcroots"),
         peer_daemons: Vec::new(),

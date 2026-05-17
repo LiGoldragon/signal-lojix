@@ -291,6 +291,7 @@ pub struct LojixDaemonConfiguration {
     pub daemon_socket_path: WirePath,
     pub daemon_socket_mode: SocketMode,
     pub daemon_socket_group: Option<UnixGroup>,
+    pub horizon_configuration_source: WirePath,
     pub state_directory: WirePath,
     pub gc_root_directory: WirePath,
     pub peer_daemons: Vec<PeerDaemonBinding>,

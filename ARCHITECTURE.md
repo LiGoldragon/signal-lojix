@@ -141,8 +141,9 @@ store path, and state.
 
 `LojixDaemonConfiguration` is the typed control-plane record for
 `lojix-daemon`. It names the daemon socket path and mode, optional Unix
-group, state directory, GC-root directory, peer daemon bindings,
-operator identity, and owned cluster. It uses
+group, pan-horizon configuration source, state directory, GC-root
+directory, peer daemon bindings, operator identity, and owned cluster.
+It uses
 `nota_config::impl_rkyv_configuration!`, so supervised launchers may pass
 either NOTA or rkyv configuration files.
 
