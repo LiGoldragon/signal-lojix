@@ -40,6 +40,14 @@ Transport: Unix socket at `/run/lojix/daemon.sock` carrying
 `signal-core` frames. The transport itself belongs to `lojix`, not
 this contract.
 
+The human-facing `lojix` CLI is only a text adapter for this channel.
+It decodes one NOTA `Request`, sends it over the daemon socket, renders
+one NOTA `Reply`, and exits. It does not own Horizon projection, Nix
+invocation, GC-root updates, deployment ledgers, sema state, or any
+other effect-bearing deploy action. Those actions are daemon-owned and
+are reached only by sending typed `signal-lojix` requests to
+`lojix-daemon`.
+
 ## 2 · Channel Surface
 
 The implemented channel has one `signal_channel!` declaration. It is a
@@ -156,6 +164,10 @@ configuration is human-readable NOTA, not rkyv.
 
 These records are configuration only. Deploy plans, generation queries,
 and cache-retention mutations remain data-plane `Request` payloads.
+The CLI configuration never carries pan-Horizon paths, cluster proposal
+paths, Nix flake references, builder choices, or deploy plans; the CLI
+forwards those only when they appear inside the typed data-plane
+request.
 
 ## 4 · Boundary Rules
 
@@ -174,6 +186,8 @@ and cache-retention mutations remain data-plane `Request` payloads.
 - Startup configuration records live here because this is the contract
   crate for Lojix binaries. The daemon record supports rkyv; the CLI
   record is NOTA-only.
+- The contract preserves the CLI/daemon split: the CLI surface is a
+  caller of the channel, not an implementation of the deploy pipeline.
 
 ## 5 · Tests
 
