@@ -48,6 +48,20 @@ other effect-bearing deploy action. Those actions are daemon-owned and
 are reached only by sending typed `signal-lojix` requests to
 `lojix-daemon`.
 
+For the human-facing CLI, the channel has exactly one peer:
+`lojix-daemon`.
+
+```mermaid
+flowchart LR
+    cli["lojix CLI<br/>text adapter only"] -->|Signal request frame| daemon["lojix-daemon"]
+    daemon -->|Signal reply frame| cli
+```
+
+No CLI-to-Horizon relationship exists in this contract. Paths to
+pan-Horizon configuration, cluster proposals, flakes, builders, or
+deploy plans are data-plane payload content for daemon-owned handlers,
+not CLI-owned peers or configuration.
+
 ## 2 · Channel Surface
 
 The implemented channel has one `signal_channel!` declaration. It is a
@@ -228,5 +242,3 @@ tests/round_trip.rs    # frame, NOTA, validation, and boundary tests
   structural precedent for shape.
 - `lojix` at `github:LiGoldragon/lojix` is the consumer whose
   evolution drives this contract.
-- Today's `lojix-cli` at `github:LiGoldragon/lojix-cli` is the current
-  operator surface; it retires after CriomOS migrates to `lojix`.
