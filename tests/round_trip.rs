@@ -67,6 +67,18 @@ fn deployment_plan() -> DeploymentPlan {
     })
 }
 
+fn deployment_submission() -> DeploymentSubmission {
+    DeploymentSubmission {
+        cluster: cluster(),
+        node: node(),
+        source: proposal_source(),
+        flake: flake_reference(),
+        plan: deployment_plan(),
+        builder: builder_selection(),
+        substituters: vec![NodeName::from_text("prometheus").expect("node name")],
+    }
+}
+
 fn generation() -> Generation {
     Generation {
         generation: generation_id(),
@@ -186,17 +198,43 @@ where
 
 #[test]
 fn deployment_submission_round_trips_through_length_prefixed_frame() {
-    let request = Request::DeploymentSubmission(DeploymentSubmission {
-        cluster: cluster(),
-        node: node(),
-        source: proposal_source(),
-        flake: flake_reference(),
-        plan: deployment_plan(),
-        builder: builder_selection(),
-        substituters: vec![NodeName::from_text("prometheus").expect("node name")],
-    });
+    let request = Request::DeploymentSubmission(deployment_submission());
 
     assert_eq!(round_trip_request(request.clone()), request);
+}
+
+#[test]
+fn deployment_submission_digest_is_stable_over_canonical_bytes() {
+    let submission = deployment_submission();
+    let first = submission
+        .canonical_digest()
+        .expect("deployment request digest");
+    let second = submission
+        .canonical_digest()
+        .expect("deployment request digest");
+    let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&submission).expect("canonical bytes");
+
+    assert_eq!(first, second);
+    assert_eq!(first, DeploymentRequestDigest::from_canonical_bytes(&bytes));
+    assert_eq!(first.as_str().len(), 64);
+}
+
+#[test]
+fn deployment_submission_digest_changes_when_request_content_changes() {
+    let submission = deployment_submission();
+    let changed = DeploymentSubmission {
+        node: NodeName::from_text("zeus").expect("node name"),
+        ..submission.clone()
+    };
+
+    assert_ne!(
+        submission
+            .canonical_digest()
+            .expect("deployment request digest"),
+        changed
+            .canonical_digest()
+            .expect("changed deployment request digest")
+    );
 }
 
 #[test]

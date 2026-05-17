@@ -22,6 +22,8 @@ pub enum Error {
     InvalidSingleLineText { kind: &'static str, value: String },
     #[error("{kind} must be a single /nix/store path: {value}")]
     InvalidStorePath { kind: &'static str, value: String },
+    #[error("canonical deployment request bytes could not be encoded: {0}")]
+    CanonicalDeploymentRequestUnavailable(String),
 }
 
 macro_rules! validated_identifier {
@@ -245,6 +247,7 @@ validated_single_line_text!(FlakeReference, "flake reference");
 validated_single_line_text!(FailureText, "failure text");
 validated_single_line_text!(WirePath, "wire path");
 validated_single_line_text!(OperatorIdentity, "operator identity");
+validated_single_line_text!(DeploymentRequestDigest, "deployment request digest");
 validated_identifier!(UnixGroup, "unix group");
 
 validated_store_path!(StorePath, "store path", "");
@@ -390,6 +393,20 @@ pub struct DeploymentSubmission {
     pub plan: DeploymentPlan,
     pub builder: BuilderSelection,
     pub substituters: Vec<NodeName>,
+}
+
+impl DeploymentRequestDigest {
+    pub fn from_canonical_bytes(bytes: &[u8]) -> Self {
+        Self(blake3::hash(bytes).to_hex().to_string())
+    }
+}
+
+impl DeploymentSubmission {
+    pub fn canonical_digest(&self) -> Result<DeploymentRequestDigest> {
+        let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(self)
+            .map_err(|error| Error::CanonicalDeploymentRequestUnavailable(error.to_string()))?;
+        Ok(DeploymentRequestDigest::from_canonical_bytes(&bytes))
+    }
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]

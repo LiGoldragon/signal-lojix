@@ -30,6 +30,9 @@ orchestrator.
   `signal_core::signal_channel!`.
 - Deployment records: `DeploymentSubmission`, `DeploymentAccepted`,
   `DeploymentRejected`, and `DeploymentObservation`.
+- `DeploymentRequestDigest`, produced by
+  `DeploymentSubmission::canonical_digest()` from the rkyv canonical
+  request payload for Criome authorization.
 - Cache-retention records: `CacheRetentionRequest`,
   `CacheRetentionAccepted`, `CacheRetentionRejected`, and
   `CacheRetentionObservation`.
@@ -52,6 +55,9 @@ orchestrator.
 - Sum variants use the variant-name equals payload-type-name pattern.
 - Request variants own their `SignalVerb` mapping through
   `Request::signal_verb()`.
+- Deployment authorization digests are computed by the contract type
+  from typed rkyv bytes. Do not hash CLI text or a daemon-local
+  reconstruction of a deployment request.
 - Observations are pushed stream events, not ordinary reply variants.
 - Configuration records stay control-plane only. Requests carry deploy
   and query data; configuration carries sockets, paths, identity, and

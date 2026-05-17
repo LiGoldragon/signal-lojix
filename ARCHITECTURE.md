@@ -145,6 +145,12 @@ events. They carry `DeploymentPhase`, whose variants name the visible
 lifecycle stages: submitted, building, built, closure-copying,
 activation-running, activation-succeeded, and failed.
 
+`DeploymentSubmission::canonical_digest()` hashes the rkyv canonical
+bytes of the full request payload with BLAKE3 and returns a
+`DeploymentRequestDigest`. `lojix-daemon` presents that digest to
+`criome-daemon` for routed authorization before any Nix, store, cache,
+or activation effect can run.
+
 ### 3.2 Cache Retention
 
 `CacheRetentionRequest` carries a `GenerationId` plus a typed
@@ -197,6 +203,9 @@ request.
   deployment submission is `Assert`, cache retention is `Mutate`, and
   generation query is `Match`; observation subscriptions are
   `Subscribe`; observation retractions are `Retract`.
+- `DeploymentSubmission` owns its canonical request digest helper. The
+  digest is over the typed rkyv payload, not CLI text, logs, file
+  paths outside the record, or an implementation-local reconstruction.
 - Startup configuration records live here because this is the contract
   crate for Lojix binaries. The daemon record supports rkyv; the CLI
   record is NOTA-only.
@@ -211,6 +220,9 @@ request.
   length-prefixed `signal-core` frame.
 - `test-signal-verb-mapping` — request variants carry the expected
   `signal-core::SignalVerb`.
+- `deployment_submission_digest_is_stable_over_canonical_bytes` and
+  `deployment_submission_digest_changes_when_request_content_changes`
+  — routed authorization hashes the canonical typed request payload.
 - `stream_relation_witnesses_are_generated_by_the_channel_macro` —
   subscriptions open the declared stream, retractions close it, and
   events report the stream they belong to.
