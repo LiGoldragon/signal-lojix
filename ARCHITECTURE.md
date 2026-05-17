@@ -61,10 +61,47 @@ compile time.
 | `CacheRetentionObservation` (subscribe) | `Subscribe` | Subscriber → daemon: stream cache-retention transitions. Opens `CacheRetentionEventStream`. |
 | `StreamClose` | `Retract` | Subscriber → daemon: end an open subscription by token. Closes either stream. |
 
+### Authority direction
+
+Per `signal-core/ARCHITECTURE.md` §1 and
+`~/primary/skills/contract-repo.md` §"Signal is the database
+language", each verb encodes an authority direction:
+
+- **`DeploymentSubmission` is `Assert`, not `Mutate`.** The
+  operator submits a request that becomes a typed fact in the
+  daemon's store; the daemon then evaluates the request against
+  its criome-mediated authorization gate before any
+  cluster-mutating effect runs. The verb is `Assert` because the
+  submission is *"a new typed fact entered the system"*, not an
+  authority order the daemon must obey-and-confirm. Authority for
+  the actual deploy effect flows through criome (see
+  `criome/ARCHITECTURE.md` §"Authorization model" and lojix's
+  `CriomeAuthorizationActor`).
+- **`CacheRetentionRequest` is `Mutate`** — an authority order
+  from the operator to the daemon to change a generation's
+  live-set entry (pin / unpin / retire). The daemon obeys and
+  confirms; the operator transitions its own state from
+  *possibly-mutated* to *now-mutated* on the typed reply.
+- **`Subscribe` flows observer ↔ producer.** Observers up-tree
+  subscribe to the daemon's pushed events (per `skills/push-not-pull.md`).
+- **`StreamClose` is `Retract`** — subscriber-initiated; the
+  subscriber retracts its own subscription. This is a self-retraction,
+  not a top-down order.
+
 ### Reply variants
 
 `DeploymentAccepted`, `DeploymentRejected`, `CacheRetentionAccepted`,
 `CacheRetentionRejected`, `GenerationListing`, `StreamOpened`.
+
+Replies do **not** declare their own `SignalVerb`. They are causally
+tied to the request they answer; their legality is checked against
+that request's operation. Per `~/primary/skills/contract-repo.md`
+§"Reply discipline": if a future *"reply"* becomes a standalone
+observation that travels independently (e.g., a long-lived
+deployment-phase event observed by a subscriber other than the
+issuing operator), it lands as its own request variant — `Assert`
+for a new fact, `Subscribe` for a streaming observation — never as
+a verb-less message.
 
 ### Event variants (streaming)
 
@@ -103,6 +140,11 @@ rewrites GC roots.
   and are not exported here. Boundary test: every type in
   `signal-lojix` is reachable from at least one socket handler in
   the consumer daemon.
+- Domain payload-to-verb mapping lives in this contract crate (in
+  the `signal_channel!` declaration), not in `lojix` or its CLI.
+  Per `~/primary/skills/contract-repo.md` §"Signal is the database
+  language": *"Every cross-component Signal request declares its
+  root verb. The verb is part of the contract."*
 
 ## 4 · Constraints
 
@@ -126,6 +168,10 @@ rewrites GC roots.
 ## 5 · Cross-Cutting Context
 
 - Workspace `~/primary/ESSENCE.md` is upstream of every rule.
+- `~/primary/skills/contract-repo.md` is the canonical discipline
+  for contract crates — verb spine, named-relation discipline,
+  reply discipline, layered-vs-base distinction, NOTA-on-contract-
+  types. This contract follows it.
 - `signal-core` at `github:LiGoldragon/signal-core` is the wire
   kernel. Two frame types: `ExchangeFrame` (no streams) and
   `StreamingFrame` (with streams); this channel uses
