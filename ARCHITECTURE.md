@@ -2,12 +2,26 @@
 
 *Typed Signal contract for the lojix deploy orchestrator.*
 
-> **Status (2026-05-16):** contract + typed configuration slice on
-> `horizon-re-engineering`. The crate defines typed deploy,
+> **Status:** contract + typed configuration slice on
+> `horizon-leaner-shape`. The crate defines typed deploy,
 > cache-retention, generation-query, observation-stream, and
 > `nota-config` startup configuration records, declares the
-> `signal-core` channel, and exposes Nix-backed round-trip and
-> boundary tests.
+> `signal-frame` channel with contract-local operation verbs, and
+> exposes Nix-backed round-trip and boundary tests.
+
+## Migration history — contract-local verbs
+
+The channel uses contract-local operation verbs per
+`primary/reports/designer/241-signal-architecture-migration-guide.md`:
+`Deploy` (was `Assert DeploymentSubmission`), `Pin`/`Unpin`/`Retire`
+(split from `Mutate CacheRetentionRequest` so the three actions surface
+as distinct public operations), `Query` (was `Match GenerationQuery`),
+`WatchDeployments` + `UnwatchDeployments` and `WatchCacheRetention` +
+`UnwatchCacheRetention` (was the `Subscribe`/`Retract` pair per
+stream). Verb-to-Sema lowering moves into the `lojix-daemon` executor;
+this contract no longer declares Sema-side intent. The dependency on
+`signal-core` shifted to `signal-frame`; no dependency on `signal-sema`
+since lojix does not speak Sema directly on its public surface.
 
 ## 0 · TL;DR
 
