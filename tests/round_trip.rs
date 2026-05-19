@@ -1,7 +1,8 @@
 use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
-use signal_core::{
-    ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply as CoreReply, RequestPayload,
-    SessionEpoch, SignalVerb, StreamEventIdentifier, SubReply, SubscriptionTokenInner,
+use signal_frame::{
+    ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply as FrameReply, RequestPayload,
+    SessionEpoch, StreamEventIdentifier, StreamingFrame, StreamingFrameBody, SubReply,
+    SubscriptionTokenInner,
 };
 use signal_lojix::*;
 
@@ -44,7 +45,7 @@ fn proposal_source() -> ProposalSource {
 }
 
 fn flake_reference() -> FlakeReference {
-    FlakeReference::from_text("github:LiGoldragon/CriomOS/horizon-re-engineering")
+    FlakeReference::from_text("github:LiGoldragon/CriomOS/horizon-leaner-shape")
         .expect("flake reference")
 }
 
@@ -67,8 +68,8 @@ fn deployment_plan() -> DeploymentPlan {
     })
 }
 
-fn deployment_submission() -> DeploymentSubmission {
-    DeploymentSubmission {
+fn deployment_request() -> DeploymentRequest {
+    DeploymentRequest {
         cluster: cluster(),
         node: node(),
         source: proposal_source(),
@@ -125,39 +126,38 @@ fn stream_event() -> StreamEventIdentifier {
     )
 }
 
-fn round_trip_request(request: Request) -> Request {
-    let expected_verb = request.signal_verb();
-    let frame = LojixFrame::new(LojixFrameBody::Request {
+fn round_trip_operation(operation: LojixOperation) -> LojixOperation {
+    let request = operation.clone().into_request();
+    let frame = LojixFrame::new(StreamingFrameBody::Request {
         exchange: exchange(),
-        request: request.into_request(),
+        request,
     });
     let bytes = frame.encode_length_prefixed().expect("encode frame");
-    let decoded = LojixFrame::decode_length_prefixed(&bytes).expect("decode frame");
+    let decoded =
+        StreamingFrame::<LojixOperation, LojixReply, LojixEvent>::decode_length_prefixed(&bytes)
+            .expect("decode frame");
 
     match decoded.into_body() {
-        LojixFrameBody::Request { request, .. } => {
-            let operation = request.operations().head();
-            assert_eq!(operation.verb, expected_verb);
-            operation.payload.clone()
-        }
+        StreamingFrameBody::Request { request, .. } => request.payloads().head().clone(),
         other => panic!("expected request frame, got {other:?}"),
     }
 }
 
-fn round_trip_reply(reply: Reply) -> Reply {
-    let frame = LojixFrame::new(LojixFrameBody::Reply {
+fn round_trip_reply(reply: LojixReply) -> LojixReply {
+    let frame = LojixFrame::new(StreamingFrameBody::Reply {
         exchange: exchange(),
-        reply: CoreReply::completed(NonEmpty::single(SubReply::Ok {
-            verb: SignalVerb::Assert,
+        reply: FrameReply::completed(NonEmpty::single(SubReply::Ok {
             payload: reply.clone(),
         })),
     });
     let bytes = frame.encode_length_prefixed().expect("encode frame");
-    let decoded = LojixFrame::decode_length_prefixed(&bytes).expect("decode frame");
+    let decoded =
+        StreamingFrame::<LojixOperation, LojixReply, LojixEvent>::decode_length_prefixed(&bytes)
+            .expect("decode frame");
 
     match decoded.into_body() {
-        LojixFrameBody::Reply { reply, .. } => match reply {
-            CoreReply::Accepted { per_operation, .. } => match per_operation.into_head() {
+        StreamingFrameBody::Reply { reply, .. } => match reply {
+            FrameReply::Accepted { per_operation, .. } => match per_operation.into_head() {
                 SubReply::Ok { payload, .. } => payload,
                 other => panic!("expected accepted reply payload, got {other:?}"),
             },
@@ -167,17 +167,19 @@ fn round_trip_reply(reply: Reply) -> Reply {
     }
 }
 
-fn round_trip_event(event: Event) -> Event {
-    let frame = LojixFrame::new(LojixFrameBody::SubscriptionEvent {
+fn round_trip_event(event: LojixEvent) -> LojixEvent {
+    let frame = LojixFrame::new(StreamingFrameBody::SubscriptionEvent {
         event_identifier: stream_event(),
         token: SubscriptionTokenInner::new(1),
         event,
     });
     let bytes = frame.encode_length_prefixed().expect("encode frame");
-    let decoded = LojixFrame::decode_length_prefixed(&bytes).expect("decode frame");
+    let decoded =
+        StreamingFrame::<LojixOperation, LojixReply, LojixEvent>::decode_length_prefixed(&bytes)
+            .expect("decode frame");
 
     match decoded.into_body() {
-        LojixFrameBody::SubscriptionEvent { event, .. } => event,
+        StreamingFrameBody::SubscriptionEvent { event, .. } => event,
         other => panic!("expected subscription event frame, got {other:?}"),
     }
 }
@@ -197,22 +199,22 @@ where
 }
 
 #[test]
-fn deployment_submission_round_trips_through_length_prefixed_frame() {
-    let request = Request::DeploymentSubmission(deployment_submission());
+fn deploy_operation_round_trips_through_length_prefixed_frame() {
+    let operation = LojixOperation::Deploy(deployment_request());
 
-    assert_eq!(round_trip_request(request.clone()), request);
+    assert_eq!(round_trip_operation(operation.clone()), operation);
 }
 
 #[test]
-fn deployment_submission_digest_is_stable_over_canonical_bytes() {
-    let submission = deployment_submission();
-    let first = submission
+fn deployment_request_digest_is_stable_over_canonical_bytes() {
+    let request = deployment_request();
+    let first = request
         .canonical_digest()
         .expect("deployment request digest");
-    let second = submission
+    let second = request
         .canonical_digest()
         .expect("deployment request digest");
-    let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&submission).expect("canonical bytes");
+    let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&request).expect("canonical bytes");
 
     assert_eq!(first, second);
     assert_eq!(first, DeploymentRequestDigest::from_canonical_bytes(&bytes));
@@ -220,15 +222,15 @@ fn deployment_submission_digest_is_stable_over_canonical_bytes() {
 }
 
 #[test]
-fn deployment_submission_digest_changes_when_request_content_changes() {
-    let submission = deployment_submission();
-    let changed = DeploymentSubmission {
+fn deployment_request_digest_changes_when_request_content_changes() {
+    let request = deployment_request();
+    let changed = DeploymentRequest {
         node: NodeName::from_text("zeus").expect("node name"),
-        ..submission.clone()
+        ..request.clone()
     };
 
     assert_ne!(
-        submission
+        request
             .canonical_digest()
             .expect("deployment request digest"),
         changed
@@ -238,182 +240,120 @@ fn deployment_submission_digest_changes_when_request_content_changes() {
 }
 
 #[test]
-fn cache_retention_request_round_trips_through_length_prefixed_frame() {
-    let request = Request::CacheRetentionRequest(CacheRetentionRequest {
+fn cache_retention_operations_round_trip_through_length_prefixed_frame() {
+    let pin = LojixOperation::Pin(Pin {
         generation: generation_id(),
-        action: CacheRetentionAction::PinGeneration(PinGeneration {}),
+    });
+    let unpin = LojixOperation::Unpin(Unpin {
+        generation: generation_id(),
+    });
+    let retire = LojixOperation::Retire(Retire {
+        generation: generation_id(),
     });
 
-    assert_eq!(round_trip_request(request.clone()), request);
+    assert_eq!(round_trip_operation(pin.clone()), pin);
+    assert_eq!(round_trip_operation(unpin.clone()), unpin);
+    assert_eq!(round_trip_operation(retire.clone()), retire);
 }
 
 #[test]
-fn generation_query_round_trips_through_length_prefixed_frame() {
-    let request = Request::GenerationQuery(GenerationQuery {
+fn query_operation_round_trips_through_length_prefixed_frame() {
+    let operation = LojixOperation::Query(GenerationQuery {
         cluster: Some(cluster()),
         node: None,
         kind: Some(GenerationKind::HomeOnly),
     });
 
-    assert_eq!(round_trip_request(request.clone()), request);
+    assert_eq!(round_trip_operation(operation.clone()), operation);
 }
 
 #[test]
-fn observation_subscription_requests_round_trip_through_length_prefixed_frame() {
-    let deployment_subscription =
-        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
-            cluster: Some(cluster()),
-            node: Some(node()),
-            deployment: Some(deployment()),
-        });
-    let cache_subscription =
-        Request::CacheRetentionObservationSubscription(CacheRetentionObservationSubscription {
-            generation: Some(generation_id()),
-        });
-    let deployment_retraction =
-        Request::DeploymentObservationRetraction(DeploymentObservationToken::new(1));
-    let cache_retraction =
-        Request::CacheRetentionObservationRetraction(CacheRetentionObservationToken::new(2));
+fn watch_and_unwatch_operations_round_trip_through_length_prefixed_frame() {
+    let watch_deployments = LojixOperation::WatchDeployments(WatchDeployments {
+        cluster: Some(cluster()),
+        node: Some(node()),
+        deployment: Some(deployment()),
+    });
+    let watch_cache = LojixOperation::WatchCacheRetention(WatchCacheRetention {
+        generation: Some(generation_id()),
+    });
+    let unwatch_deployments =
+        LojixOperation::UnwatchDeployments(DeploymentObservationToken::new(1));
+    let unwatch_cache =
+        LojixOperation::UnwatchCacheRetention(CacheRetentionObservationToken::new(2));
 
     assert_eq!(
-        round_trip_request(deployment_subscription.clone()),
-        deployment_subscription
+        round_trip_operation(watch_deployments.clone()),
+        watch_deployments
     );
+    assert_eq!(round_trip_operation(watch_cache.clone()), watch_cache);
     assert_eq!(
-        round_trip_request(cache_subscription.clone()),
-        cache_subscription
+        round_trip_operation(unwatch_deployments.clone()),
+        unwatch_deployments
     );
-    assert_eq!(
-        round_trip_request(deployment_retraction.clone()),
-        deployment_retraction
-    );
-    assert_eq!(
-        round_trip_request(cache_retraction.clone()),
-        cache_retraction
-    );
-}
-
-#[test]
-fn request_variants_have_expected_signal_verbs() {
-    let deployment_request = Request::DeploymentSubmission(DeploymentSubmission {
-        cluster: cluster(),
-        node: node(),
-        source: proposal_source(),
-        flake: flake_reference(),
-        plan: deployment_plan(),
-        builder: builder_selection(),
-        substituters: Vec::new(),
-    });
-    let cache_request = Request::CacheRetentionRequest(CacheRetentionRequest {
-        generation: generation_id(),
-        action: CacheRetentionAction::RetireGeneration(RetireGeneration {}),
-    });
-    let query_request = Request::GenerationQuery(GenerationQuery {
-        cluster: None,
-        node: None,
-        kind: None,
-    });
-    let deployment_subscription =
-        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
-            cluster: None,
-            node: None,
-            deployment: None,
-        });
-    let cache_subscription =
-        Request::CacheRetentionObservationSubscription(CacheRetentionObservationSubscription {
-            generation: None,
-        });
-    let deployment_retraction =
-        Request::DeploymentObservationRetraction(DeploymentObservationToken::new(1));
-    let cache_retraction =
-        Request::CacheRetentionObservationRetraction(CacheRetentionObservationToken::new(2));
-
-    assert_eq!(
-        deployment_request.signal_verb(),
-        signal_core::SignalVerb::Assert
-    );
-    assert_eq!(cache_request.signal_verb(), signal_core::SignalVerb::Mutate);
-    assert_eq!(query_request.signal_verb(), signal_core::SignalVerb::Match);
-    assert_eq!(
-        deployment_subscription.signal_verb(),
-        signal_core::SignalVerb::Subscribe
-    );
-    assert_eq!(
-        cache_subscription.signal_verb(),
-        signal_core::SignalVerb::Subscribe
-    );
-    assert_eq!(
-        deployment_retraction.signal_verb(),
-        signal_core::SignalVerb::Retract
-    );
-    assert_eq!(
-        cache_retraction.signal_verb(),
-        signal_core::SignalVerb::Retract
-    );
+    assert_eq!(round_trip_operation(unwatch_cache.clone()), unwatch_cache);
 }
 
 #[test]
 fn stream_relation_witnesses_are_generated_by_the_channel_macro() {
-    let deployment_subscription =
-        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
-            cluster: None,
-            node: None,
-            deployment: None,
-        });
-    let cache_subscription =
-        Request::CacheRetentionObservationSubscription(CacheRetentionObservationSubscription {
-            generation: None,
-        });
-    let deployment_retraction =
-        Request::DeploymentObservationRetraction(DeploymentObservationToken::new(1));
-    let cache_retraction =
-        Request::CacheRetentionObservationRetraction(CacheRetentionObservationToken::new(2));
+    let watch_deployments = LojixOperation::WatchDeployments(WatchDeployments {
+        cluster: None,
+        node: None,
+        deployment: None,
+    });
+    let watch_cache = LojixOperation::WatchCacheRetention(WatchCacheRetention { generation: None });
+    let unwatch_deployments =
+        LojixOperation::UnwatchDeployments(DeploymentObservationToken::new(1));
+    let unwatch_cache =
+        LojixOperation::UnwatchCacheRetention(CacheRetentionObservationToken::new(2));
 
     assert_eq!(
-        deployment_subscription.opened_stream(),
+        watch_deployments.opened_stream(),
         Some(LojixStreamKind::DeploymentObservationStream)
     );
     assert_eq!(
-        cache_subscription.opened_stream(),
+        watch_cache.opened_stream(),
         Some(LojixStreamKind::CacheRetentionObservationStream)
     );
     assert_eq!(
-        deployment_retraction.closed_stream(),
+        unwatch_deployments.closed_stream(),
         Some(LojixStreamKind::DeploymentObservationStream)
     );
     assert_eq!(
-        cache_retraction.closed_stream(),
+        unwatch_cache.closed_stream(),
         Some(LojixStreamKind::CacheRetentionObservationStream)
     );
 
     assert_eq!(
-        Event::DeploymentObservation(deployment_observation()).stream_kind(),
+        LojixEvent::DeploymentObservation(deployment_observation()).stream_kind(),
         LojixStreamKind::DeploymentObservationStream
     );
     assert_eq!(
-        Event::CacheRetentionObservation(cache_retention_observation()).stream_kind(),
+        LojixEvent::CacheRetentionObservation(cache_retention_observation()).stream_kind(),
         LojixStreamKind::CacheRetentionObservationStream
     );
 }
 
 #[test]
 fn deployment_replies_round_trip_through_length_prefixed_frame() {
-    let accepted = Reply::DeploymentAccepted(DeploymentAccepted {
+    let accepted = LojixReply::DeploymentAccepted(DeploymentAccepted {
         deployment: deployment(),
     });
-    let rejected = Reply::DeploymentRejected(DeploymentRejected {
+    let rejected = LojixReply::DeploymentRejected(DeploymentRejected {
         reason: DeploymentRejectionReason::BuilderUnavailable,
         detail: Some(FailureText::from_text("builder is not reachable").expect("failure text")),
     });
-    let opened =
-        Reply::DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened {
+    let opened = LojixReply::DeploymentObservationSubscriptionOpened(
+        DeploymentObservationSubscriptionOpened {
             token: DeploymentObservationToken::new(1),
             observations: vec![deployment_observation()],
-        });
-    let closed =
-        Reply::DeploymentObservationSubscriptionClosed(DeploymentObservationSubscriptionClosed {
+        },
+    );
+    let closed = LojixReply::DeploymentObservationSubscriptionClosed(
+        DeploymentObservationSubscriptionClosed {
             token: DeploymentObservationToken::new(1),
-        });
+        },
+    );
 
     assert_eq!(round_trip_reply(accepted.clone()), accepted);
     assert_eq!(round_trip_reply(rejected.clone()), rejected);
@@ -423,20 +363,20 @@ fn deployment_replies_round_trip_through_length_prefixed_frame() {
 
 #[test]
 fn cache_retention_replies_round_trip_through_length_prefixed_frame() {
-    let accepted = Reply::CacheRetentionAccepted(CacheRetentionAccepted {
+    let accepted = LojixReply::CacheRetentionAccepted(CacheRetentionAccepted {
         mutation: mutation(),
     });
-    let rejected = Reply::CacheRetentionRejected(CacheRetentionRejected {
+    let rejected = LojixReply::CacheRetentionRejected(CacheRetentionRejected {
         reason: CacheRetentionRejectionReason::PolicyConflict,
         detail: None,
     });
-    let opened = Reply::CacheRetentionObservationSubscriptionOpened(
+    let opened = LojixReply::CacheRetentionObservationSubscriptionOpened(
         CacheRetentionObservationSubscriptionOpened {
             token: CacheRetentionObservationToken::new(2),
             observations: vec![cache_retention_observation()],
         },
     );
-    let closed = Reply::CacheRetentionObservationSubscriptionClosed(
+    let closed = LojixReply::CacheRetentionObservationSubscriptionClosed(
         CacheRetentionObservationSubscriptionClosed {
             token: CacheRetentionObservationToken::new(2),
         },
@@ -450,8 +390,8 @@ fn cache_retention_replies_round_trip_through_length_prefixed_frame() {
 
 #[test]
 fn observation_events_round_trip_through_subscription_event_frame() {
-    let deployment_event = Event::DeploymentObservation(deployment_observation());
-    let cache_event = Event::CacheRetentionObservation(cache_retention_observation());
+    let deployment_event = LojixEvent::DeploymentObservation(deployment_observation());
+    let cache_event = LojixEvent::CacheRetentionObservation(cache_retention_observation());
 
     assert_eq!(round_trip_event(deployment_event.clone()), deployment_event);
     assert_eq!(round_trip_event(cache_event.clone()), cache_event);
@@ -459,7 +399,7 @@ fn observation_events_round_trip_through_subscription_event_frame() {
 
 #[test]
 fn generation_listing_round_trips_through_length_prefixed_frame() {
-    let reply = Reply::GenerationListing(GenerationListing {
+    let reply = LojixReply::GenerationListing(GenerationListing {
         generations: vec![generation()],
     });
 
@@ -468,37 +408,35 @@ fn generation_listing_round_trips_through_length_prefixed_frame() {
 
 #[test]
 fn sum_records_round_trip_through_nota_text() {
-    round_trip_nota(deployment_plan(), "(HomeOnlyDeployment li Activate)");
-    round_trip_nota(builder_selection(), "(NamedBuilder ouranos)");
-    round_trip_nota(
-        CacheRetentionAction::RetireGeneration(RetireGeneration {}),
-        "(RetireGeneration)",
-    );
+    round_trip_nota(deployment_plan(), "(HomeOnlyDeployment (li Activate))");
+    round_trip_nota(builder_selection(), "(NamedBuilder (ouranos))");
     round_trip_nota(
         DeploymentPhase::DeploymentFailed(DeploymentFailed {
             deployment: deployment(),
             reason: FailureText::from_text("activation failed").expect("failure text"),
         }),
-        "(DeploymentFailed deploy_aab \"activation failed\")",
+        "(DeploymentFailed (deploy_aab \"activation failed\"))",
     );
 }
 
 #[test]
-fn subscription_records_round_trip_through_nota_text() {
+fn watch_operation_round_trips_through_nota_text() {
     round_trip_nota(
-        Request::DeploymentObservationSubscription(DeploymentObservationSubscription {
+        LojixOperation::WatchDeployments(WatchDeployments {
             cluster: Some(cluster()),
             node: Some(node()),
             deployment: None,
         }),
-        "(DeploymentObservationSubscription goldragon ouranos None)",
+        "(WatchDeployments ((Some goldragon) (Some ouranos) None))",
     );
     round_trip_nota(
-        Reply::DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened {
-            token: DeploymentObservationToken::new(1),
-            observations: vec![deployment_observation()],
-        }),
-        "(DeploymentObservationSubscriptionOpened (DeploymentObservationToken 1) [(DeploymentObservation (DeploymentBuilt deploy_aab (EvaluatedDerivation \"/nix/store/00000000000000000000000000000000-criomos.drv\")))])",
+        LojixReply::DeploymentObservationSubscriptionOpened(
+            DeploymentObservationSubscriptionOpened {
+                token: DeploymentObservationToken::new(1),
+                observations: vec![deployment_observation()],
+            },
+        ),
+        "(DeploymentObservationSubscriptionOpened ((1) [((DeploymentBuilt (deploy_aab (EvaluatedDerivation (\"/nix/store/00000000000000000000000000000000-criomos.drv\")))))]))",
     );
 }
 
@@ -516,7 +454,7 @@ fn daemon_configuration_round_trips_through_nota_text() {
             operator_identity: operator_identity(),
             owned_cluster: cluster(),
         },
-        "(LojixDaemonConfiguration \"/tmp/lojix-daemon.sock\" 432 None \"/tmp/horizon.nota\" \"/tmp/lojix-state\" \"/tmp/lojix-gcroots\" [] operator goldragon)",
+        "(\"/tmp/lojix-daemon.sock\" 432 None \"/tmp/horizon.nota\" \"/tmp/lojix-state\" \"/tmp/lojix-gcroots\" [] operator goldragon)",
     );
 }
 
@@ -527,7 +465,7 @@ fn cli_configuration_round_trips_through_nota_text() {
             daemon_socket_path: wire_path("/tmp/lojix-daemon.sock"),
             reply_rendering: ReplyRendering::Compact,
         },
-        "(LojixCliConfiguration \"/tmp/lojix-daemon.sock\" Compact)",
+        "(\"/tmp/lojix-daemon.sock\" Compact)",
     );
 }
 

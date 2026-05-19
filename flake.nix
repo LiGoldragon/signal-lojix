@@ -70,13 +70,6 @@
               cargoTestExtraArgs = "--test round_trip contract_crate_has_no_runtime_dependencies";
             }
           );
-          test-signal-verb-mapping = craneLib.cargoTest (
-            commonArgs
-            // {
-              inherit cargoArtifacts;
-              cargoTestExtraArgs = "--test round_trip request_variants_have_expected_signal_verbs";
-            }
-          );
           test-doc = craneLib.cargoTest (
             commonArgs
             // {

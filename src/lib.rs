@@ -9,7 +9,7 @@
 
 use nota_codec::{NotaEnum, NotaRecord, NotaSum, NotaTransparent, NotaTryTransparent};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
-use signal_core::signal_channel;
+use signal_frame::signal_channel;
 use std::fmt;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -385,7 +385,7 @@ pub enum BuilderSelection {
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
-pub struct DeploymentSubmission {
+pub struct DeploymentRequest {
     pub cluster: ClusterName,
     pub node: NodeName,
     pub source: ProposalSource,
@@ -401,7 +401,7 @@ impl DeploymentRequestDigest {
     }
 }
 
-impl DeploymentSubmission {
+impl DeploymentRequest {
     pub fn canonical_digest(&self) -> Result<DeploymentRequestDigest> {
         let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(self)
             .map_err(|error| Error::CanonicalDeploymentRequestUnavailable(error.to_string()))?;
@@ -516,7 +516,7 @@ pub struct DeploymentObservation {
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
-pub struct DeploymentObservationSubscription {
+pub struct WatchDeployments {
     pub cluster: Option<ClusterName>,
     pub node: Option<NodeName>,
     pub deployment: Option<DeploymentId>,
@@ -549,25 +549,18 @@ pub struct DeploymentObservationSubscriptionClosed {
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
-pub struct PinGeneration {}
-
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
-pub struct UnpinGeneration {}
-
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
-pub struct RetireGeneration {}
-
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaSum, Debug, Clone, PartialEq, Eq)]
-pub enum CacheRetentionAction {
-    PinGeneration(PinGeneration),
-    UnpinGeneration(UnpinGeneration),
-    RetireGeneration(RetireGeneration),
+pub struct Pin {
+    pub generation: GenerationId,
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
-pub struct CacheRetentionRequest {
+pub struct Unpin {
     pub generation: GenerationId,
-    pub action: CacheRetentionAction,
+}
+
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
+pub struct Retire {
+    pub generation: GenerationId,
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
@@ -603,7 +596,7 @@ pub struct CacheRetentionObservation {
 }
 
 #[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaRecord, Debug, Clone, PartialEq, Eq)]
-pub struct CacheRetentionObservationSubscription {
+pub struct WatchCacheRetention {
     pub generation: Option<GenerationId>,
 }
 
@@ -645,84 +638,43 @@ pub struct GenerationListing {
     pub generations: Vec<Generation>,
 }
 
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OperationKind {
-    DeploymentSubmission,
-    CacheRetentionRequest,
-    GenerationQuery,
-    DeploymentObservationSubscription,
-    CacheRetentionObservationSubscription,
-    DeploymentObservationRetraction,
-    CacheRetentionObservationRetraction,
-}
-
-// Per signal-core's `signal_channel!` macro: each request variant is
-// preceded by the SignalVerb it instantiates, and the macro auto-emits
-// the `Request::signal_verb()` mapping witness. Observations are push
-// events, so they live in the event block rather than in ordinary
-// request/reply exchange payloads.
 signal_channel! {
     channel Lojix {
-        request Request {
-            Assert DeploymentSubmission(DeploymentSubmission),
-            Mutate CacheRetentionRequest(CacheRetentionRequest),
-            Match GenerationQuery(GenerationQuery),
-            Subscribe DeploymentObservationSubscription(DeploymentObservationSubscription)
-                opens DeploymentObservationStream,
-            Subscribe CacheRetentionObservationSubscription(CacheRetentionObservationSubscription)
-                opens CacheRetentionObservationStream,
-            Retract DeploymentObservationRetraction(DeploymentObservationToken),
-            Retract CacheRetentionObservationRetraction(CacheRetentionObservationToken),
-        }
-        reply Reply {
-            DeploymentAccepted(DeploymentAccepted),
-            DeploymentRejected(DeploymentRejected),
-            CacheRetentionAccepted(CacheRetentionAccepted),
-            CacheRetentionRejected(CacheRetentionRejected),
-            GenerationListing(GenerationListing),
-            DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened),
-            DeploymentObservationSubscriptionClosed(DeploymentObservationSubscriptionClosed),
-            CacheRetentionObservationSubscriptionOpened(CacheRetentionObservationSubscriptionOpened),
-            CacheRetentionObservationSubscriptionClosed(CacheRetentionObservationSubscriptionClosed),
-        }
-        event Event {
-            DeploymentObservation(DeploymentObservation) belongs DeploymentObservationStream,
-            CacheRetentionObservation(CacheRetentionObservation)
-                belongs CacheRetentionObservationStream,
-        }
-        stream DeploymentObservationStream {
-            token DeploymentObservationToken;
-            opened DeploymentObservationSubscriptionOpened;
-            event DeploymentObservation;
-            close DeploymentObservationRetraction;
-        }
-        stream CacheRetentionObservationStream {
-            token CacheRetentionObservationToken;
-            opened CacheRetentionObservationSubscriptionOpened;
-            event CacheRetentionObservation;
-            close CacheRetentionObservationRetraction;
-        }
+        operation Deploy(DeploymentRequest),
+        operation Pin(Pin),
+        operation Unpin(Unpin),
+        operation Retire(Retire),
+        operation Query(GenerationQuery),
+        operation WatchDeployments(WatchDeployments) opens DeploymentObservationStream,
+        operation UnwatchDeployments(DeploymentObservationToken),
+        operation WatchCacheRetention(WatchCacheRetention) opens CacheRetentionObservationStream,
+        operation UnwatchCacheRetention(CacheRetentionObservationToken),
     }
-}
-
-impl Request {
-    pub fn operation_kind(&self) -> OperationKind {
-        match self {
-            Self::DeploymentSubmission(_) => OperationKind::DeploymentSubmission,
-            Self::CacheRetentionRequest(_) => OperationKind::CacheRetentionRequest,
-            Self::GenerationQuery(_) => OperationKind::GenerationQuery,
-            Self::DeploymentObservationSubscription(_) => {
-                OperationKind::DeploymentObservationSubscription
-            }
-            Self::CacheRetentionObservationSubscription(_) => {
-                OperationKind::CacheRetentionObservationSubscription
-            }
-            Self::DeploymentObservationRetraction(_) => {
-                OperationKind::DeploymentObservationRetraction
-            }
-            Self::CacheRetentionObservationRetraction(_) => {
-                OperationKind::CacheRetentionObservationRetraction
-            }
-        }
+    reply LojixReply {
+        DeploymentAccepted(DeploymentAccepted),
+        DeploymentRejected(DeploymentRejected),
+        CacheRetentionAccepted(CacheRetentionAccepted),
+        CacheRetentionRejected(CacheRetentionRejected),
+        GenerationListing(GenerationListing),
+        DeploymentObservationSubscriptionOpened(DeploymentObservationSubscriptionOpened),
+        DeploymentObservationSubscriptionClosed(DeploymentObservationSubscriptionClosed),
+        CacheRetentionObservationSubscriptionOpened(CacheRetentionObservationSubscriptionOpened),
+        CacheRetentionObservationSubscriptionClosed(CacheRetentionObservationSubscriptionClosed),
+    }
+    event LojixEvent {
+        DeploymentObservation(DeploymentObservation) belongs DeploymentObservationStream,
+        CacheRetentionObservation(CacheRetentionObservation) belongs CacheRetentionObservationStream,
+    }
+    stream DeploymentObservationStream {
+        token DeploymentObservationToken;
+        opened DeploymentObservationSubscriptionOpened;
+        event DeploymentObservation;
+        close UnwatchDeployments;
+    }
+    stream CacheRetentionObservationStream {
+        token CacheRetentionObservationToken;
+        opened CacheRetentionObservationSubscriptionOpened;
+        event CacheRetentionObservation;
+        close UnwatchCacheRetention;
     }
 }
