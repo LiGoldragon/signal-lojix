@@ -28,6 +28,33 @@ binary, or the deploy pipeline — those live in the `lojix` crate.
 > realization step. See `~/primary/ESSENCE.md` §"Today and
 > eventually".
 
+## MUST IMPLEMENT — signal architecture migration
+
+This contract is migrating to contract-local verbs per
+`primary/reports/designer/238-signal-architecture-redirection-contract-local-verbs.md`
+and `primary/reports/designer/239-signal-architecture-migration-plan.md`.
+
+This crate is currently skeleton (no `Cargo.toml`, no `src/`). When
+implementation begins, drop the SignalVerb prefixes from the planned
+variants. Candidate contract-local verbs per the existing variant
+table: `Deploy` (verb-form; payload becomes the deploy request noun,
+not `DeploymentSubmission`), `Pin` / `Unpin` / `Retire` (verb-form
+splits of `CacheRetentionRequest` — three distinct public actions
+should not collapse under one `Mutate CacheRetentionRequest`), `Query`
+(for `GenerationQuery`, payload names the filter shape), `Watch`
+(for the two subscribe variants; payload distinguishes deployment
+events vs cache-retention events), `Unwatch` (for `StreamClose`).
+Move verb-to-Sema lowering into the lojix-daemon executor. The
+dependency on `signal-core` shifts to `signal-frame` once the new
+crate is published.
+
+References: `primary/reports/designer/238-signal-architecture-redirection-contract-local-verbs.md`,
+`primary/reports/designer/239-signal-architecture-migration-plan.md`.
+
+**Note to remover:** when the implementation lands with the new
+shape, remove this section and add a `## Migration history —
+contract-local verbs (2026-05-XX)` paragraph noting the shape.
+
 ## 1 · Channel Boundary
 
 | Side | Component |
