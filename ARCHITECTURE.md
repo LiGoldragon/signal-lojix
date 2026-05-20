@@ -22,38 +22,60 @@ round trips. It does not own the daemon implementation, the CLI
 binary, or the deploy pipeline — those live in the `lojix` crate.
 
 > **Scope (today vs eventually).** This contract sits on today's
-> stack — `signal-core` wire kernel, rkyv archives, `sema-engine`
+> stack — `signal-frame` wire kernel, rkyv archives, `sema-engine`
 > typed database engine in the consumer daemon. The
 > eventually-self-hosting stack is Sema-on-Sema; this contract is a
 > realization step. See `~/primary/ESSENCE.md` §"Today and
 > eventually".
 
-## MUST IMPLEMENT — signal architecture migration
+## MUST IMPLEMENT — three-layer migration
 
-This contract is migrating to contract-local verbs per
-`primary/reports/designer/238-signal-architecture-redirection-contract-local-verbs.md`
-and `primary/reports/designer/239-signal-architecture-migration-plan.md`.
+This contract is migrating to the three-layer model affirmed
+2026-05-20 per
+`primary/reports/designer/246-v4-bundled-fix-deep-design-with-examples.md`
+and `primary/reports/designer/248-three-layer-changes-for-operators.md`.
 
 This crate is currently skeleton (no `Cargo.toml`, no `src/`). When
-implementation begins, drop the SignalVerb prefixes from the planned
-variants. Candidate contract-local verbs per the existing variant
-table: `Deploy` (verb-form; payload becomes the deploy request noun,
-not `DeploymentSubmission`), `Pin` / `Unpin` / `Retire` (verb-form
+implementation begins, drop the SignalVerb prefixes entirely.
+
+**Layer 1 — Contract Operations on the wire (this crate).** Candidate
+contract-local verbs per the existing variant table: `Deploy`
+(verb-form; payload becomes the deploy request noun, not
+`DeploymentSubmission`), `Pin` / `Unpin` / `Retire` (verb-form
 splits of `CacheRetentionRequest` — three distinct public actions
-should not collapse under one `Mutate CacheRetentionRequest`), `Query`
+should not collapse under one cache-retention operation), `Query`
 (for `GenerationQuery`, payload names the filter shape), `Watch`
 (for the two subscribe variants; payload distinguishes deployment
 events vs cache-retention events), `Unwatch` (for `StreamClose`).
-Move verb-to-Sema lowering into the lojix-daemon executor. The
-dependency on `signal-core` shifts to `signal-frame` once the new
-crate is published.
 
-References: `primary/reports/designer/238-signal-architecture-redirection-contract-local-verbs.md`,
-`primary/reports/designer/239-signal-architecture-migration-plan.md`.
+**Lojix is not a persona component.** The mandatory `Tap`/`Untap`
+observable block does not apply. The existing
+deployment-observation and cache-retention-observation subscriptions
+stay as domain-specific Watch/Unwatch pairs.
+
+**Layer 2 — Component Commands (lojix-daemon crate).** Lojix's
+daemon owns its typed Command enum (e.g. `LojixCommand::PlanBuild`,
+`LojixCommand::CopyClosure`, `LojixCommand::ActivateGeneration`,
+`LojixCommand::WriteLiveSetEntry`) plus a `CommandExecutor` that
+knows the deploy pipeline and the live-set tables.
+
+**Layer 3 — Sema classification (signal-sema).** Each Component
+Command projects to a payloadless `SemaOperation` class label via
+`ToSemaOperation`. Lojix does not import payload-bearing Sema
+variants.
+
+**Frame layer.** The dependency on `signal-core` shifts to
+`signal-frame` once the new crate is published.
+
+References:
+- `primary/reports/designer/246-v4-bundled-fix-deep-design-with-examples.md`
+- `primary/reports/designer/248-three-layer-changes-for-operators.md`
+- `primary/skills/component-triad.md` §"Verbs come in three layers"
+- `primary/skills/contract-repo.md` §"Public contracts use contract-local operation verbs"
 
 **Note to remover:** when the implementation lands with the new
 shape, remove this section and add a `## Migration history —
-contract-local verbs (2026-05-XX)` paragraph noting the shape.
+three-layer model (2026-05-XX)` paragraph noting the shape.
 
 ## 1 · Channel Boundary
 
@@ -65,33 +87,39 @@ contract-local verbs (2026-05-XX)` paragraph noting the shape.
 | Reply / event consumer | the caller that submitted the operation; subscribers |
 
 Transport: Unix socket at `/run/lojix/daemon.sock` carrying
-`signal-core` length-prefixed rkyv frames. The transport itself
+`signal-frame` length-prefixed rkyv frames. The transport itself
 belongs to the `lojix` repo, not this contract.
 
 ## 2 · Channel shape
 
 One streaming channel — exchange operations plus a daemon-pushed
 observation stream. Declared via `signal_channel!` per
-`signal-core`'s `ARCHITECTURE.md` §3, with `request` / `reply` /
-`event` / `stream` blocks. The grammar enforces verb tagging,
-opens/belongs cross-references, and stream-relation witnesses at
-compile time.
+`signal-frame`'s `ARCHITECTURE.md`, with `request` / `reply` /
+`event` / `stream` blocks. The grammar enforces opens/belongs
+cross-references and stream-relation witnesses at compile time.
 
-### Request variants and their SignalVerbs
+### Contract operations (Layer 1) and their Sema-class projections (Layer 3)
 
-| Variant | Verb | Purpose |
+The wire form carries the contract-local verb only; the Sema class
+label below is the *expected daemon-side classification* used for
+cross-component observation.
+
+| Operation | Purpose | Expected Sema class |
 |---|---|---|
-| `DeploymentSubmission` | `Assert` | Operator client → daemon: submit a deploy request. Daemon mints a `DeploymentIdentifier`. |
-| `CacheRetentionRequest` | `Mutate` | Operator → daemon: pin / unpin / retire a generation. Mutates the live-set entry. |
-| `GenerationQuery` | `Match` | Any client → daemon: read the live set (whole or filtered). |
-| `DeploymentObservation` (subscribe) | `Subscribe` | Subscriber → daemon: stream phase events from one or all deploys. Opens `DeploymentEventStream`. |
-| `CacheRetentionObservation` (subscribe) | `Subscribe` | Subscriber → daemon: stream cache-retention transitions. Opens `CacheRetentionEventStream`. |
-| `StreamClose` | `Retract` | Subscriber → daemon: end an open subscription by token. Closes either stream. |
+| `Deploy` | Operator client → daemon: submit a deploy request. Daemon mints a `DeploymentIdentifier`. | `Assert` |
+| `Pin` / `Unpin` / `Retire` | Operator → daemon: pin / unpin / retire a generation. Mutates the live-set entry. | `Mutate` (Pin/Unpin), `Retract` (Retire) |
+| `Query` | Any client → daemon: read the live set (whole or filtered). | `Match` |
+| `WatchDeployments` | Subscriber → daemon: stream phase events from one or all deploys. Opens `DeploymentEventStream`. | `Subscribe` |
+| `WatchCacheRetention` | Subscriber → daemon: stream cache-retention transitions. Opens `CacheRetentionEventStream`. | `Subscribe` |
+| `Unwatch` | Subscriber → daemon: end an open subscription by token. Closes either stream. | `Retract` |
 
 ### Reply variants
 
-`DeploymentAccepted`, `DeploymentRejected`, `CacheRetentionAccepted`,
-`CacheRetentionRejected`, `GenerationListing`, `StreamOpened`.
+Verb-past-tense for outcomes plus typed rejection payloads (per
+reply discipline in `skills/contract-repo.md`): `Deployed`,
+`DeployRejected`, `Pinned` / `Unpinned` / `Retired`,
+`Queried(GenerationListing)`, `Watching` (subscription opened), and
+the typed `*Rejected` reasons.
 
 ### Event variants (streaming)
 
@@ -103,22 +131,21 @@ rewrites GC roots.
 
 ### Streams
 
-- `DeploymentEventStream` — opened by `DeploymentObservation` Subscribe;
-  carries `DeploymentPhaseEvent` items; closed by `StreamClose`.
-- `CacheRetentionEventStream` — opened by `CacheRetentionObservation`
-  Subscribe; carries `CacheRetentionTransitionEvent` items; closed by
-  `StreamClose`.
+- `DeploymentEventStream` — opened by `WatchDeployments`; carries
+  `DeploymentPhaseEvent` items; closed by `Unwatch`.
+- `CacheRetentionEventStream` — opened by `WatchCacheRetention`;
+  carries `CacheRetentionTransitionEvent` items; closed by `Unwatch`.
 
 ## 3 · Boundary Rules
 
 - Pure contract crate. No behavior. No storage. No actors. No I/O.
 - Channel shape is declared via one `signal_channel!` invocation so
-  the macro emits the typed enums, verb witnesses, frame aliases
-  (`StreamingFrame` / `StreamingFrameBody` since events ride this
-  channel), stream-relation witnesses, and NOTA codecs.
+  the macro emits the typed enums, frame aliases (`StreamingFrame` /
+  `StreamingFrameBody` since events ride this channel),
+  stream-relation witnesses, and NOTA codecs.
 - Every record carries `NotaRecord` (text wire) + rkyv (binary wire)
-  derives. Verb wrapping and request-sequence brackets live at the
-  `signal-core` kernel layer, not in this crate.
+  derives. Request-sequence brackets live at the `signal-frame`
+  kernel layer, not in this crate.
 - Sum-with-data variants use the variant-name == payload-type-name
   convention (precedent: `signal-persona-mind`,
   `signal-persona-message`).
@@ -133,30 +160,36 @@ rewrites GC roots.
 
 ## 4 · Constraints
 
-- Channel declares exactly the six SignalVerbs it uses; the macro
-  rejects any verb keyword outside the six-root spine.
-- Every `Subscribe` variant annotates `opens <StreamName>`.
+- Every contract-local operation is a verb in verb form; the macro
+  emits the NOTA codec keyed on the payload's record head.
+- Every subscription-shaped variant annotates `opens <StreamName>`.
 - Every event variant annotates `belongs <StreamName>`.
-- Every declared stream is opened by at least one `Subscribe`
+- Every declared stream is opened by at least one subscription-shaped
   variant.
 - Every event variant's `belongs` resolves to a stream whose
   `event` annotation points back at the same variant.
-- A `StreamClose` variant tagged `Retract` carries the stream's
-  token type as its payload.
+- A stream-close variant (e.g. `Unwatch`) carries the stream's
+  token type as its payload; the macro grammar enforces a request-side
+  `Retract`-shaped variant for close.
 - No `Unknown` variant on any closed enum. New domain shapes are
   coordinated schema bumps in this crate, not runtime escape
   hatches.
-- Daemon-side typed errors decode through `DeploymentRejected` /
-  `CacheRetentionRejected` payloads — no untyped error strings on
-  the wire.
+- Daemon-side typed errors decode through `DeployRejected` /
+  `PinRejected` (etc.) payloads — no untyped error strings on the
+  wire.
+- Sema classification projections live in the lojix daemon
+  (Component Commands impl `ToSemaOperation`), not in this contract
+  crate.
 
 ## 5 · Cross-Cutting Context
 
 - Workspace `~/primary/ESSENCE.md` is upstream of every rule.
-- `signal-core` at `github:LiGoldragon/signal-core` is the wire
+- `signal-frame` at `github:LiGoldragon/signal-frame` is the wire
   kernel. Two frame types: `ExchangeFrame` (no streams) and
   `StreamingFrame` (with streams); this channel uses
   `StreamingFrame` because it carries events.
+- `signal-sema` at `github:LiGoldragon/signal-sema` owns the
+  payloadless classification labels used at the observation layer.
 - `lojix` at `github:LiGoldragon/lojix` is the daemon implementation
   whose evolution drives this contract. Both binaries (the
   long-lived `lojix-daemon` orchestrator and the thin `lojix` CLI
