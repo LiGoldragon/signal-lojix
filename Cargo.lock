@@ -193,7 +193,7 @@ dependencies = [
 [[package]]
 name = "nota-codec"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/nota-codec.git?branch=main#88852e6897c12e4418b252351813f758ee438ea0"
+source = "git+https://github.com/LiGoldragon/nota-codec.git?branch=main#538555e895529e2884b7d37d20c66aadc2a49c08"
 dependencies = [
  "camino",
  "nota-derive",
@@ -213,7 +213,7 @@ dependencies = [
 [[package]]
 name = "nota-derive"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/nota-derive.git?branch=main#30c665f3ebf7d03e66dd1a5ee9cf67a0f36cd470"
+source = "git+https://github.com/LiGoldragon/nota-derive.git?branch=main#8323149593b95d6e90c1fdde54e9aba58803337c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -225,6 +225,12 @@ name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
+
+[[package]]
+name = "paste"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
 name = "pin-project-lite"
@@ -333,9 +339,10 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 [[package]]
 name = "signal-frame"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#4bdf1e1e706477c213259c8f661ee2787d48377c"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#75837dce71ca59a8e675ed2082076a4a8fc07339"
 dependencies = [
  "nota-codec",
+ "paste",
  "rkyv",
  "signal-frame-macros",
  "thiserror",
@@ -344,7 +351,7 @@ dependencies = [
 [[package]]
 name = "signal-frame-macros"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#4bdf1e1e706477c213259c8f661ee2787d48377c"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#75837dce71ca59a8e675ed2082076a4a8fc07339"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -7,7 +7,7 @@
 //! Runtime actors, storage tables, subprocess execution, and socket
 //! lifecycle live in the `lojix` implementation crate.
 
-use nota_codec::{NotaEnum, NotaRecord, NotaSum, NotaTransparent, NotaTryTransparent};
+use nota_codec::{NotaEnum, NotaRecord, NotaTransparent, NotaTryTransparent};
 use rkyv::{Archive, Deserialize as RkyvDeserialize, Serialize as RkyvSerialize};
 use signal_frame::signal_channel;
 use std::fmt;
@@ -359,7 +359,7 @@ pub struct HomeOnlyDeployment {
     pub mode: HomeMode,
 }
 
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaSum, Debug, Clone, PartialEq, Eq)]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, PartialEq, Eq)]
 pub enum DeploymentPlan {
     FullOsDeployment(FullOsDeployment),
     OsOnlyDeployment(OsOnlyDeployment),
@@ -377,7 +377,7 @@ pub struct NamedBuilder {
     pub node: NodeName,
 }
 
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaSum, Debug, Clone, PartialEq, Eq)]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, PartialEq, Eq)]
 pub enum BuilderSelection {
     BuildLocally(BuildLocally),
     DispatcherChoosesBuilder(DispatcherChoosesBuilder),
@@ -440,7 +440,7 @@ pub struct RealizedStorePath {
     pub store_path: StorePath,
 }
 
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaSum, Debug, Clone, PartialEq, Eq)]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, PartialEq, Eq)]
 pub enum BuildResult {
     EvaluatedDerivation(EvaluatedDerivation),
     RealizedStorePath(RealizedStorePath),
@@ -499,7 +499,7 @@ pub struct DeploymentFailed {
     pub reason: FailureText,
 }
 
-#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaSum, Debug, Clone, PartialEq, Eq)]
+#[derive(Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, PartialEq, Eq)]
 pub enum DeploymentPhase {
     DeploymentSubmitted(DeploymentSubmitted),
     DeploymentBuilding(DeploymentBuilding),
