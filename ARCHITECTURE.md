@@ -268,3 +268,19 @@ tests/round_trip.rs    # frame, NOTA, validation, and boundary tests
   structural precedent for shape.
 - `lojix` at `github:LiGoldragon/lojix` is the consumer whose
   evolution drives this contract.
+
+## Pending schema-engine upgrade
+
+**Status:** scheduled for migration to schema-language-based contract per `reports/designer/326-v13-spirit-complete-schema-vision.md` + `reports/designer/324-migration-mvp-spirit-handover-re-specification.md`.
+
+**Target:** this contract's hand-written `signal_channel!` invocation converts to a single `lojix/lojix.schema` file (shared with the `lojix` daemon's repository). The brilliant macro library (`primary-ezqx.1`) reads the schema + emits this crate's wire types + ShortHeader projection + dispatcher binding + VersionProjection impls.
+
+**Sequence:** per `primary-9up1` migration to current foundation. Spirit is the MVP pilot landing first via `primary-ezqx.1`; this contract's schema cutover coordinates with the lojix foundation migration.
+
+**Per-component concerns:** Per `primary-9up1` migration to current foundation. Lojix's deploy stack has wide blast radius; contract changes must coordinate with cluster-operator deploy windows.
+
+**References:**
+- `reports/designer/326-v13-spirit-complete-schema-vision.md` — uniform header form + schema-language design
+- `reports/designer/324-migration-mvp-spirit-handover-re-specification.md` — migration MVP + handover state
+- `reports/designer/322-spirit-mvp-positional-schema-worked-example.md` — Spirit MVP worked example
+- `reports/operator/174-schema-import-header-design-critique-2026-05-24.md` — header/body/feature separation + lowering rules
