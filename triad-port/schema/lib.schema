@@ -1,0 +1,121 @@
+;; signal-lojix — ORDINARY wire contract for the lojix deploy orchestrator.
+;;
+;; Wire-only: emits the rkyv + NOTA codec and the signal-frame mail envelope.
+;; No engine traits, no Nexus/SEMA content, no daemon behaviour. The
+;; peer-callable read / observe / subscribe surface. Owner-only mutations
+;; (Deploy/Pin/Unpin/Retire) live in meta-signal-lojix.
+;;
+;; This contract DEFINES the shared record types ONCE — meta-signal-lojix
+;; cross-imports them via  signal-lojix:lib:TypeName.
+;;
+;; STREAMING (day-one decision 2tfa). schema-next cannot yet emit a
+;; daemon-pushed event frame — no event/stream root, no opens/belongs
+;; construct (verified against schema-next + schema-rust-next; the cloud
+;; port never needed it). So the Watch/Unwatch SUBSCRIPTION HANDSHAKE is
+;; authored in the emittable form (ordinary request -> SubscriptionToken
+;; reply) and the two event payloads are defined once as namespace records,
+;; so streaming is NOT dropped from the contract. The schema-next +
+;; schema-rust-next event-frame-emission enhancement is the named follow-on
+;; on the lojix path. Full argument + the provisional post-grammar event
+;; root: ARCHITECTURE.md §4.
+
+{}
+[Query WatchDeployments WatchCacheRetention Unwatch CheckHostKeyMaterial]
+[Queried Watching Unwatched KeyMaterialChecked QueryRejected WatchRejected UnwatchRejected KeyMaterialCheckRejected]
+{
+  Query Selection
+  WatchDeployments DeploymentWatch
+  WatchCacheRetention CacheRetentionWatch
+  Unwatch SubscriptionClose
+  CheckHostKeyMaterial KeyMaterialQuery
+  Queried GenerationListing
+  Watching SubscriptionOpened
+  Unwatched SubscriptionClosed
+  KeyMaterialChecked KeyMaterialReport
+  QueryRejected RejectedQuery
+  WatchRejected RejectedWatch
+  UnwatchRejected RejectedUnwatch
+  KeyMaterialCheckRejected RejectedKeyMaterialCheck
+
+  DeploymentIdentifier Integer
+  GenerationIdentifier Integer
+  SubscriptionToken Integer
+  CommitSequence Integer
+  StateDigest Integer
+  ClusterName String
+  NodeName String
+  UserName String
+  ClosurePath String
+  ProposalSource String
+  FlakeReference String
+  EventLogPosition Integer
+  PinLabel String
+
+  DeploymentKind [FullOs OsOnly HomeOnly]
+  SystemAction [Eval Build Boot Switch Test BootOnce]
+  ActivationKind [Switch Boot Test BootOnce]
+  GenerationSlot [Current BootPending Rollback Pinned Recent]
+  DatabaseMarker { CommitSequence * StateDigest * }
+
+  Generation {
+    GenerationIdentifier *
+    DeploymentIdentifier *
+    ClusterName *
+    NodeName *
+    DeploymentKind *
+    ActivationKind *
+    GenerationSlot *
+    ClosurePath *
+  }
+  GenerationListing { generations (Vec Generation) DatabaseMarker * }
+
+  NodeSelector { ClusterName * NodeName * kind (Optional DeploymentKind) }
+  GenerationLookup { GenerationIdentifier * }
+  EventLogRange { from EventLogPosition until EventLogPosition }
+  Selection [(ByNode NodeSelector) (ByGeneration GenerationLookup) (ByEventLog EventLogRange)]
+
+  DeploymentWatch { deployment (Optional DeploymentIdentifier) cluster (Optional ClusterName) node (Optional NodeName) }
+  CacheRetentionWatch { cluster (Optional ClusterName) node (Optional NodeName) }
+  SubscriptionClose { SubscriptionToken * }
+  SubscriptionOpened { SubscriptionToken * CommitSequence * }
+  SubscriptionClosed { SubscriptionToken * }
+
+  KeyMaterialQuery { ClusterName * NodeName * source ProposalSource }
+  KeyMaterialConcern [SecureShellPublicKey YggdrasilPublicKey YggdrasilAddress]
+  MismatchValue String
+  OperatorHint String
+  KeyMaterialMismatch { KeyMaterialConcern * expected MismatchValue actual MismatchValue operatorHint OperatorHint }
+  KeyMaterialReport { NodeName * mismatches (Vec KeyMaterialMismatch) DatabaseMarker * }
+
+  DeploymentPhase [Submitted Building Built Copying Activating Activated Failed]
+  PhaseDetail String
+  DeploymentPhaseEvent {
+    DeploymentIdentifier *
+    GenerationIdentifier *
+    ClusterName *
+    NodeName *
+    DeploymentPhase *
+    EventLogPosition *
+    detail (Optional PhaseDetail)
+  }
+  CacheRetentionTransition [Pinned Unpinned Promoted Demoted Retired Evicted]
+  CacheRetentionTransitionEvent {
+    GenerationIdentifier *
+    ClusterName *
+    NodeName *
+    CacheRetentionTransition *
+    from_slot GenerationSlot
+    to_slot (Optional GenerationSlot)
+    label (Optional PinLabel)
+    EventLogPosition *
+  }
+
+  QueryRejectionReason [GenerationUnknown NodeUnknown EventLogPositionOutOfRange MalformedSelector]
+  WatchRejectionReason [SubscriptionLimitReached MalformedWatch StreamUnavailable]
+  UnwatchRejectionReason [SubscriptionTokenUnknown SubscriptionAlreadyClosed]
+  KeyMaterialCheckRejectionReason [NodeUnknown ProposalSourceUnreachable HostUnreachable PublicationMalformed]
+  RejectedQuery { QueryRejectionReason * DatabaseMarker * }
+  RejectedWatch { WatchRejectionReason * }
+  RejectedUnwatch { UnwatchRejectionReason * SubscriptionToken * }
+  RejectedKeyMaterialCheck { KeyMaterialCheckRejectionReason * DatabaseMarker * }
+}
