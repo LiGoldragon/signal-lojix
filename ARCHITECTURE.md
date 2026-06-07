@@ -2,12 +2,10 @@
 
 *Typed Signal contract for the lojix deploy orchestrator.*
 
-> **Status (2026-05-15):** Skeleton. Documentation only. No
-> `Cargo.toml`, no `src/`, no `flake.nix`. Implementation lands when
-> `lojix` daemon development begins on the `horizon-re-engineering`
-> feature branch. The repo exists to lock the namespace and provide
-> the canonical home for this architecture spec. See
-> `~/primary/protocols/active-repositories.md` §"Replacement Stack".
+> **Status (2026-06-07):** Implemented contract crate under
+> `triad-port/`. The crate owns schema-derived typed records and
+> codecs only; daemon runtime and CLI behavior live in `lojix`.
+> See `~/primary/protocols/active-repositories.md` §"Replacement Stack".
 
 ## 0 · TL;DR
 
@@ -35,8 +33,8 @@ This contract is migrating to the three-layer model affirmed
 `primary/reports/designer/246-v4-bundled-fix-deep-design-with-examples.md`
 and `primary/reports/designer/248-three-layer-changes-for-operators.md`.
 
-This crate is currently skeleton (no `Cargo.toml`, no `src/`). When
-implementation begins, drop the SignalVerb prefixes entirely.
+The implemented crate keeps the SignalVerb prefixes out of the public
+operation roots.
 
 **Layer 1 — Contract Operations on the wire (this crate).** Candidate
 contract-local verbs per the existing variant table: `Deploy`
@@ -73,9 +71,11 @@ References:
 - `primary/skills/component-triad.md` §"Verbs come in three layers"
 - `primary/skills/contract-repo.md` §"Public contracts use contract-local operation verbs"
 
-**Note to remover:** when the implementation lands with the new
-shape, remove this section and add a `## Migration history —
-three-layer model (2026-05-XX)` paragraph noting the shape.
+## Migration history — three-layer model (2026-06-07)
+
+The implemented triad-port contract uses contract-local operation
+verbs and leaves component commands plus Sema-class projection inside
+the `lojix` daemon.
 
 ## 1 · Channel Boundary
 

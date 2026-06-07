@@ -1,12 +1,13 @@
 # signal-lojix — skills
 
-The repo is currently a skeleton; this file will fill out when
-implementation starts. Until then:
+The live contract crate is under `triad-port/`.
 
 ## Status
 
-- No code lands here until `lojix-daemon` development begins.
-- The canonical specification is in `ARCHITECTURE.md` §"Planned Surface".
+- Pure contract code only: schema, generated typed records, codecs,
+  and round-trip witnesses.
+- No daemon runtime, process effects, storage, actors, or CLI behavior.
+- The canonical specification is in `ARCHITECTURE.md`.
 
 ## Required reading when implementation starts
 
