@@ -15,13 +15,12 @@ path = "src/lib.rs"
 
 [features]
 default   = []
-nota-text = ["dep:nota-next"]
+nota-text = ["dep:nota-next", "signal-frame/nota-text"]
 
 [dependencies]
-nota-codec   = { git = "https://github.com/LiGoldragon/nota-codec.git", branch = "main" }
 nota-next    = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main", optional = true }
 rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
-signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main" }
+signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main", default-features = false }
 
 [build-dependencies]
 schema-rust-next = { git = "https://github.com/LiGoldragon/schema-rust-next.git", branch = "main" }

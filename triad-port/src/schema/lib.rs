@@ -14,86 +14,147 @@ pub type Path = std::string::String;
 pub use nota_next::{NotaDecode, NotaDecodeError, NotaEncode, NotaSource};
 
 #[rustfmt::skip]
-pub type Query = Selection;
-
-#[rustfmt::skip]
-pub type WatchDeployments = DeploymentWatch;
-
-#[rustfmt::skip]
-pub type WatchCacheRetention = CacheRetentionWatch;
-
-#[rustfmt::skip]
-pub type Unwatch = SubscriptionClose;
-
-#[rustfmt::skip]
-pub type CheckHostKeyMaterial = KeyMaterialQuery;
-
-#[rustfmt::skip]
-pub type Queried = GenerationListing;
-
-#[rustfmt::skip]
-pub type Watching = SubscriptionOpened;
-
-#[rustfmt::skip]
-pub type Unwatched = SubscriptionClosed;
-
-#[rustfmt::skip]
-pub type KeyMaterialChecked = KeyMaterialReport;
-
-#[rustfmt::skip]
-pub type QueryRejected = RejectedQuery;
-
-#[rustfmt::skip]
-pub type WatchRejected = RejectedWatch;
-
-#[rustfmt::skip]
-pub type UnwatchRejected = RejectedUnwatch;
-
-#[rustfmt::skip]
-pub type KeyMaterialCheckRejected = RejectedKeyMaterialCheck;
-
-#[rustfmt::skip]
-pub type DeploymentIdentifier = Integer;
-
-#[rustfmt::skip]
-pub type GenerationIdentifier = Integer;
-
-#[rustfmt::skip]
-pub type SubscriptionToken = Integer;
-
-#[rustfmt::skip]
-pub type CommitSequence = Integer;
-
-#[rustfmt::skip]
-pub type StateDigest = Integer;
-
-#[rustfmt::skip]
-pub type ClusterName = String;
-
-#[rustfmt::skip]
-pub type NodeName = String;
-
-#[rustfmt::skip]
-pub type UserName = String;
-
-#[rustfmt::skip]
-pub type ClosurePath = String;
-
-#[rustfmt::skip]
-pub type ProposalSource = String;
-
-#[rustfmt::skip]
-pub type FlakeReference = String;
-
-#[rustfmt::skip]
-pub type EventLogPosition = Integer;
-
-#[rustfmt::skip]
-pub type PinLabel = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Query(Selection);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WatchDeployments(DeploymentWatch);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WatchCacheRetention(CacheRetentionWatch);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Unwatch(SubscriptionClose);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CheckHostKeyMaterial(KeyMaterialQuery);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Queried(GenerationListing);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Watching(SubscriptionOpened);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Unwatched(SubscriptionClosed);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct KeyMaterialChecked(KeyMaterialReport);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryRejected(RejectedQuery);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WatchRejected(RejectedWatch);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UnwatchRejected(RejectedUnwatch);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct KeyMaterialCheckRejected(RejectedKeyMaterialCheck);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeploymentIdentifier(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GenerationIdentifier(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SubscriptionToken(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CommitSequence(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct StateDigest(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ClusterName(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct NodeName(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UserName(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ClosurePath(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ProposalSource(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct FlakeReference(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EventLogPosition(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PinLabel(String);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum DeploymentKind {
     FullOs,
     OsOnly,
@@ -102,7 +163,16 @@ pub enum DeploymentKind {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum SystemAction {
     Eval,
     Build,
@@ -114,7 +184,16 @@ pub enum SystemAction {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum ActivationKind {
     Switch,
     Boot,
@@ -124,7 +203,16 @@ pub enum ActivationKind {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum GenerationSlot {
     Current,
     BootPending,
@@ -175,7 +263,7 @@ pub struct NodeSelector {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct GenerationLookup(pub GenerationIdentifier);
+pub struct GenerationLookup(GenerationIdentifier);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -214,7 +302,7 @@ pub struct CacheRetentionWatch {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct SubscriptionClose(pub SubscriptionToken);
+pub struct SubscriptionClose(SubscriptionToken);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -227,7 +315,7 @@ pub struct SubscriptionOpened {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct SubscriptionClosed(pub SubscriptionToken);
+pub struct SubscriptionClosed(SubscriptionToken);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -240,7 +328,16 @@ pub struct KeyMaterialQuery {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum KeyMaterialConcern {
     SecureShellPublicKey,
     YggdrasilPublicKey,
@@ -248,10 +345,14 @@ pub enum KeyMaterialConcern {
 }
 
 #[rustfmt::skip]
-pub type MismatchValue = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct MismatchValue(String);
 
 #[rustfmt::skip]
-pub type OperatorHint = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct OperatorHint(String);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -274,7 +375,16 @@ pub struct KeyMaterialReport {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum DeploymentPhase {
     Submitted,
     Building,
@@ -286,7 +396,9 @@ pub enum DeploymentPhase {
 }
 
 #[rustfmt::skip]
-pub type PhaseDetail = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PhaseDetail(String);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -303,7 +415,16 @@ pub struct DeploymentPhaseEvent {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum CacheRetentionTransition {
     Pinned,
     Unpinned,
@@ -329,7 +450,16 @@ pub struct CacheRetentionTransitionEvent {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum QueryRejectionReason {
     GenerationUnknown,
     NodeUnknown,
@@ -339,7 +469,16 @@ pub enum QueryRejectionReason {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum WatchRejectionReason {
     SubscriptionLimitReached,
     MalformedWatch,
@@ -348,7 +487,16 @@ pub enum WatchRejectionReason {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum UnwatchRejectionReason {
     SubscriptionTokenUnknown,
     SubscriptionAlreadyClosed,
@@ -356,7 +504,16 @@ pub enum UnwatchRejectionReason {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum KeyMaterialCheckRejectionReason {
     NodeUnknown,
     ProposalSourceUnreachable,
@@ -375,7 +532,7 @@ pub struct RejectedQuery {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct RejectedWatch(pub WatchRejectionReason);
+pub struct RejectedWatch(WatchRejectionReason);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -416,6 +573,500 @@ pub enum Output {
     WatchRejected(WatchRejected),
     UnwatchRejected(UnwatchRejected),
     KeyMaterialCheckRejected(KeyMaterialCheckRejected),
+}
+
+#[rustfmt::skip]
+impl Query {
+    pub fn new(payload: Selection) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Selection {
+        &self.0
+    }
+    pub fn into_payload(self) -> Selection {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Selection> for Query {
+    fn from(payload: Selection) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl WatchDeployments {
+    pub fn new(payload: DeploymentWatch) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &DeploymentWatch {
+        &self.0
+    }
+    pub fn into_payload(self) -> DeploymentWatch {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<DeploymentWatch> for WatchDeployments {
+    fn from(payload: DeploymentWatch) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl WatchCacheRetention {
+    pub fn new(payload: CacheRetentionWatch) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &CacheRetentionWatch {
+        &self.0
+    }
+    pub fn into_payload(self) -> CacheRetentionWatch {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<CacheRetentionWatch> for WatchCacheRetention {
+    fn from(payload: CacheRetentionWatch) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Unwatch {
+    pub fn new(payload: SubscriptionClose) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &SubscriptionClose {
+        &self.0
+    }
+    pub fn into_payload(self) -> SubscriptionClose {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<SubscriptionClose> for Unwatch {
+    fn from(payload: SubscriptionClose) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl CheckHostKeyMaterial {
+    pub fn new(payload: KeyMaterialQuery) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &KeyMaterialQuery {
+        &self.0
+    }
+    pub fn into_payload(self) -> KeyMaterialQuery {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<KeyMaterialQuery> for CheckHostKeyMaterial {
+    fn from(payload: KeyMaterialQuery) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Queried {
+    pub fn new(payload: GenerationListing) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &GenerationListing {
+        &self.0
+    }
+    pub fn into_payload(self) -> GenerationListing {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<GenerationListing> for Queried {
+    fn from(payload: GenerationListing) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Watching {
+    pub fn new(payload: SubscriptionOpened) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &SubscriptionOpened {
+        &self.0
+    }
+    pub fn into_payload(self) -> SubscriptionOpened {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<SubscriptionOpened> for Watching {
+    fn from(payload: SubscriptionOpened) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Unwatched {
+    pub fn new(payload: SubscriptionClosed) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &SubscriptionClosed {
+        &self.0
+    }
+    pub fn into_payload(self) -> SubscriptionClosed {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<SubscriptionClosed> for Unwatched {
+    fn from(payload: SubscriptionClosed) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl KeyMaterialChecked {
+    pub fn new(payload: KeyMaterialReport) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &KeyMaterialReport {
+        &self.0
+    }
+    pub fn into_payload(self) -> KeyMaterialReport {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<KeyMaterialReport> for KeyMaterialChecked {
+    fn from(payload: KeyMaterialReport) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl QueryRejected {
+    pub fn new(payload: RejectedQuery) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &RejectedQuery {
+        &self.0
+    }
+    pub fn into_payload(self) -> RejectedQuery {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<RejectedQuery> for QueryRejected {
+    fn from(payload: RejectedQuery) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl WatchRejected {
+    pub fn new(payload: RejectedWatch) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &RejectedWatch {
+        &self.0
+    }
+    pub fn into_payload(self) -> RejectedWatch {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<RejectedWatch> for WatchRejected {
+    fn from(payload: RejectedWatch) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl UnwatchRejected {
+    pub fn new(payload: RejectedUnwatch) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &RejectedUnwatch {
+        &self.0
+    }
+    pub fn into_payload(self) -> RejectedUnwatch {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<RejectedUnwatch> for UnwatchRejected {
+    fn from(payload: RejectedUnwatch) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl KeyMaterialCheckRejected {
+    pub fn new(payload: RejectedKeyMaterialCheck) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &RejectedKeyMaterialCheck {
+        &self.0
+    }
+    pub fn into_payload(self) -> RejectedKeyMaterialCheck {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<RejectedKeyMaterialCheck> for KeyMaterialCheckRejected {
+    fn from(payload: RejectedKeyMaterialCheck) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl DeploymentIdentifier {
+    pub fn new(payload: Integer) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Integer {
+        &self.0
+    }
+    pub fn into_payload(self) -> Integer {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Integer> for DeploymentIdentifier {
+    fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl GenerationIdentifier {
+    pub fn new(payload: Integer) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Integer {
+        &self.0
+    }
+    pub fn into_payload(self) -> Integer {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Integer> for GenerationIdentifier {
+    fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl SubscriptionToken {
+    pub fn new(payload: Integer) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Integer {
+        &self.0
+    }
+    pub fn into_payload(self) -> Integer {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Integer> for SubscriptionToken {
+    fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl CommitSequence {
+    pub fn new(payload: Integer) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Integer {
+        &self.0
+    }
+    pub fn into_payload(self) -> Integer {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Integer> for CommitSequence {
+    fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl StateDigest {
+    pub fn new(payload: Integer) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Integer {
+        &self.0
+    }
+    pub fn into_payload(self) -> Integer {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Integer> for StateDigest {
+    fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ClusterName {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for ClusterName {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl NodeName {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for NodeName {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl UserName {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for UserName {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ClosurePath {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for ClosurePath {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ProposalSource {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for ProposalSource {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl FlakeReference {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for FlakeReference {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl EventLogPosition {
+    pub fn new(payload: Integer) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Integer {
+        &self.0
+    }
+    pub fn into_payload(self) -> Integer {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Integer> for EventLogPosition {
+    fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl PinLabel {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for PinLabel {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
 }
 
 #[rustfmt::skip]
@@ -476,6 +1127,63 @@ impl From<SubscriptionToken> for SubscriptionClosed {
 }
 
 #[rustfmt::skip]
+impl MismatchValue {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for MismatchValue {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl OperatorHint {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for OperatorHint {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl PhaseDetail {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for PhaseDetail {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl RejectedWatch {
     pub fn new(payload: WatchRejectionReason) -> Self {
         Self(payload)
@@ -509,48 +1217,48 @@ impl Selection {
 
 #[rustfmt::skip]
 impl Input {
-    pub fn query(payload: Query) -> Self {
-        Self::Query(payload)
+    pub fn query(payload: Selection) -> Self {
+        Self::Query(Query::new(payload))
     }
-    pub fn watch_deployments(payload: WatchDeployments) -> Self {
-        Self::WatchDeployments(payload)
+    pub fn watch_deployments(payload: DeploymentWatch) -> Self {
+        Self::WatchDeployments(WatchDeployments::new(payload))
     }
-    pub fn watch_cache_retention(payload: WatchCacheRetention) -> Self {
-        Self::WatchCacheRetention(payload)
+    pub fn watch_cache_retention(payload: CacheRetentionWatch) -> Self {
+        Self::WatchCacheRetention(WatchCacheRetention::new(payload))
     }
-    pub fn unwatch(payload: Unwatch) -> Self {
-        Self::Unwatch(payload)
+    pub fn unwatch(payload: SubscriptionClose) -> Self {
+        Self::Unwatch(Unwatch::new(payload))
     }
-    pub fn check_host_key_material(payload: CheckHostKeyMaterial) -> Self {
-        Self::CheckHostKeyMaterial(payload)
+    pub fn check_host_key_material(payload: KeyMaterialQuery) -> Self {
+        Self::CheckHostKeyMaterial(CheckHostKeyMaterial::new(payload))
     }
 }
 
 #[rustfmt::skip]
 impl Output {
-    pub fn queried(payload: Queried) -> Self {
-        Self::Queried(payload)
+    pub fn queried(payload: GenerationListing) -> Self {
+        Self::Queried(Queried::new(payload))
     }
-    pub fn watching(payload: Watching) -> Self {
-        Self::Watching(payload)
+    pub fn watching(payload: SubscriptionOpened) -> Self {
+        Self::Watching(Watching::new(payload))
     }
-    pub fn unwatched(payload: Unwatched) -> Self {
-        Self::Unwatched(payload)
+    pub fn unwatched(payload: SubscriptionClosed) -> Self {
+        Self::Unwatched(Unwatched::new(payload))
     }
-    pub fn key_material_checked(payload: KeyMaterialChecked) -> Self {
-        Self::KeyMaterialChecked(payload)
+    pub fn key_material_checked(payload: KeyMaterialReport) -> Self {
+        Self::KeyMaterialChecked(KeyMaterialChecked::new(payload))
     }
-    pub fn query_rejected(payload: QueryRejected) -> Self {
-        Self::QueryRejected(payload)
+    pub fn query_rejected(payload: RejectedQuery) -> Self {
+        Self::QueryRejected(QueryRejected::new(payload))
     }
-    pub fn watch_rejected(payload: WatchRejected) -> Self {
-        Self::WatchRejected(payload)
+    pub fn watch_rejected(payload: RejectedWatch) -> Self {
+        Self::WatchRejected(WatchRejected::new(payload))
     }
-    pub fn unwatch_rejected(payload: UnwatchRejected) -> Self {
-        Self::UnwatchRejected(payload)
+    pub fn unwatch_rejected(payload: RejectedUnwatch) -> Self {
+        Self::UnwatchRejected(UnwatchRejected::new(payload))
     }
-    pub fn key_material_check_rejected(payload: KeyMaterialCheckRejected) -> Self {
-        Self::KeyMaterialCheckRejected(payload)
+    pub fn key_material_check_rejected(payload: RejectedKeyMaterialCheck) -> Self {
+        Self::KeyMaterialCheckRejected(KeyMaterialCheckRejected::new(payload))
     }
 }
 
@@ -576,13 +1284,390 @@ impl From<EventLogRange> for Selection {
 }
 
 #[rustfmt::skip]
+impl From<Query> for Input {
+    fn from(payload: Query) -> Self {
+        Self::Query(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<WatchDeployments> for Input {
+    fn from(payload: WatchDeployments) -> Self {
+        Self::WatchDeployments(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<WatchCacheRetention> for Input {
+    fn from(payload: WatchCacheRetention) -> Self {
+        Self::WatchCacheRetention(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Unwatch> for Input {
+    fn from(payload: Unwatch) -> Self {
+        Self::Unwatch(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<CheckHostKeyMaterial> for Input {
+    fn from(payload: CheckHostKeyMaterial) -> Self {
+        Self::CheckHostKeyMaterial(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Queried> for Output {
+    fn from(payload: Queried) -> Self {
+        Self::Queried(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Watching> for Output {
+    fn from(payload: Watching) -> Self {
+        Self::Watching(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Unwatched> for Output {
+    fn from(payload: Unwatched) -> Self {
+        Self::Unwatched(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<KeyMaterialChecked> for Output {
+    fn from(payload: KeyMaterialChecked) -> Self {
+        Self::KeyMaterialChecked(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<QueryRejected> for Output {
+    fn from(payload: QueryRejected) -> Self {
+        Self::QueryRejected(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<WatchRejected> for Output {
+    fn from(payload: WatchRejected) -> Self {
+        Self::WatchRejected(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<UnwatchRejected> for Output {
+    fn from(payload: UnwatchRejected) -> Self {
+        Self::UnwatchRejected(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<KeyMaterialCheckRejected> for Output {
+    fn from(payload: KeyMaterialCheckRejected) -> Self {
+        Self::KeyMaterialCheckRejected(payload)
+    }
+}
+
+#[rustfmt::skip]
 #[cfg(feature = "nota-text")]
-impl DeploymentKind {
+impl Query {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl WatchDeployments {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl WatchCacheRetention {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Unwatch {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl CheckHostKeyMaterial {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Queried {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Watching {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Unwatched {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl KeyMaterialChecked {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl QueryRejected {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl WatchRejected {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl UnwatchRejected {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl KeyMaterialCheckRejected {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl DeploymentIdentifier {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl GenerationIdentifier {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl SubscriptionToken {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl CommitSequence {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl StateDigest {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ClusterName {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl NodeName {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl UserName {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ClosurePath {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ProposalSource {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl FlakeReference {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl EventLogPosition {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl PinLabel {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl DeploymentKind {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -592,8 +1677,8 @@ impl SystemAction {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -603,8 +1688,8 @@ impl ActivationKind {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -614,8 +1699,8 @@ impl GenerationSlot {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -768,6 +1853,28 @@ impl KeyMaterialConcern {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl MismatchValue {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl OperatorHint {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -801,6 +1908,17 @@ impl DeploymentPhase {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl PhaseDetail {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -823,8 +1941,8 @@ impl CacheRetentionTransition {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -845,8 +1963,8 @@ impl QueryRejectionReason {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -856,8 +1974,8 @@ impl WatchRejectionReason {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -867,8 +1985,8 @@ impl UnwatchRejectionReason {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -878,8 +1996,8 @@ impl KeyMaterialCheckRejectionReason {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-    pub fn to_nota(&self) -> String {
-        <Self as NotaEncode>::to_nota(self)
+    pub fn to_nota(self) -> String {
+        <Self as NotaEncode>::to_nota(&self)
     }
 }
 
@@ -1240,5 +2358,64 @@ impl Output {
             });
         }
         Ok((route, value))
+    }
+}
+
+#[rustfmt::skip]
+impl signal_frame::RequestPayload for Input {}
+#[rustfmt::skip]
+impl signal_frame::SignalOperationHeads for Input {
+    const HEADS: &'static [&'static str] = &[
+        "Query",
+        "WatchDeployments",
+        "WatchCacheRetention",
+        "Unwatch",
+        "CheckHostKeyMaterial",
+    ];
+}
+#[rustfmt::skip]
+impl signal_frame::LogVariant for Input {
+    fn log_variant(&self) -> u64 {
+        self.short_header()
+    }
+}
+#[rustfmt::skip]
+pub type Frame = signal_frame::ExchangeFrame<Input, Output>;
+#[rustfmt::skip]
+pub type FrameBody = signal_frame::ExchangeFrameBody<Input, Output>;
+#[rustfmt::skip]
+pub type Request = signal_frame::Request<Input>;
+#[rustfmt::skip]
+pub type ReplyEnvelope = signal_frame::Reply<Output>;
+#[rustfmt::skip]
+pub type RequestBuilder = signal_frame::RequestBuilder<Input>;
+#[rustfmt::skip]
+impl Input {
+    pub fn into_frame(self, exchange: signal_frame::ExchangeIdentifier) -> Frame {
+        let short_header = signal_frame::ShortHeader::new(self.short_header());
+        let request = signal_frame::Request::from_payload(self);
+        Frame::with_short_header(
+            short_header,
+            FrameBody::Request {
+                exchange,
+                request,
+            },
+        )
+    }
+}
+#[rustfmt::skip]
+impl Output {
+    pub fn into_reply_frame(self, exchange: signal_frame::ExchangeIdentifier) -> Frame {
+        let short_header = signal_frame::ShortHeader::new(self.short_header());
+        let reply = signal_frame::Reply::committed(
+            signal_frame::NonEmpty::single(signal_frame::SubReply::Ok(self)),
+        );
+        Frame::with_short_header(
+            short_header,
+            FrameBody::Reply {
+                exchange,
+                reply,
+            },
+        )
     }
 }
