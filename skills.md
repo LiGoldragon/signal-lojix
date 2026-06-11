@@ -1,6 +1,6 @@
 # signal-lojix — skills
 
-The live contract crate is under `triad-port/`.
+The live contract crate is at the repo root.
 
 ## Status
 

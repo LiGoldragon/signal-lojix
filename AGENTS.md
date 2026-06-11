@@ -3,7 +3,7 @@ You MUST read [~/primary/repos/lore/AGENTS.md](../../../lore/AGENTS.md) — the 
 # signal-lojix — agent carve-outs
 
 - **Status: implemented contract (2026-06-07).** The live Rust crate
-  is under `triad-port/`. Keep this repo pure: generated typed
+  is at the repo root. Keep this repo pure: generated typed
   records, schema, codecs, and contract tests only. Daemon runtime,
   actors, process effects, storage, and CLI behavior live in `lojix`.
 

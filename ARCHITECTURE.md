@@ -2,8 +2,8 @@
 
 *Typed Signal contract for the lojix deploy orchestrator.*
 
-> **Status (2026-06-07):** Implemented contract crate under
-> `triad-port/`. The crate owns schema-derived typed records and
+> **Status (2026-06-07):** Implemented contract crate at the
+> repo root. The crate owns schema-derived typed records and
 > codecs only; daemon runtime and CLI behavior live in `lojix`.
 > See `~/primary/protocols/active-repositories.md` §"Replacement Stack".
 
@@ -73,7 +73,7 @@ References:
 
 ## Migration history — three-layer model (2026-06-07)
 
-The implemented triad-port contract uses contract-local operation
+The implemented contract uses contract-local operation
 verbs and leaves component commands plus Sema-class projection inside
 the `lojix` daemon.
 
