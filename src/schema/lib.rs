@@ -46,6 +46,11 @@ pub struct Queried(GenerationListing);
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TestRunsQueried(TestRunListing);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Watching(SubscriptionOpened);
 
 #[rustfmt::skip]
@@ -87,6 +92,11 @@ pub struct DeploymentIdentifier(Integer);
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct GenerationIdentifier(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TestRunIdentifier(Integer);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -231,6 +241,31 @@ pub struct DatabaseMarker {
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum TestMode {
+    Hermetic,
+    Live,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum HostSelection {
+    DefaultHost,
+    OnHost(NodeName),
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Generation {
     pub generation_identifier: GenerationIdentifier,
@@ -276,10 +311,93 @@ pub struct EventLogRange {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TestRunLookup {
+    pub cluster_name: ClusterName,
+    pub node_name: NodeName,
+    pub run: Option<TestRunIdentifier>,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum Selection {
     ByNode(NodeSelector),
     ByGeneration(GenerationLookup),
     ByEventLog(EventLogRange),
+    ByTestRun(TestRunLookup),
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum TestRunPhase {
+    Submitted,
+    BringingUp,
+    Deploying,
+    Asserting,
+    TearingDown,
+    Completed,
+    Failed,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum TestOutcome {
+    Pending,
+    Passed,
+    Failed(FailureStage),
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum FailureStage {
+    BringUp,
+    Deploy,
+    Assert,
+    TearDown,
+    HermeticCheck,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TestRunRecord {
+    pub test_run_identifier: TestRunIdentifier,
+    pub cluster_name: ClusterName,
+    pub node_name: NodeName,
+    pub host: NodeName,
+    pub mode: TestMode,
+    pub phase: TestRunPhase,
+    pub outcome: TestOutcome,
+    pub closure_path: Option<ClosurePath>,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TestRunListing {
+    pub runs: Vec<TestRunRecord>,
+    pub database_marker: DatabaseMarker,
 }
 
 #[rustfmt::skip]
@@ -566,6 +684,7 @@ pub enum Input {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum Output {
     Queried(Queried),
+    TestRunsQueried(TestRunsQueried),
     Watching(Watching),
     Unwatched(Unwatched),
     KeyMaterialChecked(KeyMaterialChecked),
@@ -685,6 +804,25 @@ impl Queried {
 #[rustfmt::skip]
 impl From<GenerationListing> for Queried {
     fn from(payload: GenerationListing) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl TestRunsQueried {
+    pub fn new(payload: TestRunListing) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &TestRunListing {
+        &self.0
+    }
+    pub fn into_payload(self) -> TestRunListing {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<TestRunListing> for TestRunsQueried {
+    fn from(payload: TestRunListing) -> Self {
         Self::new(payload)
     }
 }
@@ -855,6 +993,25 @@ impl GenerationIdentifier {
 }
 #[rustfmt::skip]
 impl From<Integer> for GenerationIdentifier {
+    fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl TestRunIdentifier {
+    pub fn new(payload: Integer) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Integer {
+        &self.0
+    }
+    pub fn into_payload(self) -> Integer {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Integer> for TestRunIdentifier {
     fn from(payload: Integer) -> Self {
         Self::new(payload)
     }
@@ -1203,6 +1360,13 @@ impl From<WatchRejectionReason> for RejectedWatch {
 }
 
 #[rustfmt::skip]
+impl HostSelection {
+    pub fn on_host(payload: String) -> Self {
+        Self::OnHost(NodeName::new(payload))
+    }
+}
+
+#[rustfmt::skip]
 impl Selection {
     pub fn by_node(payload: NodeSelector) -> Self {
         Self::ByNode(payload)
@@ -1212,6 +1376,16 @@ impl Selection {
     }
     pub fn by_event_log(payload: EventLogRange) -> Self {
         Self::ByEventLog(payload)
+    }
+    pub fn by_test_run(payload: TestRunLookup) -> Self {
+        Self::ByTestRun(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl TestOutcome {
+    pub fn failed(payload: FailureStage) -> Self {
+        Self::Failed(payload)
     }
 }
 
@@ -1239,6 +1413,9 @@ impl Output {
     pub fn queried(payload: GenerationListing) -> Self {
         Self::Queried(Queried::new(payload))
     }
+    pub fn test_runs_queried(payload: TestRunListing) -> Self {
+        Self::TestRunsQueried(TestRunsQueried::new(payload))
+    }
     pub fn watching(payload: SubscriptionOpened) -> Self {
         Self::Watching(Watching::new(payload))
     }
@@ -1263,6 +1440,13 @@ impl Output {
 }
 
 #[rustfmt::skip]
+impl From<NodeName> for HostSelection {
+    fn from(payload: NodeName) -> Self {
+        Self::OnHost(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl From<NodeSelector> for Selection {
     fn from(payload: NodeSelector) -> Self {
         Self::ByNode(payload)
@@ -1280,6 +1464,20 @@ impl From<GenerationLookup> for Selection {
 impl From<EventLogRange> for Selection {
     fn from(payload: EventLogRange) -> Self {
         Self::ByEventLog(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<TestRunLookup> for Selection {
+    fn from(payload: TestRunLookup) -> Self {
+        Self::ByTestRun(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<FailureStage> for TestOutcome {
+    fn from(payload: FailureStage) -> Self {
+        Self::Failed(payload)
     }
 }
 
@@ -1322,6 +1520,13 @@ impl From<CheckHostKeyMaterial> for Input {
 impl From<Queried> for Output {
     fn from(payload: Queried) -> Self {
         Self::Queried(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<TestRunsQueried> for Output {
+    fn from(payload: TestRunsQueried) -> Self {
+        Self::TestRunsQueried(payload)
     }
 }
 
@@ -1414,13 +1619,14 @@ pub mod short_header {
     pub const INPUT_UNWATCH: u64 = 0x0003000000000000;
     pub const INPUT_CHECK_HOST_KEY_MATERIAL: u64 = 0x0004000000000000;
     pub const OUTPUT_QUERIED: u64 = 0x0100000000000000;
-    pub const OUTPUT_WATCHING: u64 = 0x0101000000000000;
-    pub const OUTPUT_UNWATCHED: u64 = 0x0102000000000000;
-    pub const OUTPUT_KEY_MATERIAL_CHECKED: u64 = 0x0103000000000000;
-    pub const OUTPUT_QUERY_REJECTED: u64 = 0x0104000000000000;
-    pub const OUTPUT_WATCH_REJECTED: u64 = 0x0105000000000000;
-    pub const OUTPUT_UNWATCH_REJECTED: u64 = 0x0106000000000000;
-    pub const OUTPUT_KEY_MATERIAL_CHECK_REJECTED: u64 = 0x0107000000000000;
+    pub const OUTPUT_TEST_RUNS_QUERIED: u64 = 0x0101000000000000;
+    pub const OUTPUT_WATCHING: u64 = 0x0102000000000000;
+    pub const OUTPUT_UNWATCHED: u64 = 0x0103000000000000;
+    pub const OUTPUT_KEY_MATERIAL_CHECKED: u64 = 0x0104000000000000;
+    pub const OUTPUT_QUERY_REJECTED: u64 = 0x0105000000000000;
+    pub const OUTPUT_WATCH_REJECTED: u64 = 0x0106000000000000;
+    pub const OUTPUT_UNWATCH_REJECTED: u64 = 0x0107000000000000;
+    pub const OUTPUT_KEY_MATERIAL_CHECK_REJECTED: u64 = 0x0108000000000000;
 }
 
 #[rustfmt::skip]
@@ -1492,6 +1698,7 @@ pub enum InputRoute {
 )]
 pub enum OutputRoute {
     Queried,
+    TestRunsQueried,
     Watching,
     Unwatched,
     KeyMaterialChecked,
@@ -1583,6 +1790,7 @@ impl Output {
     pub fn route(&self) -> OutputRoute {
         match self {
             Self::Queried(_) => OutputRoute::Queried,
+            Self::TestRunsQueried(_) => OutputRoute::TestRunsQueried,
             Self::Watching(_) => OutputRoute::Watching,
             Self::Unwatched(_) => OutputRoute::Unwatched,
             Self::KeyMaterialChecked(_) => OutputRoute::KeyMaterialChecked,
@@ -1595,6 +1803,7 @@ impl Output {
     pub fn short_header(&self) -> u64 {
         match self {
             Self::Queried(_) => short_header::OUTPUT_QUERIED,
+            Self::TestRunsQueried(_) => short_header::OUTPUT_TEST_RUNS_QUERIED,
             Self::Watching(_) => short_header::OUTPUT_WATCHING,
             Self::Unwatched(_) => short_header::OUTPUT_UNWATCHED,
             Self::KeyMaterialChecked(_) => short_header::OUTPUT_KEY_MATERIAL_CHECKED,
@@ -1611,6 +1820,7 @@ impl Output {
     ) -> Result<OutputRoute, SignalFrameError> {
         match header {
             short_header::OUTPUT_QUERIED => Ok(OutputRoute::Queried),
+            short_header::OUTPUT_TEST_RUNS_QUERIED => Ok(OutputRoute::TestRunsQueried),
             short_header::OUTPUT_WATCHING => Ok(OutputRoute::Watching),
             short_header::OUTPUT_UNWATCHED => Ok(OutputRoute::Unwatched),
             short_header::OUTPUT_KEY_MATERIAL_CHECKED => {

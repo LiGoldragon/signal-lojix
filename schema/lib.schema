@@ -21,7 +21,14 @@
 
 {}
 [Query WatchDeployments WatchCacheRetention Unwatch CheckHostKeyMaterial]
-[Queried Watching Unwatched KeyMaterialChecked QueryRejected WatchRejected UnwatchRejected KeyMaterialCheckRejected]
+[Queried TestRunsQueried Watching Unwatched KeyMaterialChecked QueryRejected WatchRejected UnwatchRejected KeyMaterialCheckRejected]
+;; TEST-OP SHARED TYPES (report 54). TestRunIdentifier, TestMode, and
+;; HostSelection are DEFINED HERE — the ordinary contract owns the shared
+;; record types once. meta-signal-lojix cross-imports them via
+;; signal-lojix:lib:TypeName for the Test request, and the daemon's binary
+;; config schema imports TestMode for its default. TestMode lives here (not in
+;; meta) because the ordinary TestRunRecord below carries it; signal-lojix is
+;; upstream of meta, so a shared type a read record needs must originate here.
 {
   Query Selection
   WatchDeployments DeploymentWatch
@@ -29,6 +36,7 @@
   Unwatch SubscriptionClose
   CheckHostKeyMaterial KeyMaterialQuery
   Queried GenerationListing
+  TestRunsQueried TestRunListing
   Watching SubscriptionOpened
   Unwatched SubscriptionClosed
   KeyMaterialChecked KeyMaterialReport
@@ -39,6 +47,7 @@
 
   DeploymentIdentifier Integer
   GenerationIdentifier Integer
+  TestRunIdentifier Integer
   SubscriptionToken Integer
   CommitSequence Integer
   StateDigest Integer
@@ -57,6 +66,18 @@
   GenerationSlot [Current BootPending Rollback Pinned Recent]
   DatabaseMarker { CommitSequence * StateDigest * }
 
+  ;; The test-run dispatch mode. Hermetic builds the pre-declared
+  ;; .#checks.<system>.vm-<cluster>-<node> nixos test (sandboxed VM, no host
+  ;; effect); Live drives the report-51 host-untouched cycle. Shared between
+  ;; the meta Test op, the daemon config default, and the ordinary
+  ;; TestRunRecord below. Report 54 decision C — two variants, no Both.
+  TestMode [Hermetic Live]
+
+  ;; The multi-host picker. DefaultHost reads the daemon config default;
+  ;; (OnHost <h>) overrides among the node's declared host-set. Shared so the
+  ;; meta TestRun request and the durable record name one type.
+  HostSelection [DefaultHost (OnHost NodeName)]
+
   Generation {
     GenerationIdentifier *
     DeploymentIdentifier *
@@ -72,7 +93,36 @@
   NodeSelector { ClusterName * NodeName * kind (Optional DeploymentKind) }
   GenerationLookup { GenerationIdentifier * }
   EventLogRange { from EventLogPosition until EventLogPosition }
-  Selection [(ByNode NodeSelector) (ByGeneration GenerationLookup) (ByEventLog EventLogRange)]
+
+  ;; TEST-RUN QUERY (report 54 §5.3). (ByTestRun …) selects the durable
+  ;; test-run outcomes over the ordinary read socket — write the test on the
+  ;; meta socket, observe the result here, exactly as deploys already work.
+  ;; The lookup names the cluster + node and optionally one run identifier;
+  ;; None returns every run for that node, newest first.
+  TestRunLookup { ClusterName * NodeName * run (Optional TestRunIdentifier) }
+  Selection [(ByNode NodeSelector) (ByGeneration GenerationLookup) (ByEventLog EventLogRange) (ByTestRun TestRunLookup)]
+
+  ;; The durable test-run outcome record, returned by (Query (ByTestRun …)).
+  ;; One row per submitted test: the run identifier, the resolved
+  ;; cluster/node/host/mode, the lifecycle phase reached, the pass/fail
+  ;; outcome, and (once known) the built closure under test. The daemon's SEMA
+  ;; TestRunTable persists these; this wire shape is what the query reply
+  ;; carries. A Pending outcome at phase Submitted is the freshly-accepted
+  ;; test the Unit-2a stub records before any real dispatch (Unit 2b).
+  TestRunPhase [Submitted BringingUp Deploying Asserting TearingDown Completed Failed]
+  TestOutcome [Pending Passed (Failed FailureStage)]
+  FailureStage [BringUp Deploy Assert TearDown HermeticCheck]
+  TestRunRecord {
+    TestRunIdentifier *
+    ClusterName *
+    NodeName *
+    host NodeName
+    mode TestMode
+    phase TestRunPhase
+    outcome TestOutcome
+    closure_path (Optional ClosurePath)
+  }
+  TestRunListing { runs (Vec TestRunRecord) DatabaseMarker * }
 
   DeploymentWatch { deployment (Optional DeploymentIdentifier) cluster (Optional ClusterName) node (Optional NodeName) }
   CacheRetentionWatch { cluster (Optional ClusterName) node (Optional NodeName) }

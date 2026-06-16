@@ -31,10 +31,13 @@ fn default_build_round_trips_ordinary_request_without_nota_text() {
 
 #[test]
 fn default_build_round_trips_ordinary_reply_without_nota_text() {
-    let output = Output::Queried(GenerationListing {
-        generations: Vec::new(),
-        database_marker: marker(),
-    }.into());
+    let output = Output::Queried(
+        GenerationListing {
+            generations: Vec::new(),
+            database_marker: marker(),
+        }
+        .into(),
+    );
     let frame = output.encode_signal_frame().expect("encode reply");
     let (_route, decoded) = Output::decode_signal_frame(&frame).expect("decode reply");
 

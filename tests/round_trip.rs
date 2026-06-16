@@ -35,17 +35,23 @@ fn watch_input() -> Input {
 }
 
 fn queried_output() -> Output {
-    Output::Queried(GenerationListing {
-        generations: Vec::new(),
-        database_marker: marker(),
-    }.into())
+    Output::Queried(
+        GenerationListing {
+            generations: Vec::new(),
+            database_marker: marker(),
+        }
+        .into(),
+    )
 }
 
 fn watching_output() -> Output {
-    Output::Watching(SubscriptionOpened {
-        subscription_token: 7.into(),
-        commit_sequence: 1.into(),
-    }.into())
+    Output::Watching(
+        SubscriptionOpened {
+            subscription_token: 7.into(),
+            commit_sequence: 1.into(),
+        }
+        .into(),
+    )
 }
 
 fn round_trip_nota<Value>(value: Value)
