@@ -19,6 +19,14 @@ This crate owns records, validation newtypes, the
 round trips. It does not own the daemon implementation, the CLI
 binary, or the deploy pipeline — those live in the `lojix` crate.
 
+## Direction
+
+`signal-lojix` is the **public peer-callable wire vocabulary** for the `lojix-daemon`. It owns only typed wire vocabulary, NOTA codecs, and round-trip witnesses for cluster deploy orchestration — no daemon code, no runtime, no actors, no storage.
+
+**Lojix is not a persona component.** The mandatory `Tap`/`Untap` observable surface does not apply. Deployment-observation and cache-retention-observation are domain-specific `Watch`/`Unwatch` pairs. Contract-local verbs (`Deploy`, `Pin`, `Unpin`, `Retire`, `Query`, `WatchDeployments`, `WatchCacheRetention`, `Unwatch`) keep the six Sema class words off the wire; the daemon lowers internally.
+
+The legacy `lojix-cli` monolithic orchestrator stays at its current schema until CriomOS migrates to consume the daemon's projection, then retires; it does not gradually grow into a client of this contract.
+
 > **Scope (today vs eventually).** This contract sits on today's
 > stack — `signal-frame` wire kernel, rkyv archives, `sema-engine`
 > typed database engine in the consumer daemon. The
