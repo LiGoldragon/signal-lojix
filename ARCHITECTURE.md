@@ -31,8 +31,7 @@ The legacy `lojix-cli` monolithic orchestrator stays at its current schema until
 > stack — `signal-frame` wire kernel, rkyv archives, `sema-engine`
 > typed database engine in the consumer daemon. The
 > eventually-self-hosting stack is Sema-on-Sema; this contract is a
-> realization step. See `~/primary/ESSENCE.md` §"Today and
-> eventually".
+> realization step. See `~/primary/ARCHITECTURE.md` §"Workspace vision and intent".
 
 ## MUST IMPLEMENT — three-layer migration
 
@@ -191,7 +190,7 @@ rewrites GC roots.
 
 ## 5 · Cross-Cutting Context
 
-- Workspace `~/primary/ESSENCE.md` is upstream of every rule.
+- Workspace `~/primary/ARCHITECTURE.md` §"Workspace vision and intent" is upstream of every rule.
 - `signal-frame` at `github:LiGoldragon/signal-frame` is the wire
   kernel. Two frame types: `ExchangeFrame` (no streams) and
   `StreamingFrame` (with streams); this channel uses
