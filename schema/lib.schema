@@ -21,7 +21,7 @@
 
 {}
 [Query WatchDeployments WatchCacheRetention Unwatch CheckHostKeyMaterial]
-[Queried TestRunsQueried Watching Unwatched KeyMaterialChecked QueryRejected WatchRejected UnwatchRejected KeyMaterialCheckRejected]
+[Queried DeploymentEventsQueried TestRunsQueried Watching Unwatched KeyMaterialChecked QueryRejected WatchRejected UnwatchRejected KeyMaterialCheckRejected]
 ;; TEST-OP SHARED TYPES (report 54). TestRunIdentifier, TestMode, and
 ;; HostSelection are DEFINED HERE — the ordinary contract owns the shared
 ;; record types once. meta-signal-lojix cross-imports them via
@@ -36,6 +36,7 @@
   Unwatch SubscriptionClose
   CheckHostKeyMaterial KeyMaterialQuery
   Queried GenerationListing
+  DeploymentEventsQueried EventLogPage
   TestRunsQueried TestRunListing
   Watching SubscriptionOpened
   Unwatched SubscriptionClosed
@@ -60,9 +61,13 @@
   EventLogPosition Integer
   PinLabel String
 
-  DeploymentKind [FullOs OsOnly HomeOnly]
-  SystemAction [Eval Build Boot Switch Test BootOnce]
-  ActivationKind [Switch Boot Test BootOnce]
+  GenerationArtifact [CompleteHost BaseHost UserEnvironment]
+  HostComposition [CompleteHost BaseHost]
+  HostDeployAction [Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce]
+  UserEnvironmentAction [Realize SetProfile ActivateNow]
+  SourceRevisionPolicy [RequireImmutable ResolveAndRecord]
+  SourceRevisionRecord { policy SourceRevisionPolicy requested_ref FlakeReference resolved_ref FlakeReference resolved_revision String }
+  ActivationEffect [LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly]
   GenerationSlot [Current BootPending Rollback Pinned Recent]
   DatabaseMarker { CommitSequence * StateDigest * }
 
@@ -83,14 +88,16 @@
     DeploymentIdentifier *
     ClusterName *
     NodeName *
-    DeploymentKind *
-    ActivationKind *
+    GenerationArtifact *
+    ActivationEffect *
     GenerationSlot *
     ClosurePath *
+    source_revision (Optional SourceRevisionRecord)
   }
   GenerationListing { generations (Vec Generation) DatabaseMarker * }
+  EventLogPage { deployment_events (Vec DeploymentPhaseEvent) retention_events (Vec CacheRetentionTransitionEvent) DatabaseMarker * }
 
-  NodeSelector { ClusterName * NodeName * kind (Optional DeploymentKind) }
+  NodeSelector { ClusterName * NodeName * artifact (Optional GenerationArtifact) }
   GenerationLookup { GenerationIdentifier * }
   EventLogRange { from EventLogPosition until EventLogPosition }
 
@@ -147,6 +154,7 @@
     DeploymentPhase *
     EventLogPosition *
     detail (Optional PhaseDetail)
+    source_revision (Optional SourceRevisionRecord)
   }
   CacheRetentionTransition [Pinned Unpinned Promoted Demoted Retired Evicted]
   CacheRetentionTransitionEvent {

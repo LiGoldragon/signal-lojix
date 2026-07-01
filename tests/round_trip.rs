@@ -18,7 +18,7 @@ fn query_input() -> Input {
         Selection::ByNode(NodeSelector {
             cluster_name: "goldragon".to_string().into(),
             node_name: "ouranos".to_string().into(),
-            kind: None,
+            artifact: None,
         })
         .into(),
     )

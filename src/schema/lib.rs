@@ -46,6 +46,11 @@ pub struct Queried(GenerationListing);
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeploymentEventsQueried(EventLogPage);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TestRunsQueried(TestRunListing);
 
 #[rustfmt::skip]
@@ -165,10 +170,10 @@ pub struct PinLabel(String);
     PartialEq,
     Eq,
 )]
-pub enum DeploymentKind {
-    FullOs,
-    OsOnly,
-    HomeOnly,
+pub enum GenerationArtifact {
+    CompleteHost,
+    BaseHost,
+    UserEnvironment,
 }
 
 #[rustfmt::skip]
@@ -183,13 +188,9 @@ pub enum DeploymentKind {
     PartialEq,
     Eq,
 )]
-pub enum SystemAction {
-    Eval,
-    Build,
-    Boot,
-    Switch,
-    Test,
-    BootOnce,
+pub enum HostComposition {
+    CompleteHost,
+    BaseHost,
 }
 
 #[rustfmt::skip]
@@ -204,11 +205,78 @@ pub enum SystemAction {
     PartialEq,
     Eq,
 )]
-pub enum ActivationKind {
-    Switch,
-    Boot,
-    Test,
-    BootOnce,
+pub enum HostDeployAction {
+    Evaluate,
+    Realize,
+    SetBootProfile,
+    ActivateNow,
+    TestActivation,
+    ScheduleBootOnce,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum UserEnvironmentAction {
+    Realize,
+    SetProfile,
+    ActivateNow,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum SourceRevisionPolicy {
+    RequireImmutable,
+    ResolveAndRecord,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SourceRevisionRecord {
+    pub policy: SourceRevisionPolicy,
+    pub requested_ref: FlakeReference,
+    pub resolved_ref: FlakeReference,
+    pub resolved_revision: String,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum ActivationEffect {
+    LiveActivation,
+    BootProfile,
+    TestActivation,
+    BootOnceProfile,
+    ProfileOnly,
 }
 
 #[rustfmt::skip]
@@ -272,10 +340,11 @@ pub struct Generation {
     pub deployment_identifier: DeploymentIdentifier,
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub deployment_kind: DeploymentKind,
-    pub activation_kind: ActivationKind,
+    pub generation_artifact: GenerationArtifact,
+    pub activation_effect: ActivationEffect,
     pub generation_slot: GenerationSlot,
     pub closure_path: ClosurePath,
+    pub source_revision: Option<SourceRevisionRecord>,
 }
 
 #[rustfmt::skip]
@@ -289,10 +358,19 @@ pub struct GenerationListing {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EventLogPage {
+    pub deployment_events: Vec<DeploymentPhaseEvent>,
+    pub retention_events: Vec<CacheRetentionTransitionEvent>,
+    pub database_marker: DatabaseMarker,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct NodeSelector {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub kind: Option<DeploymentKind>,
+    pub artifact: Option<GenerationArtifact>,
 }
 
 #[rustfmt::skip]
@@ -529,6 +607,7 @@ pub struct DeploymentPhaseEvent {
     pub deployment_phase: DeploymentPhase,
     pub event_log_position: EventLogPosition,
     pub detail: Option<PhaseDetail>,
+    pub source_revision: Option<SourceRevisionRecord>,
 }
 
 #[rustfmt::skip]
@@ -684,6 +763,7 @@ pub enum Input {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum Output {
     Queried(Queried),
+    DeploymentEventsQueried(DeploymentEventsQueried),
     TestRunsQueried(TestRunsQueried),
     Watching(Watching),
     Unwatched(Unwatched),
@@ -804,6 +884,25 @@ impl Queried {
 #[rustfmt::skip]
 impl From<GenerationListing> for Queried {
     fn from(payload: GenerationListing) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl DeploymentEventsQueried {
+    pub fn new(payload: EventLogPage) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &EventLogPage {
+        &self.0
+    }
+    pub fn into_payload(self) -> EventLogPage {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<EventLogPage> for DeploymentEventsQueried {
+    fn from(payload: EventLogPage) -> Self {
         Self::new(payload)
     }
 }
@@ -1719,6 +1818,9 @@ impl Output {
     pub fn queried(payload: GenerationListing) -> Self {
         Self::Queried(Queried::new(payload))
     }
+    pub fn deployment_events_queried(payload: EventLogPage) -> Self {
+        Self::DeploymentEventsQueried(DeploymentEventsQueried::new(payload))
+    }
     pub fn test_runs_queried(payload: TestRunListing) -> Self {
         Self::TestRunsQueried(TestRunsQueried::new(payload))
     }
@@ -1830,6 +1932,13 @@ impl From<Queried> for Output {
 }
 
 #[rustfmt::skip]
+impl From<DeploymentEventsQueried> for Output {
+    fn from(payload: DeploymentEventsQueried) -> Self {
+        Self::DeploymentEventsQueried(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl From<TestRunsQueried> for Output {
     fn from(payload: TestRunsQueried) -> Self {
         Self::TestRunsQueried(payload)
@@ -1925,14 +2034,15 @@ pub mod short_header {
     pub const INPUT_UNWATCH: u64 = 0x0003000000000000;
     pub const INPUT_CHECK_HOST_KEY_MATERIAL: u64 = 0x0004000000000000;
     pub const OUTPUT_QUERIED: u64 = 0x0100000000000000;
-    pub const OUTPUT_TEST_RUNS_QUERIED: u64 = 0x0101000000000000;
-    pub const OUTPUT_WATCHING: u64 = 0x0102000000000000;
-    pub const OUTPUT_UNWATCHED: u64 = 0x0103000000000000;
-    pub const OUTPUT_KEY_MATERIAL_CHECKED: u64 = 0x0104000000000000;
-    pub const OUTPUT_QUERY_REJECTED: u64 = 0x0105000000000000;
-    pub const OUTPUT_WATCH_REJECTED: u64 = 0x0106000000000000;
-    pub const OUTPUT_UNWATCH_REJECTED: u64 = 0x0107000000000000;
-    pub const OUTPUT_KEY_MATERIAL_CHECK_REJECTED: u64 = 0x0108000000000000;
+    pub const OUTPUT_DEPLOYMENT_EVENTS_QUERIED: u64 = 0x0101000000000000;
+    pub const OUTPUT_TEST_RUNS_QUERIED: u64 = 0x0102000000000000;
+    pub const OUTPUT_WATCHING: u64 = 0x0103000000000000;
+    pub const OUTPUT_UNWATCHED: u64 = 0x0104000000000000;
+    pub const OUTPUT_KEY_MATERIAL_CHECKED: u64 = 0x0105000000000000;
+    pub const OUTPUT_QUERY_REJECTED: u64 = 0x0106000000000000;
+    pub const OUTPUT_WATCH_REJECTED: u64 = 0x0107000000000000;
+    pub const OUTPUT_UNWATCH_REJECTED: u64 = 0x0108000000000000;
+    pub const OUTPUT_KEY_MATERIAL_CHECK_REJECTED: u64 = 0x0109000000000000;
 }
 
 #[rustfmt::skip]
@@ -2004,6 +2114,7 @@ pub enum InputRoute {
 )]
 pub enum OutputRoute {
     Queried,
+    DeploymentEventsQueried,
     TestRunsQueried,
     Watching,
     Unwatched,
@@ -2096,6 +2207,7 @@ impl Output {
     pub fn route(&self) -> OutputRoute {
         match self {
             Self::Queried(_) => OutputRoute::Queried,
+            Self::DeploymentEventsQueried(_) => OutputRoute::DeploymentEventsQueried,
             Self::TestRunsQueried(_) => OutputRoute::TestRunsQueried,
             Self::Watching(_) => OutputRoute::Watching,
             Self::Unwatched(_) => OutputRoute::Unwatched,
@@ -2109,6 +2221,9 @@ impl Output {
     pub fn short_header(&self) -> u64 {
         match self {
             Self::Queried(_) => short_header::OUTPUT_QUERIED,
+            Self::DeploymentEventsQueried(_) => {
+                short_header::OUTPUT_DEPLOYMENT_EVENTS_QUERIED
+            }
             Self::TestRunsQueried(_) => short_header::OUTPUT_TEST_RUNS_QUERIED,
             Self::Watching(_) => short_header::OUTPUT_WATCHING,
             Self::Unwatched(_) => short_header::OUTPUT_UNWATCHED,
@@ -2126,6 +2241,9 @@ impl Output {
     ) -> Result<OutputRoute, SignalFrameError> {
         match header {
             short_header::OUTPUT_QUERIED => Ok(OutputRoute::Queried),
+            short_header::OUTPUT_DEPLOYMENT_EVENTS_QUERIED => {
+                Ok(OutputRoute::DeploymentEventsQueried)
+            }
             short_header::OUTPUT_TEST_RUNS_QUERIED => Ok(OutputRoute::TestRunsQueried),
             short_header::OUTPUT_WATCHING => Ok(OutputRoute::Watching),
             short_header::OUTPUT_UNWATCHED => Ok(OutputRoute::Unwatched),

@@ -25,7 +25,7 @@ binary, or the deploy pipeline — those live in the `lojix` crate.
 
 **Lojix is not a persona component.** The mandatory `Tap`/`Untap` observable surface does not apply. Deployment-observation and cache-retention-observation are domain-specific `Watch`/`Unwatch` pairs. Contract-local verbs (`Deploy`, `Pin`, `Unpin`, `Retire`, `Query`, `WatchDeployments`, `WatchCacheRetention`, `Unwatch`) keep the six Sema class words off the wire; the daemon lowers internally.
 
-The legacy `lojix-cli` monolithic orchestrator stays at its current schema until CriomOS migrates to consume the daemon's projection, then retires; it does not gradually grow into a client of this contract.
+The deploy surface is direct typed contract vocabulary; callers update to this contract rather than carrying alternate aliases or translators.
 
 > **Scope (today vs eventually).** This contract sits on today's
 > stack — `signal-frame` wire kernel, rkyv archives, `sema-engine`
@@ -123,10 +123,10 @@ cross-component observation.
 ### Reply variants
 
 Verb-past-tense for outcomes plus typed rejection payloads (per
-reply discipline in `skills/contract-repo.md`): `Deployed`,
-`DeployRejected`, `Pinned` / `Unpinned` / `Retired`,
-`Queried(GenerationListing)`, `Watching` (subscription opened), and
-the typed `*Rejected` reasons.
+reply discipline in `skills/contract-repo.md`):
+`Queried(GenerationListing)`, `DeploymentEventsQueried(EventLogPage)`,
+`TestRunsQueried(TestRunListing)`, `Watching` (subscription opened),
+`Unwatched`, `KeyMaterialChecked`, and the typed `*Rejected` reasons.
 
 ### Event variants (streaming)
 
@@ -205,8 +205,6 @@ rewrites GC roots.
   `github:LiGoldragon/signal-persona-mind`,
   `signal-persona-message`, `signal-persona-router`, etc., is the
   structural precedent for shape.
-- Today's `lojix-cli` at `github:LiGoldragon/lojix-cli` is the
-  legacy monolithic orchestrator. It stays at its current schema
-  until CriomOS migrates to consume this daemon's projection, then
-  retires — it does not gradually grow into a client of this
-  contract.
+- The deploy interface is direct typed `signal-lojix` vocabulary.
+  Renames are breaking schema changes coordinated with consumers, not
+  compatibility layers.

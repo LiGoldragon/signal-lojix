@@ -1,7 +1,7 @@
 use std::process::Command;
 
 #[test]
-fn default_dependency_tree_does_not_pull_text_or_legacy_signal_crates() {
+fn default_dependency_tree_does_not_pull_text_or_retired_signal_crates() {
     let output = Command::new("cargo")
         .args(["tree", "--edges", "normal", "--no-default-features"])
         .output()

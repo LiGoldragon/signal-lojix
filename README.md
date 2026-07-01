@@ -1,18 +1,19 @@
 # signal-lojix
 
 Typed Signal contract for the lojix deploy orchestrator. Defines the
-records exchanged between operator clients and `lojix-daemon` over the
-daemon's Unix socket.
+ordinary peer-callable records exchanged between operator clients and
+`lojix-daemon` over the daemon's ordinary Unix socket.
 
-**Status: skeleton.** Documentation only — no code yet. See
-`ARCHITECTURE.md` for the planned shape and `~/primary/protocols/active-repositories.md`
-for the replacement-stack context.
+**Status: implemented contract.** The repo contains the schema,
+generated Rust records/codecs, and contract witnesses. Runtime deploy
+behavior lives in `lojix`.
 
 ## Related
 
-- `lojix-daemon` — the daemon that consumes this contract.
-- `lojix-cli` — today's monolithic deploy orchestrator; becomes a thin
-  client over `lojix-daemon` once the daemon ships.
+- `lojix-daemon` — the daemon that consumes this ordinary contract.
+- `meta-signal-lojix` — owner-only policy contract for deploy and
+  retention mutations.
+- `signal-frame` — frame kernel used by this contract.
 - `signal-persona-mind`, `signal-persona-message` — structural
   precedents for the contract-crate shape.
 
