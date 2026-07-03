@@ -1,6 +1,6 @@
 #![cfg(feature = "nota-text")]
 
-use nota_next::{NotaDecode, NotaEncode, NotaSource};
+use nota::{NotaDecode, NotaEncode, NotaSource};
 use signal_lojix::schema::lib::{
     CacheRetentionWatch, DatabaseMarker, GenerationListing, Input, NodeSelector, Output, Selection,
     SubscriptionOpened,
