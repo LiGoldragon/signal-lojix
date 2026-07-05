@@ -8,14 +8,14 @@
 ;; This contract DEFINES the shared record types ONCE — meta-signal-lojix
 ;; cross-imports them via  signal-lojix:lib:TypeName.
 ;;
-;; STREAMING (day-one decision 2tfa). schema-next cannot yet emit a
+;; STREAMING (day-one decision 2tfa). schema cannot yet emit a
 ;; daemon-pushed event frame — no event/stream root, no opens/belongs
-;; construct (verified against schema-next + schema-rust-next; the cloud
+;; construct (verified against schema + schema-rust; the cloud
 ;; port never needed it). So the Watch/Unwatch SUBSCRIPTION HANDSHAKE is
 ;; authored in the emittable form (ordinary request -> SubscriptionToken
 ;; reply) and the two event payloads are defined once as namespace records,
-;; so streaming is NOT dropped from the contract. The schema-next +
-;; schema-rust-next event-frame-emission enhancement is the named follow-on
+;; so streaming is NOT dropped from the contract. The schema +
+;; schema-rust event-frame-emission enhancement is the named follow-on
 ;; on the lojix path. Full argument + the provisional post-grammar event
 ;; root: ARCHITECTURE.md §4.
 
