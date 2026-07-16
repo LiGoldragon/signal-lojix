@@ -1,6 +1,5 @@
-use signal_lojix::schema::lib::{
-    DatabaseMarker, GenerationListing, Input, NodeSelector, Output, Selection,
-};
+use signal_lojix::schema::lib::{DatabaseMarker, GenerationListing, NodeSelector, Selection};
+use signal_lojix::{Input, Output};
 
 fn marker() -> DatabaseMarker {
     DatabaseMarker {
@@ -30,7 +29,7 @@ fn default_build_round_trips_ordinary_request_without_nota_text() {
 }
 
 #[test]
-fn default_build_round_trips_ordinary_reply_without_nota_text() {
+fn canonical_package_roots_round_trip_ordinary_reply_without_nota_text() {
     let output = Output::Queried(
         GenerationListing {
             generation_vector: Vec::new(),

@@ -23,7 +23,7 @@ impl SchemaBuild {
         GenerationDriver::new(GenerationPlan::wire_contract(
             &self.crate_root,
             "signal-lojix",
-            "0.2.0",
+            "0.4.0",
         ))
         .generate()
         .expect("generate signal-lojix schema artifacts")
