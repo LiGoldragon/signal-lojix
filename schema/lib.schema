@@ -20,8 +20,8 @@
 ;; root: ARCHITECTURE.md §4.
 
 {}
-[Query WatchDeployments WatchCacheRetention Unwatch CheckHostKeyMaterial]
-[Queried DeploymentEventsQueried TestRunsQueried Watching Unwatched KeyMaterialChecked QueryRejected WatchRejected UnwatchRejected KeyMaterialCheckRejected]
+[Query.QueryPayload WatchDeployments.WatchDeploymentsPayload WatchCacheRetention.WatchCacheRetentionPayload Unwatch.UnwatchPayload CheckHostKeyMaterial.CheckHostKeyMaterialPayload]
+[Queried.QueriedPayload DeploymentEventsQueried.DeploymentEventsQueriedPayload TestRunsQueried.TestRunsQueriedPayload Watching.WatchingPayload Unwatched.UnwatchedPayload KeyMaterialChecked.KeyMaterialCheckedPayload QueryRejected.QueryRejectedPayload WatchRejected.WatchRejectedPayload UnwatchRejected.UnwatchRejectedPayload KeyMaterialCheckRejected.KeyMaterialCheckRejectedPayload]
 ;; TEST-OP SHARED TYPES (report 54). TestRunIdentifier, TestMode, and
 ;; HostSelection are DEFINED HERE — the ordinary contract owns the shared
 ;; record types once. meta-signal-lojix cross-imports them via
@@ -30,60 +30,60 @@
 ;; meta) because the ordinary TestRunRecord below carries it; signal-lojix is
 ;; upstream of meta, so a shared type a read record needs must originate here.
 {
-  Query Selection
-  WatchDeployments DeploymentWatch
-  WatchCacheRetention CacheRetentionWatch
-  Unwatch SubscriptionClose
-  CheckHostKeyMaterial KeyMaterialQuery
-  Queried GenerationListing
-  DeploymentEventsQueried EventLogPage
-  TestRunsQueried TestRunListing
-  Watching SubscriptionOpened
-  Unwatched SubscriptionClosed
-  KeyMaterialChecked KeyMaterialReport
-  QueryRejected RejectedQuery
-  WatchRejected RejectedWatch
-  UnwatchRejected RejectedUnwatch
-  KeyMaterialCheckRejected RejectedKeyMaterialCheck
+  QueryPayload.Selection
+  WatchDeploymentsPayload.DeploymentWatch
+  WatchCacheRetentionPayload.CacheRetentionWatch
+  UnwatchPayload.SubscriptionClose
+  CheckHostKeyMaterialPayload.KeyMaterialQuery
+  QueriedPayload.GenerationListing
+  DeploymentEventsQueriedPayload.EventLogPage
+  TestRunsQueriedPayload.TestRunListing
+  WatchingPayload.SubscriptionOpened
+  UnwatchedPayload.SubscriptionClosed
+  KeyMaterialCheckedPayload.KeyMaterialReport
+  QueryRejectedPayload.RejectedQuery
+  WatchRejectedPayload.RejectedWatch
+  UnwatchRejectedPayload.RejectedUnwatch
+  KeyMaterialCheckRejectedPayload.RejectedKeyMaterialCheck
 
-  DeploymentIdentifier Integer
-  GenerationIdentifier Integer
-  TestRunIdentifier Integer
-  SubscriptionToken Integer
-  CommitSequence Integer
-  StateDigest Integer
-  ClusterName String
-  NodeName String
-  UserName String
-  ClosurePath String
-  ProposalSource String
-  FlakeReference String
-  EventLogPosition Integer
-  PinLabel String
+  DeploymentIdentifier.Integer
+  GenerationIdentifier.Integer
+  TestRunIdentifier.Integer
+  SubscriptionToken.Integer
+  CommitSequence.Integer
+  StateDigest.Integer
+  ClusterName.String
+  NodeName.String
+  UserName.String
+  ClosurePath.String
+  ProposalSource.String
+  FlakeReference.String
+  EventLogPosition.Integer
+  PinLabel.String
 
-  GenerationArtifact [CompleteHost BaseHost UserEnvironment]
-  HostComposition [CompleteHost BaseHost]
-  HostDeployAction [Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce]
-  UserEnvironmentAction [Realize SetProfile ActivateNow]
-  SourceRevisionPolicy [RequireImmutable ResolveAndRecord]
-  SourceRevisionRecord { policy.SourceRevisionPolicy requested_ref.FlakeReference resolved_ref.FlakeReference resolved_revision.String }
-  ActivationEffect [LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly]
-  GenerationSlot [Current BootPending Rollback Pinned Recent]
-  DatabaseMarker { CommitSequence StateDigest }
+  GenerationArtifact.[CompleteHost BaseHost UserEnvironment]
+  HostComposition.[CompleteHost BaseHost]
+  HostDeployAction.[Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce]
+  UserEnvironmentAction.[Realize SetProfile ActivateNow]
+  SourceRevisionPolicy.[RequireImmutable ResolveAndRecord]
+  SourceRevisionRecord.{ SourceRevisionPolicy requested_ref.FlakeReference resolved_ref.FlakeReference String }
+  ActivationEffect.[LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly]
+  GenerationSlot.[Current BootPending Rollback Pinned Recent]
+  DatabaseMarker.{ CommitSequence StateDigest }
 
   ;; The test-run dispatch mode. Hermetic builds the pre-declared
   ;; .#checks.<system>.vm-<cluster>-<node> nixos test (sandboxed VM, no host
   ;; effect); Live drives the report-51 host-untouched cycle. Shared between
   ;; the meta Test op, the daemon config default, and the ordinary
   ;; TestRunRecord below. Report 54 decision C — two variants, no Both.
-  TestMode [Hermetic Live]
+  TestMode.[Hermetic Live]
 
   ;; The multi-host picker. DefaultHost reads the daemon config default;
   ;; (OnHost <h>) overrides among the node's declared host-set. Shared so the
   ;; meta TestRun request and the durable record name one type.
-  HostSelection [DefaultHost (OnHost NodeName)]
+  HostSelection.[DefaultHost (OnHost NodeName)]
 
-  Generation {
+  Generation.{
     GenerationIdentifier
     DeploymentIdentifier
     ClusterName
@@ -92,22 +92,22 @@
     ActivationEffect
     GenerationSlot
     ClosurePath
-    source_revision.(Optional SourceRevisionRecord)
+    Optional.SourceRevisionRecord
   }
-  GenerationListing { generations.(Vector Generation) DatabaseMarker }
-  EventLogPage { deployment_events.(Vector DeploymentPhaseEvent) retention_events.(Vector CacheRetentionTransitionEvent) DatabaseMarker }
+  GenerationListing.{ Vector.Generation DatabaseMarker }
+  EventLogPage.{ Vector.DeploymentPhaseEvent Vector.CacheRetentionTransitionEvent DatabaseMarker }
 
-  NodeSelector { ClusterName NodeName artifact.(Optional GenerationArtifact) }
-  GenerationLookup { GenerationIdentifier }
-  EventLogRange { from.EventLogPosition until.EventLogPosition }
+  NodeSelector.{ ClusterName NodeName Optional.GenerationArtifact }
+  GenerationLookup.{ GenerationIdentifier }
+  EventLogRange.{ from.EventLogPosition until.EventLogPosition }
 
   ;; TEST-RUN QUERY (report 54 §5.3). (ByTestRun …) selects the durable
   ;; test-run outcomes over the ordinary read socket — write the test on the
   ;; meta socket, observe the result here, exactly as deploys already work.
   ;; The lookup names the cluster + node and optionally one run identifier;
   ;; None returns every run for that node, newest first.
-  TestRunLookup { ClusterName NodeName run.(Optional TestRunIdentifier) }
-  Selection [(ByNode NodeSelector) (ByGeneration GenerationLookup) (ByEventLog EventLogRange) (ByTestRun TestRunLookup)]
+  TestRunLookup.{ ClusterName NodeName Optional.TestRunIdentifier }
+  Selection.[(ByNode NodeSelector) (ByGeneration GenerationLookup) (ByEventLog EventLogRange) (ByTestRun TestRunLookup)]
 
   ;; The durable test-run outcome record, returned by (Query (ByTestRun …)).
   ;; One row per submitted test: the run identifier, the resolved
@@ -116,64 +116,67 @@
   ;; TestRunTable persists these; this wire shape is what the query reply
   ;; carries. A Pending outcome at phase Submitted is the freshly-accepted
   ;; test the Unit-2a stub records before any real dispatch (Unit 2b).
-  TestRunPhase [Submitted BringingUp Deploying Asserting TearingDown Completed Failed]
-  TestOutcome [Pending Passed (Failed FailureStage)]
-  FailureStage [BringUp Deploy Assert TearDown HermeticCheck]
-  TestRunRecord {
+  TestRunPhase.[Submitted BringingUp Deploying Asserting TearingDown Completed Failed]
+  TestOutcome.[Pending Passed (Failed FailureStage)]
+  FailureStage.[BringUp Deploy Assert TearDown HermeticCheck]
+  TestRunRecord.{
     TestRunIdentifier
     ClusterName
-    NodeName
+    node.NodeName
     host.NodeName
-    mode.TestMode
-    phase.TestRunPhase
-    outcome.TestOutcome
-    closure_path.(Optional ClosurePath)
+    TestMode
+    TestRunPhase
+    TestOutcome
+    Optional.ClosurePath
   }
-  TestRunListing { runs.(Vector TestRunRecord) DatabaseMarker }
+  TestRunListing.{ Vector.TestRunRecord DatabaseMarker }
 
-  DeploymentWatch { deployment.(Optional DeploymentIdentifier) cluster.(Optional ClusterName) node.(Optional NodeName) }
-  CacheRetentionWatch { cluster.(Optional ClusterName) node.(Optional NodeName) }
-  SubscriptionClose { SubscriptionToken }
-  SubscriptionOpened { SubscriptionToken CommitSequence }
-  SubscriptionClosed { SubscriptionToken }
+  DeploymentWatch.{ Optional.DeploymentIdentifier Optional.ClusterName Optional.NodeName }
+  CacheRetentionWatch.{ Optional.ClusterName Optional.NodeName }
+  SubscriptionClose.{ SubscriptionToken }
+  SubscriptionOpened.{ SubscriptionToken CommitSequence }
+  SubscriptionClosed.{ SubscriptionToken }
 
-  KeyMaterialQuery { ClusterName NodeName source.ProposalSource }
-  KeyMaterialConcern [SecureShellPublicKey YggdrasilPublicKey YggdrasilAddress]
-  MismatchValue String
-  OperatorHint String
-  KeyMaterialMismatch { KeyMaterialConcern expected.MismatchValue actual.MismatchValue OperatorHint }
-  KeyMaterialReport { NodeName mismatches.(Vector KeyMaterialMismatch) DatabaseMarker }
+  KeyMaterialQuery.{ ClusterName NodeName ProposalSource }
+  KeyMaterialConcern.[SecureShellPublicKey YggdrasilPublicKey YggdrasilAddress]
+  MismatchValue.String
+  OperatorHint.String
+  KeyMaterialMismatch.{ KeyMaterialConcern expected.MismatchValue actual.MismatchValue OperatorHint }
+  KeyMaterialReport.{ NodeName Vector.KeyMaterialMismatch DatabaseMarker }
 
-  DeploymentPhase [Submitted Building Built Copying Activating Activated Failed]
-  PhaseDetail String
-  DeploymentPhaseEvent {
+  DeploymentPhase.[Submitted Building Built Copying Activating Activated Failed]
+  PhaseDetail.String
+  DeploymentPhaseEvent.{
     DeploymentIdentifier
     GenerationIdentifier
     ClusterName
     NodeName
     DeploymentPhase
     EventLogPosition
-    detail.(Optional PhaseDetail)
-    source_revision.(Optional SourceRevisionRecord)
+    Optional.PhaseDetail
+    Optional.SourceRevisionRecord
   }
-  CacheRetentionTransition [Pinned Unpinned Promoted Demoted Retired Evicted]
-  CacheRetentionTransitionEvent {
+  CacheRetentionTransition.[Pinned Unpinned Promoted Demoted Retired Evicted]
+  CacheRetentionTransitionEvent.{
     GenerationIdentifier
     ClusterName
     NodeName
     CacheRetentionTransition
-    from_slot.GenerationSlot
-    to_slot.(Optional GenerationSlot)
-    label.(Optional PinLabel)
+    GenerationSlot
+    Optional.GenerationSlot
+    Optional.PinLabel
     EventLogPosition
   }
 
-  QueryRejectionReason [GenerationUnknown NodeUnknown EventLogPositionOutOfRange MalformedSelector]
-  WatchRejectionReason [SubscriptionLimitReached MalformedWatch StreamUnavailable]
-  UnwatchRejectionReason [SubscriptionTokenUnknown SubscriptionAlreadyClosed]
-  KeyMaterialCheckRejectionReason [NodeUnknown ProposalSourceUnreachable HostUnreachable PublicationMalformed]
-  RejectedQuery { QueryRejectionReason DatabaseMarker }
-  RejectedWatch { WatchRejectionReason }
-  RejectedUnwatch { UnwatchRejectionReason SubscriptionToken }
-  RejectedKeyMaterialCheck { KeyMaterialCheckRejectionReason DatabaseMarker }
+  QueryRejectionReason.[GenerationUnknown NodeUnknown EventLogPositionOutOfRange MalformedSelector]
+  WatchRejectionReason.[SubscriptionLimitReached MalformedWatch StreamUnavailable]
+  UnwatchRejectionReason.[SubscriptionTokenUnknown SubscriptionAlreadyClosed]
+  KeyMaterialCheckRejectionReason.[NodeUnknown ProposalSourceUnreachable HostUnreachable PublicationMalformed]
+  RejectedQuery.{ QueryRejectionReason DatabaseMarker }
+  RejectedWatch.{ WatchRejectionReason }
+  RejectedUnwatch.{ UnwatchRejectionReason SubscriptionToken }
+  RejectedKeyMaterialCheck.{ KeyMaterialCheckRejectionReason DatabaseMarker }
 }
+
+{}
+{}

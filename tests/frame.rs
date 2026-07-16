@@ -14,7 +14,7 @@ fn query_input() -> Input {
         Selection::ByNode(NodeSelector {
             cluster_name: "goldragon".to_string().into(),
             node_name: "ouranos".to_string().into(),
-            artifact: None,
+            optional_generation_artifact: None,
         })
         .into(),
     )
@@ -33,7 +33,7 @@ fn default_build_round_trips_ordinary_request_without_nota_text() {
 fn default_build_round_trips_ordinary_reply_without_nota_text() {
     let output = Output::Queried(
         GenerationListing {
-            generations: Vec::new(),
+            generation_vector: Vec::new(),
             database_marker: marker(),
         }
         .into(),

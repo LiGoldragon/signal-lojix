@@ -19,7 +19,7 @@ pub use nota::{NotaDecodeError, NotaEncode, NotaSource};
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct Query(Selection);
+pub struct QueryPayload(Selection);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -27,7 +27,7 @@ pub struct Query(Selection);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct WatchDeployments(DeploymentWatch);
+pub struct WatchDeploymentsPayload(DeploymentWatch);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -35,7 +35,7 @@ pub struct WatchDeployments(DeploymentWatch);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct WatchCacheRetention(CacheRetentionWatch);
+pub struct WatchCacheRetentionPayload(CacheRetentionWatch);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -43,7 +43,7 @@ pub struct WatchCacheRetention(CacheRetentionWatch);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct Unwatch(SubscriptionClose);
+pub struct UnwatchPayload(SubscriptionClose);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -51,7 +51,7 @@ pub struct Unwatch(SubscriptionClose);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct CheckHostKeyMaterial(KeyMaterialQuery);
+pub struct CheckHostKeyMaterialPayload(KeyMaterialQuery);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -59,7 +59,7 @@ pub struct CheckHostKeyMaterial(KeyMaterialQuery);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct Queried(GenerationListing);
+pub struct QueriedPayload(GenerationListing);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -67,7 +67,7 @@ pub struct Queried(GenerationListing);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct DeploymentEventsQueried(EventLogPage);
+pub struct DeploymentEventsQueriedPayload(EventLogPage);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -75,7 +75,7 @@ pub struct DeploymentEventsQueried(EventLogPage);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct TestRunsQueried(TestRunListing);
+pub struct TestRunsQueriedPayload(TestRunListing);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -83,7 +83,7 @@ pub struct TestRunsQueried(TestRunListing);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct Watching(SubscriptionOpened);
+pub struct WatchingPayload(SubscriptionOpened);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -91,7 +91,7 @@ pub struct Watching(SubscriptionOpened);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct Unwatched(SubscriptionClosed);
+pub struct UnwatchedPayload(SubscriptionClosed);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -99,7 +99,7 @@ pub struct Unwatched(SubscriptionClosed);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct KeyMaterialChecked(KeyMaterialReport);
+pub struct KeyMaterialCheckedPayload(KeyMaterialReport);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -107,7 +107,7 @@ pub struct KeyMaterialChecked(KeyMaterialReport);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct QueryRejected(RejectedQuery);
+pub struct QueryRejectedPayload(RejectedQuery);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -115,7 +115,7 @@ pub struct QueryRejected(RejectedQuery);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct WatchRejected(RejectedWatch);
+pub struct WatchRejectedPayload(RejectedWatch);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -123,7 +123,7 @@ pub struct WatchRejected(RejectedWatch);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct UnwatchRejected(RejectedUnwatch);
+pub struct UnwatchRejectedPayload(RejectedUnwatch);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -131,7 +131,7 @@ pub struct UnwatchRejected(RejectedUnwatch);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct KeyMaterialCheckRejected(RejectedKeyMaterialCheck);
+pub struct KeyMaterialCheckRejectedPayload(RejectedKeyMaterialCheck);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -358,10 +358,10 @@ pub enum SourceRevisionPolicy {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SourceRevisionRecord {
-    pub policy: SourceRevisionPolicy,
+    pub source_revision_policy: SourceRevisionPolicy,
     pub requested_ref: FlakeReference,
     pub resolved_ref: FlakeReference,
-    pub resolved_revision: String,
+    pub string: String,
 }
 
 #[rustfmt::skip]
@@ -467,7 +467,7 @@ pub struct Generation {
     pub activation_effect: ActivationEffect,
     pub generation_slot: GenerationSlot,
     pub closure_path: ClosurePath,
-    pub source_revision: Option<SourceRevisionRecord>,
+    pub optional_source_revision_record: Option<SourceRevisionRecord>,
 }
 
 #[rustfmt::skip]
@@ -477,7 +477,7 @@ pub struct Generation {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct GenerationListing {
-    pub generations: Vec<Generation>,
+    pub generation_vector: Vec<Generation>,
     pub database_marker: DatabaseMarker,
 }
 
@@ -488,8 +488,8 @@ pub struct GenerationListing {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct EventLogPage {
-    pub deployment_events: Vec<DeploymentPhaseEvent>,
-    pub retention_events: Vec<CacheRetentionTransitionEvent>,
+    pub deployment_phase_event_vector: Vec<DeploymentPhaseEvent>,
+    pub cache_retention_transition_event_vector: Vec<CacheRetentionTransitionEvent>,
     pub database_marker: DatabaseMarker,
 }
 
@@ -502,7 +502,7 @@ pub struct EventLogPage {
 pub struct NodeSelector {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub artifact: Option<GenerationArtifact>,
+    pub optional_generation_artifact: Option<GenerationArtifact>,
 }
 
 #[rustfmt::skip]
@@ -533,7 +533,7 @@ pub struct EventLogRange {
 pub struct TestRunLookup {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub run: Option<TestRunIdentifier>,
+    pub optional_test_run_identifier: Option<TestRunIdentifier>,
 }
 
 #[rustfmt::skip]
@@ -618,12 +618,12 @@ pub enum FailureStage {
 pub struct TestRunRecord {
     pub test_run_identifier: TestRunIdentifier,
     pub cluster_name: ClusterName,
-    pub node_name: NodeName,
+    pub node: NodeName,
     pub host: NodeName,
-    pub mode: TestMode,
-    pub phase: TestRunPhase,
-    pub outcome: TestOutcome,
-    pub closure_path: Option<ClosurePath>,
+    pub test_mode: TestMode,
+    pub test_run_phase: TestRunPhase,
+    pub test_outcome: TestOutcome,
+    pub optional_closure_path: Option<ClosurePath>,
 }
 
 #[rustfmt::skip]
@@ -633,7 +633,7 @@ pub struct TestRunRecord {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TestRunListing {
-    pub runs: Vec<TestRunRecord>,
+    pub test_run_record_vector: Vec<TestRunRecord>,
     pub database_marker: DatabaseMarker,
 }
 
@@ -644,9 +644,9 @@ pub struct TestRunListing {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DeploymentWatch {
-    pub deployment: Option<DeploymentIdentifier>,
-    pub cluster: Option<ClusterName>,
-    pub node: Option<NodeName>,
+    pub optional_deployment_identifier: Option<DeploymentIdentifier>,
+    pub optional_cluster_name: Option<ClusterName>,
+    pub optional_node_name: Option<NodeName>,
 }
 
 #[rustfmt::skip]
@@ -656,8 +656,8 @@ pub struct DeploymentWatch {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CacheRetentionWatch {
-    pub cluster: Option<ClusterName>,
-    pub node: Option<NodeName>,
+    pub optional_cluster_name: Option<ClusterName>,
+    pub optional_node_name: Option<NodeName>,
 }
 
 #[rustfmt::skip]
@@ -696,7 +696,7 @@ pub struct SubscriptionClosed(SubscriptionToken);
 pub struct KeyMaterialQuery {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub source: ProposalSource,
+    pub proposal_source: ProposalSource,
 }
 
 #[rustfmt::skip]
@@ -757,7 +757,7 @@ pub struct KeyMaterialMismatch {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct KeyMaterialReport {
     pub node_name: NodeName,
-    pub mismatches: Vec<KeyMaterialMismatch>,
+    pub key_material_mismatch_vector: Vec<KeyMaterialMismatch>,
     pub database_marker: DatabaseMarker,
 }
 
@@ -807,8 +807,8 @@ pub struct DeploymentPhaseEvent {
     pub node_name: NodeName,
     pub deployment_phase: DeploymentPhase,
     pub event_log_position: EventLogPosition,
-    pub detail: Option<PhaseDetail>,
-    pub source_revision: Option<SourceRevisionRecord>,
+    pub optional_phase_detail: Option<PhaseDetail>,
+    pub optional_source_revision_record: Option<SourceRevisionRecord>,
 }
 
 #[rustfmt::skip]
@@ -846,9 +846,9 @@ pub struct CacheRetentionTransitionEvent {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
     pub cache_retention_transition: CacheRetentionTransition,
-    pub from_slot: GenerationSlot,
-    pub to_slot: Option<GenerationSlot>,
-    pub label: Option<PinLabel>,
+    pub generation_slot: GenerationSlot,
+    pub optional_generation_slot: Option<GenerationSlot>,
+    pub optional_pin_label: Option<PinLabel>,
     pub event_log_position: EventLogPosition,
 }
 
@@ -985,11 +985,11 @@ pub struct RejectedKeyMaterialCheck {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum Input {
-    Query(Query),
-    WatchDeployments(WatchDeployments),
-    WatchCacheRetention(WatchCacheRetention),
-    Unwatch(Unwatch),
-    CheckHostKeyMaterial(CheckHostKeyMaterial),
+    Query(QueryPayload),
+    WatchDeployments(WatchDeploymentsPayload),
+    WatchCacheRetention(WatchCacheRetentionPayload),
+    Unwatch(UnwatchPayload),
+    CheckHostKeyMaterial(CheckHostKeyMaterialPayload),
 }
 
 #[rustfmt::skip]
@@ -999,20 +999,20 @@ pub enum Input {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum Output {
-    Queried(Queried),
-    DeploymentEventsQueried(DeploymentEventsQueried),
-    TestRunsQueried(TestRunsQueried),
-    Watching(Watching),
-    Unwatched(Unwatched),
-    KeyMaterialChecked(KeyMaterialChecked),
-    QueryRejected(QueryRejected),
-    WatchRejected(WatchRejected),
-    UnwatchRejected(UnwatchRejected),
-    KeyMaterialCheckRejected(KeyMaterialCheckRejected),
+    Queried(QueriedPayload),
+    DeploymentEventsQueried(DeploymentEventsQueriedPayload),
+    TestRunsQueried(TestRunsQueriedPayload),
+    Watching(WatchingPayload),
+    Unwatched(UnwatchedPayload),
+    KeyMaterialChecked(KeyMaterialCheckedPayload),
+    QueryRejected(QueryRejectedPayload),
+    WatchRejected(WatchRejectedPayload),
+    UnwatchRejected(UnwatchRejectedPayload),
+    KeyMaterialCheckRejected(KeyMaterialCheckRejectedPayload),
 }
 
 #[rustfmt::skip]
-impl Query {
+impl QueryPayload {
     pub fn new(payload: Selection) -> Self {
         Self(payload)
     }
@@ -1024,14 +1024,14 @@ impl Query {
     }
 }
 #[rustfmt::skip]
-impl From<Selection> for Query {
+impl From<Selection> for QueryPayload {
     fn from(payload: Selection) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl WatchDeployments {
+impl WatchDeploymentsPayload {
     pub fn new(payload: DeploymentWatch) -> Self {
         Self(payload)
     }
@@ -1043,14 +1043,14 @@ impl WatchDeployments {
     }
 }
 #[rustfmt::skip]
-impl From<DeploymentWatch> for WatchDeployments {
+impl From<DeploymentWatch> for WatchDeploymentsPayload {
     fn from(payload: DeploymentWatch) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl WatchCacheRetention {
+impl WatchCacheRetentionPayload {
     pub fn new(payload: CacheRetentionWatch) -> Self {
         Self(payload)
     }
@@ -1062,14 +1062,14 @@ impl WatchCacheRetention {
     }
 }
 #[rustfmt::skip]
-impl From<CacheRetentionWatch> for WatchCacheRetention {
+impl From<CacheRetentionWatch> for WatchCacheRetentionPayload {
     fn from(payload: CacheRetentionWatch) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl Unwatch {
+impl UnwatchPayload {
     pub fn new(payload: SubscriptionClose) -> Self {
         Self(payload)
     }
@@ -1081,14 +1081,14 @@ impl Unwatch {
     }
 }
 #[rustfmt::skip]
-impl From<SubscriptionClose> for Unwatch {
+impl From<SubscriptionClose> for UnwatchPayload {
     fn from(payload: SubscriptionClose) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl CheckHostKeyMaterial {
+impl CheckHostKeyMaterialPayload {
     pub fn new(payload: KeyMaterialQuery) -> Self {
         Self(payload)
     }
@@ -1100,14 +1100,14 @@ impl CheckHostKeyMaterial {
     }
 }
 #[rustfmt::skip]
-impl From<KeyMaterialQuery> for CheckHostKeyMaterial {
+impl From<KeyMaterialQuery> for CheckHostKeyMaterialPayload {
     fn from(payload: KeyMaterialQuery) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl Queried {
+impl QueriedPayload {
     pub fn new(payload: GenerationListing) -> Self {
         Self(payload)
     }
@@ -1119,14 +1119,14 @@ impl Queried {
     }
 }
 #[rustfmt::skip]
-impl From<GenerationListing> for Queried {
+impl From<GenerationListing> for QueriedPayload {
     fn from(payload: GenerationListing) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl DeploymentEventsQueried {
+impl DeploymentEventsQueriedPayload {
     pub fn new(payload: EventLogPage) -> Self {
         Self(payload)
     }
@@ -1138,14 +1138,14 @@ impl DeploymentEventsQueried {
     }
 }
 #[rustfmt::skip]
-impl From<EventLogPage> for DeploymentEventsQueried {
+impl From<EventLogPage> for DeploymentEventsQueriedPayload {
     fn from(payload: EventLogPage) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl TestRunsQueried {
+impl TestRunsQueriedPayload {
     pub fn new(payload: TestRunListing) -> Self {
         Self(payload)
     }
@@ -1157,14 +1157,14 @@ impl TestRunsQueried {
     }
 }
 #[rustfmt::skip]
-impl From<TestRunListing> for TestRunsQueried {
+impl From<TestRunListing> for TestRunsQueriedPayload {
     fn from(payload: TestRunListing) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl Watching {
+impl WatchingPayload {
     pub fn new(payload: SubscriptionOpened) -> Self {
         Self(payload)
     }
@@ -1176,14 +1176,14 @@ impl Watching {
     }
 }
 #[rustfmt::skip]
-impl From<SubscriptionOpened> for Watching {
+impl From<SubscriptionOpened> for WatchingPayload {
     fn from(payload: SubscriptionOpened) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl Unwatched {
+impl UnwatchedPayload {
     pub fn new(payload: SubscriptionClosed) -> Self {
         Self(payload)
     }
@@ -1195,14 +1195,14 @@ impl Unwatched {
     }
 }
 #[rustfmt::skip]
-impl From<SubscriptionClosed> for Unwatched {
+impl From<SubscriptionClosed> for UnwatchedPayload {
     fn from(payload: SubscriptionClosed) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl KeyMaterialChecked {
+impl KeyMaterialCheckedPayload {
     pub fn new(payload: KeyMaterialReport) -> Self {
         Self(payload)
     }
@@ -1214,14 +1214,14 @@ impl KeyMaterialChecked {
     }
 }
 #[rustfmt::skip]
-impl From<KeyMaterialReport> for KeyMaterialChecked {
+impl From<KeyMaterialReport> for KeyMaterialCheckedPayload {
     fn from(payload: KeyMaterialReport) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl QueryRejected {
+impl QueryRejectedPayload {
     pub fn new(payload: RejectedQuery) -> Self {
         Self(payload)
     }
@@ -1233,14 +1233,14 @@ impl QueryRejected {
     }
 }
 #[rustfmt::skip]
-impl From<RejectedQuery> for QueryRejected {
+impl From<RejectedQuery> for QueryRejectedPayload {
     fn from(payload: RejectedQuery) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl WatchRejected {
+impl WatchRejectedPayload {
     pub fn new(payload: RejectedWatch) -> Self {
         Self(payload)
     }
@@ -1252,14 +1252,14 @@ impl WatchRejected {
     }
 }
 #[rustfmt::skip]
-impl From<RejectedWatch> for WatchRejected {
+impl From<RejectedWatch> for WatchRejectedPayload {
     fn from(payload: RejectedWatch) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl UnwatchRejected {
+impl UnwatchRejectedPayload {
     pub fn new(payload: RejectedUnwatch) -> Self {
         Self(payload)
     }
@@ -1271,14 +1271,14 @@ impl UnwatchRejected {
     }
 }
 #[rustfmt::skip]
-impl From<RejectedUnwatch> for UnwatchRejected {
+impl From<RejectedUnwatch> for UnwatchRejectedPayload {
     fn from(payload: RejectedUnwatch) -> Self {
         Self::new(payload)
     }
 }
 
 #[rustfmt::skip]
-impl KeyMaterialCheckRejected {
+impl KeyMaterialCheckRejectedPayload {
     pub fn new(payload: RejectedKeyMaterialCheck) -> Self {
         Self(payload)
     }
@@ -1290,7 +1290,7 @@ impl KeyMaterialCheckRejected {
     }
 }
 #[rustfmt::skip]
-impl From<RejectedKeyMaterialCheck> for KeyMaterialCheckRejected {
+impl From<RejectedKeyMaterialCheck> for KeyMaterialCheckRejectedPayload {
     fn from(payload: RejectedKeyMaterialCheck) -> Self {
         Self::new(payload)
     }
@@ -1728,53 +1728,53 @@ impl TestOutcome {
 #[rustfmt::skip]
 impl Input {
     pub fn query(payload: Selection) -> Self {
-        Self::Query(Query::new(payload))
+        Self::Query(QueryPayload::new(payload))
     }
     pub fn watch_deployments(payload: DeploymentWatch) -> Self {
-        Self::WatchDeployments(WatchDeployments::new(payload))
+        Self::WatchDeployments(WatchDeploymentsPayload::new(payload))
     }
     pub fn watch_cache_retention(payload: CacheRetentionWatch) -> Self {
-        Self::WatchCacheRetention(WatchCacheRetention::new(payload))
+        Self::WatchCacheRetention(WatchCacheRetentionPayload::new(payload))
     }
     pub fn unwatch(payload: SubscriptionClose) -> Self {
-        Self::Unwatch(Unwatch::new(payload))
+        Self::Unwatch(UnwatchPayload::new(payload))
     }
     pub fn check_host_key_material(payload: KeyMaterialQuery) -> Self {
-        Self::CheckHostKeyMaterial(CheckHostKeyMaterial::new(payload))
+        Self::CheckHostKeyMaterial(CheckHostKeyMaterialPayload::new(payload))
     }
 }
 
 #[rustfmt::skip]
 impl Output {
     pub fn queried(payload: GenerationListing) -> Self {
-        Self::Queried(Queried::new(payload))
+        Self::Queried(QueriedPayload::new(payload))
     }
     pub fn deployment_events_queried(payload: EventLogPage) -> Self {
-        Self::DeploymentEventsQueried(DeploymentEventsQueried::new(payload))
+        Self::DeploymentEventsQueried(DeploymentEventsQueriedPayload::new(payload))
     }
     pub fn test_runs_queried(payload: TestRunListing) -> Self {
-        Self::TestRunsQueried(TestRunsQueried::new(payload))
+        Self::TestRunsQueried(TestRunsQueriedPayload::new(payload))
     }
     pub fn watching(payload: SubscriptionOpened) -> Self {
-        Self::Watching(Watching::new(payload))
+        Self::Watching(WatchingPayload::new(payload))
     }
     pub fn unwatched(payload: SubscriptionClosed) -> Self {
-        Self::Unwatched(Unwatched::new(payload))
+        Self::Unwatched(UnwatchedPayload::new(payload))
     }
     pub fn key_material_checked(payload: KeyMaterialReport) -> Self {
-        Self::KeyMaterialChecked(KeyMaterialChecked::new(payload))
+        Self::KeyMaterialChecked(KeyMaterialCheckedPayload::new(payload))
     }
     pub fn query_rejected(payload: RejectedQuery) -> Self {
-        Self::QueryRejected(QueryRejected::new(payload))
+        Self::QueryRejected(QueryRejectedPayload::new(payload))
     }
     pub fn watch_rejected(payload: RejectedWatch) -> Self {
-        Self::WatchRejected(WatchRejected::new(payload))
+        Self::WatchRejected(WatchRejectedPayload::new(payload))
     }
     pub fn unwatch_rejected(payload: RejectedUnwatch) -> Self {
-        Self::UnwatchRejected(UnwatchRejected::new(payload))
+        Self::UnwatchRejected(UnwatchRejectedPayload::new(payload))
     }
     pub fn key_material_check_rejected(payload: RejectedKeyMaterialCheck) -> Self {
-        Self::KeyMaterialCheckRejected(KeyMaterialCheckRejected::new(payload))
+        Self::KeyMaterialCheckRejected(KeyMaterialCheckRejectedPayload::new(payload))
     }
 }
 
@@ -1821,106 +1821,106 @@ impl From<FailureStage> for TestOutcome {
 }
 
 #[rustfmt::skip]
-impl From<Query> for Input {
-    fn from(payload: Query) -> Self {
+impl From<QueryPayload> for Input {
+    fn from(payload: QueryPayload) -> Self {
         Self::Query(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<WatchDeployments> for Input {
-    fn from(payload: WatchDeployments) -> Self {
+impl From<WatchDeploymentsPayload> for Input {
+    fn from(payload: WatchDeploymentsPayload) -> Self {
         Self::WatchDeployments(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<WatchCacheRetention> for Input {
-    fn from(payload: WatchCacheRetention) -> Self {
+impl From<WatchCacheRetentionPayload> for Input {
+    fn from(payload: WatchCacheRetentionPayload) -> Self {
         Self::WatchCacheRetention(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<Unwatch> for Input {
-    fn from(payload: Unwatch) -> Self {
+impl From<UnwatchPayload> for Input {
+    fn from(payload: UnwatchPayload) -> Self {
         Self::Unwatch(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<CheckHostKeyMaterial> for Input {
-    fn from(payload: CheckHostKeyMaterial) -> Self {
+impl From<CheckHostKeyMaterialPayload> for Input {
+    fn from(payload: CheckHostKeyMaterialPayload) -> Self {
         Self::CheckHostKeyMaterial(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<Queried> for Output {
-    fn from(payload: Queried) -> Self {
+impl From<QueriedPayload> for Output {
+    fn from(payload: QueriedPayload) -> Self {
         Self::Queried(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<DeploymentEventsQueried> for Output {
-    fn from(payload: DeploymentEventsQueried) -> Self {
+impl From<DeploymentEventsQueriedPayload> for Output {
+    fn from(payload: DeploymentEventsQueriedPayload) -> Self {
         Self::DeploymentEventsQueried(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<TestRunsQueried> for Output {
-    fn from(payload: TestRunsQueried) -> Self {
+impl From<TestRunsQueriedPayload> for Output {
+    fn from(payload: TestRunsQueriedPayload) -> Self {
         Self::TestRunsQueried(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<Watching> for Output {
-    fn from(payload: Watching) -> Self {
+impl From<WatchingPayload> for Output {
+    fn from(payload: WatchingPayload) -> Self {
         Self::Watching(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<Unwatched> for Output {
-    fn from(payload: Unwatched) -> Self {
+impl From<UnwatchedPayload> for Output {
+    fn from(payload: UnwatchedPayload) -> Self {
         Self::Unwatched(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<KeyMaterialChecked> for Output {
-    fn from(payload: KeyMaterialChecked) -> Self {
+impl From<KeyMaterialCheckedPayload> for Output {
+    fn from(payload: KeyMaterialCheckedPayload) -> Self {
         Self::KeyMaterialChecked(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<QueryRejected> for Output {
-    fn from(payload: QueryRejected) -> Self {
+impl From<QueryRejectedPayload> for Output {
+    fn from(payload: QueryRejectedPayload) -> Self {
         Self::QueryRejected(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<WatchRejected> for Output {
-    fn from(payload: WatchRejected) -> Self {
+impl From<WatchRejectedPayload> for Output {
+    fn from(payload: WatchRejectedPayload) -> Self {
         Self::WatchRejected(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<UnwatchRejected> for Output {
-    fn from(payload: UnwatchRejected) -> Self {
+impl From<UnwatchRejectedPayload> for Output {
+    fn from(payload: UnwatchRejectedPayload) -> Self {
         Self::UnwatchRejected(payload)
     }
 }
 
 #[rustfmt::skip]
-impl From<KeyMaterialCheckRejected> for Output {
-    fn from(payload: KeyMaterialCheckRejected) -> Self {
+impl From<KeyMaterialCheckRejectedPayload> for Output {
+    fn from(payload: KeyMaterialCheckRejectedPayload) -> Self {
         Self::KeyMaterialCheckRejected(payload)
     }
 }
