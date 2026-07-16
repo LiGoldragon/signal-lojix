@@ -18,7 +18,7 @@ fn query_input() -> Input {
         Selection::ByNode(NodeSelector {
             cluster_name: "goldragon".to_string().into(),
             node_name: "ouranos".to_string().into(),
-            artifact: None,
+            optional_generation_artifact: None,
         })
         .into(),
     )
@@ -27,8 +27,8 @@ fn query_input() -> Input {
 fn watch_input() -> Input {
     Input::WatchCacheRetention(
         CacheRetentionWatch {
-            cluster: Some("goldragon".to_string().into()),
-            node: None,
+            optional_cluster_name: Some("goldragon".to_string().into()),
+            optional_node_name: None,
         }
         .into(),
     )
@@ -37,7 +37,7 @@ fn watch_input() -> Input {
 fn queried_output() -> Output {
     Output::Queried(
         GenerationListing {
-            generations: Vec::new(),
+            generation_vector: Vec::new(),
             database_marker: marker(),
         }
         .into(),
