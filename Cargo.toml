@@ -1,6 +1,6 @@
 [package]
 name         = "signal-lojix"
-version      = "0.4.0"
+version      = "0.5.0"
 edition      = "2024"
 rust-version = "1.88"
 license      = "MIT OR Apache-2.0"
@@ -23,7 +23,7 @@ rkyv         = { version = "0.8", default-features = false, features = ["std", "
 signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "b61ec7d9e98e", default-features = false }
 
 [build-dependencies]
-schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", rev = "51a65c4b241f" }
+schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", rev = "ab366e40135992ef1f73791153b70b9c6ed0a972" }
 
 [lints.rust]
 unsafe_code = "forbid"

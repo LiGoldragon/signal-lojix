@@ -83,12 +83,15 @@
   ;; meta TestRun request and the durable record name one type.
   HostSelection.[DefaultHost (OnHost NodeName)]
 
+  ;; A current user-environment closure is attributable only when its user is
+  ;; carried beside the shared node identity. Host generations carry None.
   Generation.{
     GenerationIdentifier
     DeploymentIdentifier
     ClusterName
     NodeName
     GenerationArtifact
+    Optional.UserName
     ActivationEffect
     GenerationSlot
     ClosurePath

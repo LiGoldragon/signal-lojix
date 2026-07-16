@@ -464,6 +464,7 @@ pub struct Generation {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
     pub generation_artifact: GenerationArtifact,
+    pub optional_user_name: Option<UserName>,
     pub activation_effect: ActivationEffect,
     pub generation_slot: GenerationSlot,
     pub closure_path: ClosurePath,

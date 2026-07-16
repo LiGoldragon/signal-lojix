@@ -2,8 +2,8 @@
 
 use nota::{NotaDecode, NotaEncode, NotaSource};
 use signal_lojix::schema::lib::{
-    CacheRetentionWatch, DatabaseMarker, GenerationListing, Input, NodeSelector, Output, Selection,
-    SubscriptionOpened,
+    ActivationEffect, CacheRetentionWatch, DatabaseMarker, Generation, GenerationArtifact,
+    GenerationListing, GenerationSlot, Input, NodeSelector, Output, Selection, SubscriptionOpened,
 };
 
 fn marker() -> DatabaseMarker {
@@ -37,7 +37,18 @@ fn watch_input() -> Input {
 fn queried_output() -> Output {
     Output::Queried(
         GenerationListing {
-            generation_vector: Vec::new(),
+            generation_vector: vec![Generation {
+                generation_identifier: 1.into(),
+                deployment_identifier: 2.into(),
+                cluster_name: "goldragon".to_string().into(),
+                node_name: "zeus".to_string().into(),
+                generation_artifact: GenerationArtifact::UserEnvironment,
+                optional_user_name: Some("bird".to_string().into()),
+                activation_effect: ActivationEffect::LiveActivation,
+                generation_slot: GenerationSlot::Current,
+                closure_path: "/nix/store/bird-home".to_string().into(),
+                optional_source_revision_record: None,
+            }],
             database_marker: marker(),
         }
         .into(),
