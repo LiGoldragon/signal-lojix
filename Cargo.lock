@@ -333,7 +333,7 @@ dependencies = [
 [[package]]
 name = "nota"
 version = "0.7.0"
-source = "git+https://github.com/LiGoldragon/nota.git?branch=main#f8de7a516b769fc544c7f8c0030e258833c1cf9b"
+source = "git+https://github.com/LiGoldragon/nota.git?rev=f8de7a516b769fc544c7f8c0030e258833c1cf9b#f8de7a516b769fc544c7f8c0030e258833c1cf9b"
 dependencies = [
  "nota-derive",
  "rkyv",
@@ -342,7 +342,7 @@ dependencies = [
 [[package]]
 name = "nota-derive"
 version = "0.3.0"
-source = "git+https://github.com/LiGoldragon/nota.git?branch=main#f8de7a516b769fc544c7f8c0030e258833c1cf9b"
+source = "git+https://github.com/LiGoldragon/nota.git?rev=f8de7a516b769fc544c7f8c0030e258833c1cf9b#f8de7a516b769fc544c7f8c0030e258833c1cf9b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -485,7 +485,7 @@ checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
 [[package]]
 name = "schema-language"
 version = "0.3.0"
-source = "git+https://github.com/LiGoldragon/schema-language.git?rev=4dcd70eb672d2926b4ce85f99c17de9ed24776cc#4dcd70eb672d2926b4ce85f99c17de9ed24776cc"
+source = "git+https://github.com/LiGoldragon/schema-language.git?rev=7fac6ac810bc#7fac6ac810bc736a68fa95f866b7ee1ddad19a33"
 dependencies = [
  "blake3",
  "nota",
@@ -496,7 +496,7 @@ dependencies = [
 [[package]]
 name = "schema-rust"
 version = "0.9.0"
-source = "git+https://github.com/LiGoldragon/schema-rust.git?rev=9987c588cad8da6507c378dad5d3cbeef3eebad1#9987c588cad8da6507c378dad5d3cbeef3eebad1"
+source = "git+https://github.com/LiGoldragon/schema-rust.git?rev=f62f6f652e1e#f62f6f652e1e54f064733c1afbabb91538f0e8c0"
 dependencies = [
  "nota",
  "prettyplease",
@@ -549,10 +549,21 @@ name = "signal-frame"
 version = "0.3.0"
 source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#fd7909d1497b7bb18751521387a1087cd9e7c91c"
 dependencies = [
+ "paste",
+ "rkyv",
+ "signal-frame-macros 0.1.1 (git+https://github.com/LiGoldragon/signal-frame.git?branch=main)",
+ "thiserror",
+]
+
+[[package]]
+name = "signal-frame"
+version = "0.3.0"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=b61ec7d9e98e#b61ec7d9e98e8d80381ad9497efcd4379adb5ede"
+dependencies = [
  "nota",
  "paste",
  "rkyv",
- "signal-frame-macros",
+ "signal-frame-macros 0.1.1 (git+https://github.com/LiGoldragon/signal-frame.git?rev=b61ec7d9e98e)",
  "thiserror",
 ]
 
@@ -567,13 +578,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "signal-frame-macros"
+version = "0.1.1"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=b61ec7d9e98e#b61ec7d9e98e8d80381ad9497efcd4379adb5ede"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "signal-lojix"
 version = "0.4.0"
 dependencies = [
  "nota",
  "rkyv",
  "schema-rust",
- "signal-frame",
+ "signal-frame 0.3.0 (git+https://github.com/LiGoldragon/signal-frame.git?rev=b61ec7d9e98e)",
 ]
 
 [[package]]
@@ -710,7 +731,7 @@ dependencies = [
  "kameo",
  "rkyv",
  "rustix",
- "signal-frame",
+ "signal-frame 0.3.0 (git+https://github.com/LiGoldragon/signal-frame.git?branch=main)",
  "thiserror",
  "tokio",
 ]

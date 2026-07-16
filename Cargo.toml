@@ -18,12 +18,12 @@ default   = []
 nota-text = ["dep:nota", "signal-frame/nota-text"]
 
 [dependencies]
-nota    = { git = "https://github.com/LiGoldragon/nota.git", branch = "main", optional = true }
+nota    = { git = "https://github.com/LiGoldragon/nota.git", rev = "f8de7a516b769fc544c7f8c0030e258833c1cf9b", optional = true }
 rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
-signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main", default-features = false }
+signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "b61ec7d9e98e", default-features = false }
 
 [build-dependencies]
-schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", rev = "9987c588cad8da6507c378dad5d3cbeef3eebad1" }
+schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", rev = "f62f6f652e1e" }
 
 [lints.rust]
 unsafe_code = "forbid"
