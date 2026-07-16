@@ -484,8 +484,8 @@ checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
 
 [[package]]
 name = "schema-language"
-version = "0.2.0"
-source = "git+https://github.com/LiGoldragon/schema-language.git?rev=59d59aca5767523a929e5bd6fcd011a4a4e8ff23#59d59aca5767523a929e5bd6fcd011a4a4e8ff23"
+version = "0.3.0"
+source = "git+https://github.com/LiGoldragon/schema-language.git?rev=4dcd70eb672d2926b4ce85f99c17de9ed24776cc#4dcd70eb672d2926b4ce85f99c17de9ed24776cc"
 dependencies = [
  "blake3",
  "nota",
@@ -495,8 +495,8 @@ dependencies = [
 
 [[package]]
 name = "schema-rust"
-version = "0.8.0"
-source = "git+https://github.com/LiGoldragon/schema-rust.git?branch=main#87de872dbc4ee124a6a1133ff520b594063304f5"
+version = "0.9.0"
+source = "git+https://github.com/LiGoldragon/schema-rust.git?rev=9987c588cad8da6507c378dad5d3cbeef3eebad1#9987c588cad8da6507c378dad5d3cbeef3eebad1"
 dependencies = [
  "nota",
  "prettyplease",

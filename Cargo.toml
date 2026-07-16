@@ -23,7 +23,7 @@ rkyv         = { version = "0.8", default-features = false, features = ["std", "
 signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main", default-features = false }
 
 [build-dependencies]
-schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", branch = "main" }
+schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", rev = "9987c588cad8da6507c378dad5d3cbeef3eebad1" }
 
 [lints.rust]
 unsafe_code = "forbid"
