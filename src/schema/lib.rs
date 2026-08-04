@@ -740,6 +740,7 @@ pub enum DeploymentTerminalReason {
     NodeUnknown,
     ProposalSourceUnreachable,
     FlakeReferenceMalformed,
+    InvalidDeploymentRouting,
     BuilderUnreachable,
     SubstituterUnreachable,
     DeploymentInFlight,

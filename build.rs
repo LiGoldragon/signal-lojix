@@ -24,7 +24,7 @@ impl SchemaBuild {
         GenerationDriver::new(GenerationPlan::wire_contract(
             &self.crate_root,
             "signal-lojix",
-            "0.5.0",
+            "0.6.0",
             WireContractFamily::SignalLojix,
         ))
         .generate()

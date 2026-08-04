@@ -158,7 +158,7 @@
   ;; Realize; Activated is an intermediate effect phase only.
   DeploymentLifecycle.[Submitted Building Built Copying Activating Activated Completed Rejected Failed LegacyUnknown LegacyAmbiguous]
   DeploymentFailureStage.[Admission FlakeAuth MaterializeHorizon Eval Build CopyClosure Activate Daemon]
-  DeploymentTerminalReason.[ClusterUnknown NodeUnknown ProposalSourceUnreachable FlakeReferenceMalformed BuilderUnreachable SubstituterUnreachable DeploymentInFlight UnsupportedDeployAction InternalError ActivationFailed]
+  DeploymentTerminalReason.[ClusterUnknown NodeUnknown ProposalSourceUnreachable FlakeReferenceMalformed InvalidDeploymentRouting BuilderUnreachable SubstituterUnreachable DeploymentInFlight UnsupportedDeployAction InternalError ActivationFailed]
   DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason }
   DeploymentTerminal.[Succeeded (Rejected DeploymentTerminalReason) (Failed DeploymentFailure) LegacyUnknown]
   DeploymentRecord.{
