@@ -38,6 +38,7 @@ fn queried_output() -> Output {
     Output::Queried(
         GenerationListing {
             generation_vector: Vec::new(),
+            deployment_record_vector: Vec::new(),
             database_marker: marker(),
         }
         .into(),

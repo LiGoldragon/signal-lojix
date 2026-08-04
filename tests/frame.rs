@@ -34,6 +34,7 @@ fn default_build_round_trips_ordinary_reply_without_nota_text() {
     let output = Output::Queried(
         GenerationListing {
             generation_vector: Vec::new(),
+            deployment_record_vector: Vec::new(),
             database_marker: marker(),
         }
         .into(),
