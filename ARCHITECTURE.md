@@ -92,9 +92,11 @@ the `lojix` daemon.
 | Reply / event producer | `lojix-daemon` |
 | Reply / event consumer | the caller that submitted the operation; subscribers |
 
-Transport: Unix socket at `/run/lojix/daemon.sock` carrying
-`signal-frame` length-prefixed rkyv frames. The transport itself
-belongs to the `lojix` repo, not this contract.
+Transport: a caller-configured Unix socket carrying `signal-frame`
+length-prefixed rkyv frames. This contract does not select a socket path or
+fallback; Lojix clients receive their configured paths from
+`LOJIX_ORDINARY_SOCKET` or `LOJIX_OWNER_SOCKET`. The transport itself belongs
+to the `lojix` repo, not this contract.
 
 ## 2 · Channel shape
 
