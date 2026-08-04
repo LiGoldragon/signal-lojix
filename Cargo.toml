@@ -15,15 +15,16 @@ path = "src/lib.rs"
 
 [features]
 default   = []
-nota-text = ["dep:nota", "signal-frame/nota-text"]
+dotos-text = ["dep:dotos", "signal-frame/dotos-text"]
 
 [dependencies]
-nota    = { git = "https://github.com/LiGoldragon/nota.git", branch = "main", optional = true }
+dotos   = { package = "dotos", git = "https://github.com/LiGoldragon/dotos.git", rev = "80c7b17f7ad3", optional = true }
 rkyv         = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
-signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main", default-features = false }
+signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "ca72b2d1151f", default-features = false }
 
 [build-dependencies]
-schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", rev = "9987c588cad8da6507c378dad5d3cbeef3eebad1" }
+protos = { git = "https://github.com/LiGoldragon/protos.git", rev = "937dd7df657f685cdd1ebd6f2148ad428a8b36bf" }
+schema-rust = { git = "https://github.com/LiGoldragon/schema-rust.git", rev = "4aa0bf9df2c3eaaccfd7abf9ae9547ab4f9a9b7f" }
 
 [lints.rust]
 unsafe_code = "forbid"

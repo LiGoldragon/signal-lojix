@@ -19,7 +19,7 @@ fn default_dependency_tree_does_not_pull_text_or_retired_signal_crates() {
 }
 
 #[test]
-fn nota_text_feature_is_the_only_text_projection_opt_in() {
+fn dotos_text_feature_is_the_only_text_projection_opt_in() {
     let output = Command::new("cargo")
         .args([
             "tree",
@@ -27,7 +27,7 @@ fn nota_text_feature_is_the_only_text_projection_opt_in() {
             "normal",
             "--no-default-features",
             "--features",
-            "nota-text",
+            "dotos-text",
         ])
         .output()
         .expect("run cargo tree");
@@ -36,13 +36,13 @@ fn nota_text_feature_is_the_only_text_projection_opt_in() {
     let tree = String::from_utf8(output.stdout).expect("dependency tree");
 
     assert!(
-        tree.contains("nota"),
-        "nota-text feature should opt into nota:\n{tree}"
+        tree.contains("dotos"),
+        "dotos-text feature should opt into dotos:\n{tree}"
     );
     for forbidden_crate in ["nota-codec", "signal-core"] {
         assert!(
             !tree.contains(forbidden_crate),
-            "nota-text dependency tree must not contain {forbidden_crate}:\n{tree}"
+            "dotos-text dependency tree must not contain {forbidden_crate}:\n{tree}"
         );
     }
 }

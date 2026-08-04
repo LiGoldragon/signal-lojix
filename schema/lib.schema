@@ -1,6 +1,6 @@
 ;; signal-lojix — ORDINARY wire contract for the lojix deploy orchestrator.
 ;;
-;; Wire-only: emits the rkyv + NOTA codec and the signal-frame mail envelope.
+;; Wire-only: emits the rkyv + DOTOS codec and the signal-frame mail envelope.
 ;; No engine traits, no Nexus/SEMA content, no daemon behaviour. The
 ;; peer-callable read / observe / subscribe surface. Owner-only mutations
 ;; (Deploy/Pin/Unpin/Retire) live in meta-signal-lojix.

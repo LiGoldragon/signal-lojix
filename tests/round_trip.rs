@@ -1,10 +1,18 @@
-#![cfg(feature = "nota-text")]
+#![cfg(feature = "dotos-text")]
 
-use nota::{NotaDecode, NotaEncode, NotaSource};
+use dotos::{DotosDecode, DotosEncode, DotosSource};
 use signal_lojix::schema::lib::{
     CacheRetentionWatch, DatabaseMarker, GenerationListing, Input, NodeSelector, Output, Selection,
     SubscriptionOpened,
 };
+
+fn exchange() -> signal_frame::ExchangeIdentifier {
+    signal_frame::ExchangeIdentifier::new(
+        signal_frame::SessionEpoch::new(9),
+        signal_frame::ExchangeLane::Connector,
+        signal_frame::LaneSequence::new(3),
+    )
+}
 
 fn marker() -> DatabaseMarker {
     DatabaseMarker {
@@ -55,22 +63,28 @@ fn watching_output() -> Output {
     )
 }
 
-fn round_trip_nota<Value>(value: Value)
+fn round_trip_dotos<Value>(value: Value)
 where
-    Value: NotaEncode + NotaDecode + PartialEq + std::fmt::Debug,
+    Value: DotosEncode + DotosDecode + PartialEq + std::fmt::Debug,
 {
-    let encoded = value.to_nota();
-    let recovered = NotaSource::new(&encoded)
+    let encoded = value.to_dotos();
+    let recovered = DotosSource::new(&encoded)
         .parse::<Value>()
-        .expect("decode nota text");
+        .expect("decode dotos text");
     assert_eq!(recovered, value);
 }
 
 #[test]
 fn ordinary_requests_round_trip_through_rkyv_frames() {
     for request in [query_input(), watch_input()] {
-        let frame = request.encode_signal_frame().expect("encode request");
-        let (_route, decoded) = Input::decode_signal_frame(&frame).expect("decode request");
+        let frame = request
+            .clone()
+            .encode_request_frame(exchange())
+            .expect("encode request");
+        let (decoded_exchange, decoded) =
+            signal_lojix::schema::lib::ContractMarker::decode_single_request(&frame)
+                .expect("decode request");
+        assert_eq!(decoded_exchange, exchange());
         assert_eq!(decoded, request);
     }
 }
@@ -78,24 +92,41 @@ fn ordinary_requests_round_trip_through_rkyv_frames() {
 #[test]
 fn ordinary_replies_round_trip_through_rkyv_frames() {
     for reply in [queried_output(), watching_output()] {
-        let frame = reply.encode_signal_frame().expect("encode reply");
-        let (_route, decoded) = Output::decode_signal_frame(&frame).expect("decode reply");
-        assert_eq!(decoded, reply);
+        let frame = reply
+            .clone()
+            .encode_reply_frame(exchange())
+            .expect("encode reply");
+        let decoded =
+            signal_lojix::schema::lib::ContractMarker::decode_frame(&frame).expect("decode reply");
+        let signal_lojix::schema::lib::FrameBody::Reply {
+            exchange: decoded_exchange,
+            reply: decoded_reply,
+        } = decoded.into_body()
+        else {
+            panic!("decoded frame must retain a reply body");
+        };
+        assert_eq!(decoded_exchange, exchange());
+        assert_eq!(
+            decoded_reply,
+            signal_frame::Reply::committed(signal_frame::NonEmpty::single(
+                signal_frame::SubReply::Ok(reply),
+            )),
+        );
     }
 }
 
 #[test]
-fn ordinary_roots_round_trip_through_nota_text() {
-    round_trip_nota(query_input());
-    round_trip_nota(watch_input());
-    round_trip_nota(queried_output());
-    round_trip_nota(watching_output());
+fn ordinary_roots_round_trip_through_dotos_text() {
+    round_trip_dotos(query_input());
+    round_trip_dotos(watch_input());
+    round_trip_dotos(queried_output());
+    round_trip_dotos(watching_output());
 }
 
 #[test]
-fn ordinary_nota_heads_are_contract_local_verbs() {
-    assert!(query_input().to_nota().starts_with("(Query "));
-    assert!(watch_input().to_nota().starts_with("(WatchCacheRetention "));
-    assert!(queried_output().to_nota().starts_with("(Queried "));
-    assert!(watching_output().to_nota().starts_with("(Watching "));
+fn ordinary_dotos_heads_are_contract_local_verbs() {
+    assert!(query_input().to_dotos().contains("Query"));
+    assert!(watch_input().to_dotos().contains("WatchCacheRetention"));
+    assert!(queried_output().to_dotos().contains("Queried"));
+    assert!(watching_output().to_dotos().contains("Watching"));
 }
