@@ -57,6 +57,8 @@
   UserName.String
   ClosurePath.String
   ProposalSource.String
+  SourceFingerprint.String
+  RequestedFlakeReference.String
   FlakeReference.String
   EventLogPosition.Integer
   PinLabel.String
@@ -94,7 +96,44 @@
     ClosurePath
     Optional.SourceRevisionRecord
   }
-  GenerationListing.{ Vector.Generation DatabaseMarker }
+  ;; A deployment is admitted before any effect runs and remains queryable until
+  ;; its terminal record.  This record is the correlation boundary: a reader
+  ;; can join the original request, the durable admission marker, and the
+  ;; eventual result without relying on daemon logs or a transient connection.
+  ;; The environment is a tagged identity, not an optional user field, so an
+  ;; invalid host-with-user / user-environment-without-user row cannot exist.
+  DeploymentEnvironment.[HostEnvironment (UserEnvironment UserName)]
+  DeploymentRequestedSource.{ SourceRevisionPolicy RequestedFlakeReference }
+  DeploymentRequestIdentity.{
+    DeploymentEnvironment
+    ClusterName
+    NodeName
+    GenerationArtifact
+    ActivationEffect
+    ;; A stable opaque correlator for the daemon-private proposal source.  The
+    ;; raw source can contain local topology and is intentionally not exposed
+    ;; on the ordinary peer surface.
+    SourceFingerprint
+    DeploymentRequestedSource
+    Optional.SourceRevisionRecord
+  }
+  ;; Completed is terminal for every successful request, including Evaluate and
+  ;; Realize; Activated is an intermediate effect phase only.
+  DeploymentLifecycle.[Submitted Building Built Copying Activating Activated Completed Rejected Failed LegacyUnknown LegacyAmbiguous]
+  DeploymentFailureStage.[Admission FlakeAuth MaterializeHorizon Eval Build CopyClosure Activate Daemon]
+  DeploymentTerminalReason.[ClusterUnknown NodeUnknown ProposalSourceUnreachable FlakeReferenceMalformed BuilderUnreachable SubstituterUnreachable DeploymentInFlight UnsupportedDeployAction InternalError ActivationFailed]
+  DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason }
+  DeploymentTerminal.[Succeeded (Rejected DeploymentTerminalReason) (Failed DeploymentFailure) LegacyUnknown]
+  DeploymentRecord.{
+    DeploymentIdentifier
+    GenerationIdentifier
+    DeploymentRequestIdentity
+    DatabaseMarker
+    DeploymentLifecycle
+    Optional.DatabaseMarker
+    Optional.DeploymentTerminal
+  }
+  GenerationListing.{ Vector.Generation Vector.DeploymentRecord DatabaseMarker }
   EventLogPage.{ Vector.DeploymentPhaseEvent Vector.CacheRetentionTransitionEvent DatabaseMarker }
 
   NodeSelector.{ ClusterName NodeName Optional.GenerationArtifact }
@@ -107,7 +146,8 @@
   ;; The lookup names the cluster + node and optionally one run identifier;
   ;; None returns every run for that node, newest first.
   TestRunLookup.{ ClusterName NodeName Optional.TestRunIdentifier }
-  Selection.[(ByNode NodeSelector) (ByGeneration GenerationLookup) (ByEventLog EventLogRange) (ByTestRun TestRunLookup)]
+  DeploymentLookup.{ DeploymentIdentifier }
+  Selection.[(ByNode NodeSelector) (ByGeneration GenerationLookup) (ByDeployment DeploymentLookup) (ByEventLog EventLogRange) (ByTestRun TestRunLookup)]
 
   ;; The durable test-run outcome record, returned by (Query (ByTestRun …)).
   ;; One row per submitted test: the run identifier, the resolved
@@ -144,7 +184,7 @@
   KeyMaterialMismatch.{ KeyMaterialConcern expected.MismatchValue actual.MismatchValue OperatorHint }
   KeyMaterialReport.{ NodeName Vector.KeyMaterialMismatch DatabaseMarker }
 
-  DeploymentPhase.[Submitted Building Built Copying Activating Activated Failed]
+  DeploymentPhase.[Submitted Building Built Copying Activating Activated Rejected Failed]
   PhaseDetail.String
   DeploymentPhaseEvent.{
     DeploymentIdentifier

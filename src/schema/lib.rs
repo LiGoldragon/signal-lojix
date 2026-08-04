@@ -227,6 +227,22 @@ pub struct ProposalSource(String);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SourceFingerprint(String);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RequestedFlakeReference(String);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct FlakeReference(String);
 
 #[rustfmt::skip]
@@ -476,8 +492,171 @@ pub struct Generation {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum DeploymentEnvironment {
+    HostEnvironment,
+    UserEnvironment(UserName),
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeploymentRequestedSource {
+    pub source_revision_policy: SourceRevisionPolicy,
+    pub requested_flake_reference: RequestedFlakeReference,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeploymentRequestIdentity {
+    pub deployment_environment: DeploymentEnvironment,
+    pub cluster_name: ClusterName,
+    pub node_name: NodeName,
+    pub generation_artifact: GenerationArtifact,
+    pub activation_effect: ActivationEffect,
+    pub source_fingerprint: SourceFingerprint,
+    pub deployment_requested_source: DeploymentRequestedSource,
+    pub optional_source_revision_record: Option<SourceRevisionRecord>,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum DeploymentLifecycle {
+    Submitted,
+    Building,
+    Built,
+    Copying,
+    Activating,
+    Activated,
+    Completed,
+    Rejected,
+    Failed,
+    LegacyUnknown,
+    LegacyAmbiguous,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum DeploymentFailureStage {
+    Admission,
+    FlakeAuth,
+    MaterializeHorizon,
+    Eval,
+    Build,
+    CopyClosure,
+    Activate,
+    Daemon,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum DeploymentTerminalReason {
+    ClusterUnknown,
+    NodeUnknown,
+    ProposalSourceUnreachable,
+    FlakeReferenceMalformed,
+    BuilderUnreachable,
+    SubstituterUnreachable,
+    DeploymentInFlight,
+    UnsupportedDeployAction,
+    InternalError,
+    ActivationFailed,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeploymentFailure {
+    pub deployment_failure_stage: DeploymentFailureStage,
+    pub deployment_terminal_reason: DeploymentTerminalReason,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum DeploymentTerminal {
+    Succeeded,
+    Rejected(DeploymentTerminalReason),
+    Failed(DeploymentFailure),
+    LegacyUnknown,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeploymentRecord {
+    pub deployment_identifier: DeploymentIdentifier,
+    pub generation_identifier: GenerationIdentifier,
+    pub deployment_request_identity: DeploymentRequestIdentity,
+    pub database_marker: DatabaseMarker,
+    pub deployment_lifecycle: DeploymentLifecycle,
+    pub optional_database_marker: Option<DatabaseMarker>,
+    pub optional_deployment_terminal: Option<DeploymentTerminal>,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct GenerationListing {
     pub generation_vector: Vec<Generation>,
+    pub deployment_record_vector: Vec<DeploymentRecord>,
     pub database_marker: DatabaseMarker,
 }
 
@@ -542,9 +721,18 @@ pub struct TestRunLookup {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeploymentLookup(DeploymentIdentifier);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum Selection {
     ByNode(NodeSelector),
     ByGeneration(GenerationLookup),
+    ByDeployment(DeploymentLookup),
     ByEventLog(EventLogRange),
     ByTestRun(TestRunLookup),
 }
@@ -783,6 +971,7 @@ pub enum DeploymentPhase {
     Copying,
     Activating,
     Activated,
+    Rejected,
     Failed,
 }
 
@@ -1506,6 +1695,44 @@ impl From<String> for ProposalSource {
 }
 
 #[rustfmt::skip]
+impl SourceFingerprint {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for SourceFingerprint {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl RequestedFlakeReference {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for RequestedFlakeReference {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl FlakeReference {
     pub fn new(payload: impl Into<String>) -> Self {
         Self(payload.into())
@@ -1577,6 +1804,25 @@ impl GenerationLookup {
 #[rustfmt::skip]
 impl From<GenerationIdentifier> for GenerationLookup {
     fn from(payload: GenerationIdentifier) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl DeploymentLookup {
+    pub fn new(payload: DeploymentIdentifier) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &DeploymentIdentifier {
+        &self.0
+    }
+    pub fn into_payload(self) -> DeploymentIdentifier {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<DeploymentIdentifier> for DeploymentLookup {
+    fn from(payload: DeploymentIdentifier) -> Self {
         Self::new(payload)
     }
 }
@@ -1703,12 +1949,32 @@ impl HostSelection {
 }
 
 #[rustfmt::skip]
+impl DeploymentEnvironment {
+    pub fn user_environment(payload: String) -> Self {
+        Self::UserEnvironment(UserName::new(payload))
+    }
+}
+
+#[rustfmt::skip]
+impl DeploymentTerminal {
+    pub fn rejected(payload: DeploymentTerminalReason) -> Self {
+        Self::Rejected(payload)
+    }
+    pub fn failed(payload: DeploymentFailure) -> Self {
+        Self::Failed(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl Selection {
     pub fn by_node(payload: NodeSelector) -> Self {
         Self::ByNode(payload)
     }
     pub fn by_generation(payload: GenerationIdentifier) -> Self {
         Self::ByGeneration(GenerationLookup::new(payload))
+    }
+    pub fn by_deployment(payload: DeploymentIdentifier) -> Self {
+        Self::ByDeployment(DeploymentLookup::new(payload))
     }
     pub fn by_event_log(payload: EventLogRange) -> Self {
         Self::ByEventLog(payload)
@@ -1786,6 +2052,27 @@ impl From<NodeName> for HostSelection {
 }
 
 #[rustfmt::skip]
+impl From<UserName> for DeploymentEnvironment {
+    fn from(payload: UserName) -> Self {
+        Self::UserEnvironment(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<DeploymentTerminalReason> for DeploymentTerminal {
+    fn from(payload: DeploymentTerminalReason) -> Self {
+        Self::Rejected(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<DeploymentFailure> for DeploymentTerminal {
+    fn from(payload: DeploymentFailure) -> Self {
+        Self::Failed(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl From<NodeSelector> for Selection {
     fn from(payload: NodeSelector) -> Self {
         Self::ByNode(payload)
@@ -1796,6 +2083,13 @@ impl From<NodeSelector> for Selection {
 impl From<GenerationLookup> for Selection {
     fn from(payload: GenerationLookup) -> Self {
         Self::ByGeneration(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<DeploymentLookup> for Selection {
+    fn from(payload: DeploymentLookup) -> Self {
+        Self::ByDeployment(payload)
     }
 }
 
