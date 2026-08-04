@@ -384,7 +384,6 @@ pub enum GenerationArtifact {
     CompleteHost,
     BaseHost,
     UserEnvironment,
-    LegacyUnknownArtifact,
 }
 
 #[rustfmt::skip]
@@ -514,7 +513,6 @@ pub enum ActivationEffect {
     TestActivation,
     BootOnceProfile,
     ProfileOnly,
-    LegacyUnknownActivationEffect,
 }
 
 #[rustfmt::skip]
@@ -633,7 +631,6 @@ pub struct Generation {
 pub enum DeploymentEnvironment {
     HostEnvironment,
     UserEnvironment(UserName),
-    LegacyUnknownEnvironment,
 }
 
 #[rustfmt::skip]
@@ -645,7 +642,6 @@ pub enum DeploymentEnvironment {
 pub enum RequestedDeploymentAction {
     Host(HostDeployAction),
     UserEnvironment(UserEnvironmentAction),
-    LegacyUnknownAction,
 }
 
 #[rustfmt::skip]
@@ -690,8 +686,6 @@ pub enum DeploymentLifecycle {
     Completed,
     Rejected,
     Failed,
-    LegacyUnknown,
-    LegacyAmbiguous,
 }
 
 #[rustfmt::skip]
@@ -770,7 +764,6 @@ pub enum DeploymentTerminal {
     Succeeded,
     Rejected(DeploymentTerminalReason),
     Failed(DeploymentFailure),
-    LegacyUnknown,
 }
 
 #[rustfmt::skip]

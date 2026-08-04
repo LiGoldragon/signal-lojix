@@ -33,10 +33,9 @@ The deploy surface is direct typed contract vocabulary; callers update to this c
 > eventually-self-hosting stack is Sema-on-Sema; this contract is a
 > realization step. See `~/primary/ARCHITECTURE.md` §"Workspace vision and intent".
 
-## MUST IMPLEMENT — three-layer migration
+## Three-layer design
 
-This contract is migrating to the three-layer model affirmed
-2026-05-20 per
+This contract follows the three-layer model affirmed 2026-05-20 per
 `primary/reports/designer/246-v4-bundled-fix-deep-design-with-examples.md`
 and `primary/reports/designer/248-three-layer-changes-for-operators.md`.
 

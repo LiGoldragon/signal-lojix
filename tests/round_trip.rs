@@ -66,40 +66,19 @@ fn queried_output() -> Output {
     )
 }
 
-fn legacy_generation_output() -> Output {
-    Output::Queried(
-        GenerationListing {
-            generation_vector: vec![Generation {
-                generation_identifier: 7.into(),
-                deployment_identifier: 11.into(),
-                cluster_name: "goldragon".to_string().into(),
-                node_name: "ouranos".to_string().into(),
-                generation_artifact: GenerationArtifact::LegacyUnknownArtifact,
-                activation_effect: ActivationEffect::LegacyUnknownActivationEffect,
-                generation_slot: GenerationSlot::Recent,
-                optional_closure_path: None,
-                optional_immutable_revision: None,
-            }],
-            deployment_record_vector: Vec::new(),
-            database_marker: marker(),
-        }
-        .into(),
-    )
-}
-
 fn current_generation_output() -> Output {
     Output::Queried(
         GenerationListing {
             generation_vector: vec![Generation {
                 generation_identifier: 8.into(),
                 deployment_identifier: 12.into(),
-                cluster_name: "goldragon".to_string().into(),
-                node_name: "ouranos".to_string().into(),
+                cluster_name: "fixture-cluster".to_string().into(),
+                node_name: "fixture-node".to_string().into(),
                 generation_artifact: GenerationArtifact::CompleteHost,
                 activation_effect: ActivationEffect::LiveActivation,
                 generation_slot: GenerationSlot::Current,
                 optional_closure_path: Some(
-                    "/nix/store/0123456789abcdfghijklmnpqrsvwxyz-goldragon-system"
+                    "/nix/store/0123456789abcdfghijklmnpqrsvwxyz-fixture-system"
                         .to_string()
                         .into(),
                 ),
@@ -117,9 +96,9 @@ fn completed_test_run_output() -> Output {
         TestRunListing {
             test_run_record_vector: vec![TestRunRecord {
                 test_run_identifier: 13.into(),
-                cluster_name: "goldragon".to_string().into(),
-                node: "ouranos".to_string().into(),
-                host: "ouranos".to_string().into(),
+                cluster_name: "fixture-cluster".to_string().into(),
+                node: "fixture-node".to_string().into(),
+                host: "fixture-host".to_string().into(),
                 test_mode: TestMode::Hermetic,
                 test_run_phase: TestRunPhase::Completed,
                 test_outcome: TestOutcome::Passed,
@@ -225,26 +204,17 @@ fn ordinary_roots_round_trip_through_dotos_text() {
     round_trip_dotos(watch_input());
     round_trip_dotos(queried_output());
     round_trip_dotos(current_generation_output());
-    round_trip_dotos(legacy_generation_output());
     round_trip_dotos(completed_test_run_output());
     round_trip_dotos(watching_output());
 }
 
 #[test]
-fn closure_paths_are_optional_for_legacy_generations_and_canonical_when_supplied() {
-    let Output::Queried(legacy) = legacy_generation_output() else {
-        panic!("legacy fixture must be a generation listing");
-    };
-    assert_eq!(
-        legacy.payload().generation_vector[0].optional_closure_path,
-        None
-    );
-
+fn current_closure_paths_are_canonical_when_supplied() {
     let Output::Queried(current) = current_generation_output() else {
         panic!("current fixture must be a generation listing");
     };
     let Some(current_path) = &current.payload().generation_vector[0].optional_closure_path else {
-        panic!("current-v3 generation must carry its canonical closure root");
+        panic!("current generation must carry its canonical closure root");
     };
     assert_canonical_store_root(current_path.payload());
 
@@ -259,15 +229,7 @@ fn closure_paths_are_optional_for_legacy_generations_and_canonical_when_supplied
 }
 
 #[test]
-fn legacy_artifact_is_decodable_for_migrated_output_but_rejected_for_query_selection() {
-    let legacy_output = legacy_generation_output();
-    assert!(legacy_output.to_dotos().contains("LegacyUnknownArtifact"));
-    assert!(
-        legacy_output
-            .to_dotos()
-            .contains("LegacyUnknownActivationEffect")
-    );
-
+fn retired_legacy_vocabulary_is_rejected_at_the_wire_boundary() {
     let selected = selected_query_input(RequestedGenerationArtifact::BaseHost).to_dotos();
     let attempted_legacy_selection = selected.replace("BaseHost", "LegacyUnknownArtifact");
     assert!(

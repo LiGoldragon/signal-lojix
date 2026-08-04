@@ -55,7 +55,7 @@
   ClusterName.String
   NodeName.String
   UserName.String
-  ;; A realized Nix store root. Whenever a current-v3 Generation or a
+  ;; A realized Nix store root. Whenever a Generation or a
   ;; TestRunRecord supplies this value, the producer has validated it as the
   ;; canonical /nix/store/<hash>-<name> root for that result.
   ClosurePath.String
@@ -90,26 +90,23 @@
   EventLogPosition.Integer
   PinLabel.String
 
-  GenerationArtifact.[CompleteHost BaseHost UserEnvironment LegacyUnknownArtifact]
-  ;; Selection is a request boundary, never a migration reader. Historical
-  ;; rows may expose LegacyUnknownArtifact, but a new query cannot select it.
+  GenerationArtifact.[CompleteHost BaseHost UserEnvironment]
   RequestedGenerationArtifact.[CompleteHost BaseHost UserEnvironment]
   HostComposition.[CompleteHost BaseHost]
   HostDeployAction.[Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce]
   UserEnvironmentAction.[Realize SetProfile ActivateNow]
   SourceRevisionPolicy.[RequireImmutable ResolveAndRecord]
-  ActivationEffect.[LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly LegacyUnknownActivationEffect]
+  ActivationEffect.[LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly]
   GenerationSlot.[Current BootPending Rollback Pinned Recent]
   DatabaseMarker.{ CommitSequence StateDigest }
   AdmissionMarker.DatabaseMarker
   TerminalMarker.DatabaseMarker
   TransitionMarker.DatabaseMarker
 
-  ;; The test-run dispatch mode. Hermetic builds the pre-declared
-  ;; .#checks.<system>.vm-<cluster>-<node> nixos test (sandboxed VM, no host
-  ;; effect); Live drives the report-51 host-untouched cycle. Shared between
-  ;; the meta Test op, the daemon config default, and the ordinary
-  ;; TestRunRecord below. Report 54 decision C — two variants, no Both.
+  ;; The test-run dispatch mode. Hermetic builds the exact output selector in
+  ;; its TestExecutionProfile (sandboxed VM, no host effect); Live uses the
+  ;; explicit transport in that profile. Shared between the meta Test op, the
+  ;; daemon config default, and the ordinary TestRunRecord below.
   TestMode.[Hermetic Live]
 
   ;; The multi-host picker. DefaultHost reads the daemon config default;
@@ -125,9 +122,8 @@
     GenerationArtifact
     ActivationEffect
     GenerationSlot
-    ;; v2 historical projections may not have recorded a realized closure.
-    ;; Current-v3 generation rows always carry Some(ClosurePath), whose value
-    ;; is the validated canonical store root defined above.
+    ;; A current generation records Some(ClosurePath), whose value is the
+    ;; validated canonical store root defined above.
     Optional.ClosurePath
     Optional.ImmutableRevision
   }
@@ -137,11 +133,11 @@
   ;; eventual result without relying on daemon logs or a transient connection.
   ;; The environment is a tagged identity, not an optional user field, so an
   ;; invalid host-with-user / user-environment-without-user row cannot exist.
-  DeploymentEnvironment.[HostEnvironment (UserEnvironment UserName) LegacyUnknownEnvironment]
+  DeploymentEnvironment.[HostEnvironment (UserEnvironment UserName)]
   ;; The request action is preserved exactly.  ActivationEffect is a derived
   ;; execution mode and cannot distinguish, for example, Evaluate from
   ;; ActivateNow or Realize from SetProfile.
-  RequestedDeploymentAction.[(Host HostDeployAction) (UserEnvironment UserEnvironmentAction) LegacyUnknownAction]
+  RequestedDeploymentAction.[(Host HostDeployAction) (UserEnvironment UserEnvironmentAction)]
   DeploymentRequestIdentity.{
     DeploymentEnvironment
     ClusterName
@@ -156,11 +152,11 @@
   }
   ;; Completed is terminal for every successful request, including Evaluate and
   ;; Realize; Activated is an intermediate effect phase only.
-  DeploymentLifecycle.[Submitted Building Built Copying Activating Activated Completed Rejected Failed LegacyUnknown LegacyAmbiguous]
+  DeploymentLifecycle.[Submitted Building Built Copying Activating Activated Completed Rejected Failed]
   DeploymentFailureStage.[Admission FlakeAuth MaterializeHorizon Eval Build CopyClosure Activate Daemon]
   DeploymentTerminalReason.[ClusterUnknown NodeUnknown ProposalSourceUnreachable FlakeReferenceMalformed InvalidDeploymentRouting BuilderUnreachable SubstituterUnreachable DeploymentInFlight UnsupportedDeployAction InternalError ActivationFailed]
   DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason }
-  DeploymentTerminal.[Succeeded (Rejected DeploymentTerminalReason) (Failed DeploymentFailure) LegacyUnknown]
+  DeploymentTerminal.[Succeeded (Rejected DeploymentTerminalReason) (Failed DeploymentFailure)]
   DeploymentRecord.{
     DeploymentIdentifier
     GenerationIdentifier
