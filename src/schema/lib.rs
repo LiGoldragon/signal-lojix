@@ -976,6 +976,7 @@ pub enum DeploymentPhase {
     Copying,
     Activating,
     Activated,
+    Completed,
     Rejected,
     Failed,
 }

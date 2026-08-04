@@ -187,7 +187,7 @@
   KeyMaterialMismatch.{ KeyMaterialConcern expected.MismatchValue actual.MismatchValue OperatorHint }
   KeyMaterialReport.{ NodeName Vector.KeyMaterialMismatch DatabaseMarker }
 
-  DeploymentPhase.[Submitted Building Built Copying Activating Activated Rejected Failed]
+  DeploymentPhase.[Submitted Building Built Copying Activating Activated Completed Rejected Failed]
   DeploymentPhaseEvent.{
     DeploymentIdentifier
     GenerationIdentifier
