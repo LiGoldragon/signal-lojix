@@ -70,6 +70,8 @@
   ActivationEffect.[LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly]
   GenerationSlot.[Current BootPending Rollback Pinned Recent]
   DatabaseMarker.{ CommitSequence StateDigest }
+  AdmissionMarker.DatabaseMarker
+  TerminalMarker.DatabaseMarker
 
   ;; The test-run dispatch mode. Hermetic builds the pre-declared
   ;; .#checks.<system>.vm-<cluster>-<node> nixos test (sandboxed VM, no host
@@ -104,7 +106,7 @@
   ;; The request action is preserved exactly.  ActivationEffect is a derived
   ;; execution mode and cannot distinguish, for example, Evaluate from
   ;; ActivateNow or Realize from SetProfile.
-  RequestedDeploymentAction.[(Host HostDeployAction) (UserEnvironment UserEnvironmentAction)]
+  RequestedDeploymentAction.[(Host HostDeployAction) (UserEnvironment UserEnvironmentAction) LegacyUnknownAction]
   DeploymentRequestIdentity.{
     DeploymentEnvironment
     ClusterName
@@ -128,9 +130,9 @@
     DeploymentIdentifier
     GenerationIdentifier
     DeploymentRequestIdentity
-    DatabaseMarker
+    Optional.AdmissionMarker
     DeploymentLifecycle
-    Optional.DatabaseMarker
+    Optional.TerminalMarker
     Optional.DeploymentTerminal
   }
   GenerationListing.{ Vector.Generation Vector.DeploymentRecord DatabaseMarker }

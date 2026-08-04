@@ -421,6 +421,22 @@ pub struct DatabaseMarker {
     feature = "nota-text",
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AdmissionMarker(DatabaseMarker);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TerminalMarker(DatabaseMarker);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
 #[derive(
     rkyv::Archive,
     rkyv::Serialize,
@@ -486,6 +502,7 @@ pub enum DeploymentEnvironment {
 pub enum RequestedDeploymentAction {
     Host(HostDeployAction),
     UserEnvironment(UserEnvironmentAction),
+    LegacyUnknownAction,
 }
 
 #[rustfmt::skip]
@@ -622,9 +639,9 @@ pub struct DeploymentRecord {
     pub deployment_identifier: DeploymentIdentifier,
     pub generation_identifier: GenerationIdentifier,
     pub deployment_request_identity: DeploymentRequestIdentity,
-    pub database_marker: DatabaseMarker,
+    pub optional_admission_marker: Option<AdmissionMarker>,
     pub deployment_lifecycle: DeploymentLifecycle,
-    pub optional_database_marker: Option<DatabaseMarker>,
+    pub optional_terminal_marker: Option<TerminalMarker>,
     pub optional_deployment_terminal: Option<DeploymentTerminal>,
 }
 
@@ -1738,6 +1755,44 @@ impl PinLabel {
 #[rustfmt::skip]
 impl From<String> for PinLabel {
     fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl AdmissionMarker {
+    pub fn new(payload: DatabaseMarker) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &DatabaseMarker {
+        &self.0
+    }
+    pub fn into_payload(self) -> DatabaseMarker {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<DatabaseMarker> for AdmissionMarker {
+    fn from(payload: DatabaseMarker) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl TerminalMarker {
+    pub fn new(payload: DatabaseMarker) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &DatabaseMarker {
+        &self.0
+    }
+    pub fn into_payload(self) -> DatabaseMarker {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<DatabaseMarker> for TerminalMarker {
+    fn from(payload: DatabaseMarker) -> Self {
         Self::new(payload)
     }
 }
