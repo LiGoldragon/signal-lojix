@@ -113,7 +113,7 @@ dependencies = [
 [[package]]
 name = "dotos"
 version = "0.10.0"
-source = "git+https://github.com/LiGoldragon/dotos.git?rev=80c7b17f7ad3#80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3"
+source = "git+https://github.com/LiGoldragon/dotos.git?rev=80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3#80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3"
 dependencies = [
  "dotos-derive",
  "rkyv",
@@ -122,7 +122,7 @@ dependencies = [
 [[package]]
 name = "dotos-derive"
 version = "0.5.0"
-source = "git+https://github.com/LiGoldragon/dotos.git?rev=80c7b17f7ad3#80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3"
+source = "git+https://github.com/LiGoldragon/dotos.git?rev=80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3#80c7b17f7ad3cf547d2624c6a243e5de5f85c9f3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -504,7 +504,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "schema-language"
 version = "0.3.0"
-source = "git+https://github.com/LiGoldragon/schema-language.git?rev=b834873de2a14c783f4be4f1af2dbb21f17ecd83#b834873de2a14c783f4be4f1af2dbb21f17ecd83"
+source = "git+https://github.com/LiGoldragon/schema-language.git?rev=5a7c713dd7c1e095970b26149c6ed5553dd1c715#5a7c713dd7c1e095970b26149c6ed5553dd1c715"
 dependencies = [
  "blake3",
  "dotos",
@@ -515,7 +515,7 @@ dependencies = [
 [[package]]
 name = "schema-rust"
 version = "0.10.0"
-source = "git+https://github.com/LiGoldragon/schema-rust.git?rev=4aa0bf9df2c3eaaccfd7abf9ae9547ab4f9a9b7f#4aa0bf9df2c3eaaccfd7abf9ae9547ab4f9a9b7f"
+source = "git+https://github.com/LiGoldragon/schema-rust.git?rev=ee9e287c313684e8fd5c651c69ad04a1fa9624b8#ee9e287c313684e8fd5c651c69ad04a1fa9624b8"
 dependencies = [
  "dotos",
  "prettyplease",
@@ -567,12 +567,12 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 [[package]]
 name = "signal-frame"
 version = "0.3.0"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=ca72b2d1151f#ca72b2d1151f5b3df536295b2ba68f039536ec19"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=01676293a623d97b65e320d4138c4b480c6d5dad#01676293a623d97b65e320d4138c4b480c6d5dad"
 dependencies = [
  "dotos",
  "paste",
  "rkyv",
- "signal-frame-macros 0.1.1 (git+https://github.com/LiGoldragon/signal-frame.git?rev=ca72b2d1151f)",
+ "signal-frame-macros 0.1.1 (git+https://github.com/LiGoldragon/signal-frame.git?rev=01676293a623d97b65e320d4138c4b480c6d5dad)",
  "thiserror",
 ]
 
@@ -590,7 +590,7 @@ dependencies = [
 [[package]]
 name = "signal-frame-macros"
 version = "0.1.1"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=0786fbe8caf27552afcdd5deb85bc82ec6088337#0786fbe8caf27552afcdd5deb85bc82ec6088337"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=01676293a623d97b65e320d4138c4b480c6d5dad#01676293a623d97b65e320d4138c4b480c6d5dad"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -600,7 +600,7 @@ dependencies = [
 [[package]]
 name = "signal-frame-macros"
 version = "0.1.1"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=ca72b2d1151f#ca72b2d1151f5b3df536295b2ba68f039536ec19"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=0786fbe8caf27552afcdd5deb85bc82ec6088337#0786fbe8caf27552afcdd5deb85bc82ec6088337"
 dependencies = [
  "proc-macro2",
  "quote",
