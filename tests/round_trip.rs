@@ -76,7 +76,7 @@ fn legacy_generation_output() -> Output {
                 generation_artifact: GenerationArtifact::LegacyUnknownArtifact,
                 activation_effect: ActivationEffect::LegacyUnknownActivationEffect,
                 generation_slot: GenerationSlot::Recent,
-                closure_path: "/nix/store/legacy".to_string().into(),
+                optional_closure_path: Some("/nix/store/legacy".to_string().into()),
                 optional_immutable_revision: None,
             }],
             deployment_record_vector: Vec::new(),

@@ -97,7 +97,7 @@
     GenerationArtifact
     ActivationEffect
     GenerationSlot
-    ClosurePath
+    Optional.ClosurePath
     Optional.ImmutableRevision
   }
   ;; A deployment is admitted before any effect runs and remains queryable until

@@ -508,7 +508,7 @@ pub struct Generation {
     pub generation_artifact: GenerationArtifact,
     pub activation_effect: ActivationEffect,
     pub generation_slot: GenerationSlot,
-    pub closure_path: ClosurePath,
+    pub optional_closure_path: Option<ClosurePath>,
     pub optional_immutable_revision: Option<ImmutableRevision>,
 }
 
