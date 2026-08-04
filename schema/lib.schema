@@ -62,12 +62,12 @@
   EventLogPosition.Integer
   PinLabel.String
 
-  GenerationArtifact.[CompleteHost BaseHost UserEnvironment]
+  GenerationArtifact.[CompleteHost BaseHost UserEnvironment LegacyUnknownArtifact]
   HostComposition.[CompleteHost BaseHost]
   HostDeployAction.[Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce]
   UserEnvironmentAction.[Realize SetProfile ActivateNow]
   SourceRevisionPolicy.[RequireImmutable ResolveAndRecord]
-  ActivationEffect.[LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly]
+  ActivationEffect.[LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly LegacyUnknownActivationEffect]
   GenerationSlot.[Current BootPending Rollback Pinned Recent]
   DatabaseMarker.{ CommitSequence StateDigest }
   AdmissionMarker.DatabaseMarker

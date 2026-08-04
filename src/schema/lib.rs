@@ -272,6 +272,7 @@ pub enum GenerationArtifact {
     CompleteHost,
     BaseHost,
     UserEnvironment,
+    LegacyUnknownArtifact,
 }
 
 #[rustfmt::skip]
@@ -380,6 +381,7 @@ pub enum ActivationEffect {
     TestActivation,
     BootOnceProfile,
     ProfileOnly,
+    LegacyUnknownActivationEffect,
 }
 
 #[rustfmt::skip]
