@@ -2,8 +2,9 @@
 
 use dotos::{DotosDecode, DotosEncode, DotosSource};
 use signal_lojix::schema::lib::{
-    CacheRetentionWatch, DatabaseMarker, GenerationListing, Input, NodeSelector, Output, Selection,
-    SubscriptionOpened,
+    ActivationEffect, CacheRetentionWatch, DatabaseMarker, Generation, GenerationArtifact,
+    GenerationListing, GenerationSlot, Input, NodeSelector, Output, RequestedGenerationArtifact,
+    Selection, SubscriptionOpened,
 };
 
 fn exchange() -> signal_frame::ExchangeIdentifier {
@@ -26,7 +27,18 @@ fn query_input() -> Input {
         Selection::ByNode(NodeSelector {
             cluster_name: "goldragon".to_string().into(),
             node_name: "ouranos".to_string().into(),
-            optional_generation_artifact: None,
+            optional_requested_generation_artifact: None,
+        })
+        .into(),
+    )
+}
+
+fn selected_query_input(artifact: RequestedGenerationArtifact) -> Input {
+    Input::Query(
+        Selection::ByNode(NodeSelector {
+            cluster_name: "goldragon".to_string().into(),
+            node_name: "ouranos".to_string().into(),
+            optional_requested_generation_artifact: Some(artifact),
         })
         .into(),
     )
@@ -46,6 +58,27 @@ fn queried_output() -> Output {
     Output::Queried(
         GenerationListing {
             generation_vector: Vec::new(),
+            deployment_record_vector: Vec::new(),
+            database_marker: marker(),
+        }
+        .into(),
+    )
+}
+
+fn legacy_generation_output() -> Output {
+    Output::Queried(
+        GenerationListing {
+            generation_vector: vec![Generation {
+                generation_identifier: 7.into(),
+                deployment_identifier: 11.into(),
+                cluster_name: "goldragon".to_string().into(),
+                node_name: "ouranos".to_string().into(),
+                generation_artifact: GenerationArtifact::LegacyUnknownArtifact,
+                activation_effect: ActivationEffect::LegacyUnknownActivationEffect,
+                generation_slot: GenerationSlot::Recent,
+                closure_path: "/nix/store/legacy".to_string().into(),
+                optional_immutable_revision: None,
+            }],
             deployment_record_vector: Vec::new(),
             database_marker: marker(),
         }
@@ -118,9 +151,30 @@ fn ordinary_replies_round_trip_through_rkyv_frames() {
 #[test]
 fn ordinary_roots_round_trip_through_dotos_text() {
     round_trip_dotos(query_input());
+    round_trip_dotos(selected_query_input(RequestedGenerationArtifact::BaseHost));
     round_trip_dotos(watch_input());
     round_trip_dotos(queried_output());
+    round_trip_dotos(legacy_generation_output());
     round_trip_dotos(watching_output());
+}
+
+#[test]
+fn legacy_artifact_is_decodable_for_migrated_output_but_rejected_for_query_selection() {
+    let legacy_output = legacy_generation_output();
+    assert!(legacy_output.to_dotos().contains("LegacyUnknownArtifact"));
+    assert!(
+        legacy_output
+            .to_dotos()
+            .contains("LegacyUnknownActivationEffect")
+    );
+
+    let selected = selected_query_input(RequestedGenerationArtifact::BaseHost).to_dotos();
+    let attempted_legacy_selection = selected.replace("BaseHost", "LegacyUnknownArtifact");
+    assert!(
+        DotosSource::new(&attempted_legacy_selection)
+            .parse::<Input>()
+            .is_err()
+    );
 }
 
 #[test]

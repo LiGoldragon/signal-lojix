@@ -63,6 +63,9 @@
   PinLabel.String
 
   GenerationArtifact.[CompleteHost BaseHost UserEnvironment LegacyUnknownArtifact]
+  ;; Selection is a request boundary, never a migration reader. Historical
+  ;; rows may expose LegacyUnknownArtifact, but a new query cannot select it.
+  RequestedGenerationArtifact.[CompleteHost BaseHost UserEnvironment]
   HostComposition.[CompleteHost BaseHost]
   HostDeployAction.[Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce]
   UserEnvironmentAction.[Realize SetProfile ActivateNow]
@@ -139,7 +142,7 @@
   GenerationListing.{ Vector.Generation Vector.DeploymentRecord DatabaseMarker }
   EventLogPage.{ Vector.DeploymentPhaseEvent Vector.CacheRetentionTransitionEvent DatabaseMarker }
 
-  NodeSelector.{ ClusterName NodeName Optional.GenerationArtifact }
+  NodeSelector.{ ClusterName NodeName Optional.RequestedGenerationArtifact }
   GenerationLookup.{ GenerationIdentifier }
   EventLogRange.{ from.EventLogPosition until.EventLogPosition }
 

@@ -290,6 +290,27 @@ pub enum GenerationArtifact {
     PartialEq,
     Eq,
 )]
+pub enum RequestedGenerationArtifact {
+    CompleteHost,
+    BaseHost,
+    UserEnvironment,
+}
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "dotos-text",
+    derive(dotos::DotosDecode, dotos::DotosDecodeTraced, dotos::DotosEncode)
+)]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
 pub enum HostComposition {
     CompleteHost,
     BaseHost,
@@ -688,7 +709,7 @@ pub struct EventLogPage {
 pub struct NodeSelector {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub optional_generation_artifact: Option<GenerationArtifact>,
+    pub optional_requested_generation_artifact: Option<RequestedGenerationArtifact>,
 }
 
 #[rustfmt::skip]

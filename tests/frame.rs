@@ -1,7 +1,7 @@
 use signal_lojix::schema::lib::{
     AdmissionMarker, DatabaseMarker, DeploymentEventsQueriedPayload, DeploymentPhase,
     DeploymentPhaseEvent, DeploymentTerminal, EventLogPage, FrameBody, GenerationListing, Input,
-    NodeSelector, Output, Selection, TerminalMarker, TransitionMarker,
+    NodeSelector, Output, RequestedGenerationArtifact, Selection, TerminalMarker, TransitionMarker,
 };
 
 fn exchange() -> signal_frame::ExchangeIdentifier {
@@ -24,7 +24,7 @@ fn query_input() -> Input {
         Selection::ByNode(NodeSelector {
             cluster_name: "goldragon".to_string().into(),
             node_name: "ouranos".to_string().into(),
-            optional_generation_artifact: None,
+            optional_requested_generation_artifact: None,
         })
         .into(),
     )
@@ -43,6 +43,34 @@ fn default_build_round_trips_ordinary_request_without_dotos_text() {
 
     assert_eq!(decoded_exchange, exchange());
     assert_eq!(decoded, input);
+}
+
+#[test]
+fn request_frame_carries_only_a_normal_generation_artifact_selector() {
+    let input = Input::Query(
+        Selection::ByNode(NodeSelector {
+            cluster_name: "goldragon".to_string().into(),
+            node_name: "ouranos".to_string().into(),
+            optional_requested_generation_artifact: Some(
+                RequestedGenerationArtifact::UserEnvironment,
+            ),
+        })
+        .into(),
+    );
+    let frame = input
+        .clone()
+        .encode_request_frame(exchange())
+        .expect("encode request");
+    let (decoded_exchange, decoded) =
+        signal_lojix::schema::lib::ContractMarker::decode_single_request(&frame)
+            .expect("decode request");
+
+    assert_eq!(decoded_exchange, exchange());
+    assert_eq!(decoded, input);
+    assert_eq!(
+        input.short_header(),
+        signal_lojix::schema::lib::short_header::INPUT_QUERY
+    );
 }
 
 #[test]
