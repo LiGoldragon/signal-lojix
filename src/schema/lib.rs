@@ -437,6 +437,14 @@ pub struct TerminalMarker(DatabaseMarker);
     feature = "nota-text",
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EventMarker(DatabaseMarker);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
 #[derive(
     rkyv::Archive,
     rkyv::Serialize,
@@ -985,6 +993,7 @@ pub struct DeploymentPhaseEvent {
     pub node_name: NodeName,
     pub deployment_phase: DeploymentPhase,
     pub event_log_position: EventLogPosition,
+    pub event_marker: EventMarker,
     pub optional_immutable_revision: Option<ImmutableRevision>,
     pub optional_deployment_terminal: Option<DeploymentTerminal>,
 }
@@ -1792,6 +1801,25 @@ impl TerminalMarker {
 }
 #[rustfmt::skip]
 impl From<DatabaseMarker> for TerminalMarker {
+    fn from(payload: DatabaseMarker) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl EventMarker {
+    pub fn new(payload: DatabaseMarker) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &DatabaseMarker {
+        &self.0
+    }
+    pub fn into_payload(self) -> DatabaseMarker {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<DatabaseMarker> for EventMarker {
     fn from(payload: DatabaseMarker) -> Self {
         Self::new(payload)
     }

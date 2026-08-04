@@ -72,6 +72,7 @@
   DatabaseMarker.{ CommitSequence StateDigest }
   AdmissionMarker.DatabaseMarker
   TerminalMarker.DatabaseMarker
+  EventMarker.DatabaseMarker
 
   ;; The test-run dispatch mode. Hermetic builds the pre-declared
   ;; .#checks.<system>.vm-<cluster>-<node> nixos test (sandboxed VM, no host
@@ -194,6 +195,7 @@
     NodeName
     DeploymentPhase
     EventLogPosition
+    EventMarker
     Optional.ImmutableRevision
     Optional.DeploymentTerminal
   }
