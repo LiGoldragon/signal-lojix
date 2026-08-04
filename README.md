@@ -8,6 +8,15 @@ ordinary peer-callable records exchanged between operator clients and
 generated Rust records/codecs, and contract witnesses. Runtime deploy
 behavior lives in `lojix`.
 
+## Migration-compatible closure paths
+
+`Generation.optional_closure_path` is optional solely to project legacy v2
+rows that did not retain a closure path. Every current-v3 generation records
+`Some(ClosurePath)`, validated by the producer as the canonical realized
+`/nix/store/<hash>-<name>` root. `TestRunRecord.optional_closure_path` follows
+the same path rule whenever present, while remaining absent until a test has a
+known built closure.
+
 ## Related
 
 - `lojix-daemon` — the daemon that consumes this ordinary contract.

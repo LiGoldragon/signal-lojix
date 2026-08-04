@@ -55,6 +55,9 @@
   ClusterName.String
   NodeName.String
   UserName.String
+  ;; A realized Nix store root. Whenever a current-v3 Generation or a
+  ;; TestRunRecord supplies this value, the producer has validated it as the
+  ;; canonical /nix/store/<hash>-<name> root for that result.
   ClosurePath.String
   ProposalSource.String
   ImmutableRevision.String
@@ -97,6 +100,9 @@
     GenerationArtifact
     ActivationEffect
     GenerationSlot
+    ;; v2 historical projections may not have recorded a realized closure.
+    ;; Current-v3 generation rows always carry Some(ClosurePath), whose value
+    ;; is the validated canonical store root defined above.
     Optional.ClosurePath
     Optional.ImmutableRevision
   }
@@ -158,7 +164,9 @@
   ;; The durable test-run outcome record, returned by (Query (ByTestRun …)).
   ;; One row per submitted test: the run identifier, the resolved
   ;; cluster/node/host/mode, the lifecycle phase reached, the pass/fail
-  ;; outcome, and (once known) the built closure under test. The daemon's SEMA
+  ;; outcome, and (once known) the built closure under test. Like Generation,
+  ;; a supplied ClosurePath is a validated canonical /nix/store root; None is
+  ;; permitted here while no closure is known. The daemon's SEMA
   ;; TestRunTable persists these; this wire shape is what the query reply
   ;; carries. A Pending outcome at phase Submitted is the freshly-accepted
   ;; test the Unit-2a stub records before any real dispatch (Unit 2b).

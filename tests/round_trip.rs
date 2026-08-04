@@ -4,7 +4,8 @@ use dotos::{DotosDecode, DotosEncode, DotosSource};
 use signal_lojix::schema::lib::{
     ActivationEffect, CacheRetentionWatch, DatabaseMarker, Generation, GenerationArtifact,
     GenerationListing, GenerationSlot, Input, NodeSelector, Output, RequestedGenerationArtifact,
-    Selection, SubscriptionOpened,
+    Selection, SubscriptionOpened, TestMode, TestOutcome, TestRunListing, TestRunPhase,
+    TestRunRecord,
 };
 
 fn exchange() -> signal_frame::ExchangeIdentifier {
@@ -76,10 +77,58 @@ fn legacy_generation_output() -> Output {
                 generation_artifact: GenerationArtifact::LegacyUnknownArtifact,
                 activation_effect: ActivationEffect::LegacyUnknownActivationEffect,
                 generation_slot: GenerationSlot::Recent,
-                optional_closure_path: Some("/nix/store/legacy".to_string().into()),
+                optional_closure_path: None,
                 optional_immutable_revision: None,
             }],
             deployment_record_vector: Vec::new(),
+            database_marker: marker(),
+        }
+        .into(),
+    )
+}
+
+fn current_generation_output() -> Output {
+    Output::Queried(
+        GenerationListing {
+            generation_vector: vec![Generation {
+                generation_identifier: 8.into(),
+                deployment_identifier: 12.into(),
+                cluster_name: "goldragon".to_string().into(),
+                node_name: "ouranos".to_string().into(),
+                generation_artifact: GenerationArtifact::CompleteHost,
+                activation_effect: ActivationEffect::LiveActivation,
+                generation_slot: GenerationSlot::Current,
+                optional_closure_path: Some(
+                    "/nix/store/0123456789abcdfghijklmnpqrsvwxyz-goldragon-system"
+                        .to_string()
+                        .into(),
+                ),
+                optional_immutable_revision: Some("a".repeat(40).into()),
+            }],
+            deployment_record_vector: Vec::new(),
+            database_marker: marker(),
+        }
+        .into(),
+    )
+}
+
+fn completed_test_run_output() -> Output {
+    Output::TestRunsQueried(
+        TestRunListing {
+            test_run_record_vector: vec![TestRunRecord {
+                test_run_identifier: 13.into(),
+                cluster_name: "goldragon".to_string().into(),
+                node: "ouranos".to_string().into(),
+                host: "ouranos".to_string().into(),
+                test_mode: TestMode::Hermetic,
+                test_run_phase: TestRunPhase::Completed,
+                test_outcome: TestOutcome::Passed,
+                optional_closure_path: Some(
+                    "/nix/store/0123456789abcdfghijklmnpqrsvwxyz-goldragon-test"
+                        .to_string()
+                        .into(),
+                ),
+            }],
             database_marker: marker(),
         }
         .into(),
@@ -107,6 +156,22 @@ where
     assert_eq!(recovered, value);
 }
 
+fn assert_canonical_store_root(path: &str) {
+    let store_path = path
+        .strip_prefix("/nix/store/")
+        .expect("closure path must use the canonical Nix store root");
+    let (hash, name) = store_path
+        .split_once('-')
+        .expect("canonical Nix store root must include its name");
+    assert_eq!(hash.len(), 32, "canonical Nix store hash width");
+    assert!(
+        hash.chars()
+            .all(|character| "0123456789abcdfghijklmnpqrsvwxyz".contains(character)),
+        "canonical Nix store hash alphabet",
+    );
+    assert!(!name.is_empty(), "canonical Nix store root name");
+}
+
 #[test]
 fn ordinary_requests_round_trip_through_rkyv_frames() {
     for request in [query_input(), watch_input()] {
@@ -124,7 +189,12 @@ fn ordinary_requests_round_trip_through_rkyv_frames() {
 
 #[test]
 fn ordinary_replies_round_trip_through_rkyv_frames() {
-    for reply in [queried_output(), watching_output()] {
+    for reply in [
+        queried_output(),
+        current_generation_output(),
+        completed_test_run_output(),
+        watching_output(),
+    ] {
         let frame = reply
             .clone()
             .encode_reply_frame(exchange())
@@ -154,8 +224,38 @@ fn ordinary_roots_round_trip_through_dotos_text() {
     round_trip_dotos(selected_query_input(RequestedGenerationArtifact::BaseHost));
     round_trip_dotos(watch_input());
     round_trip_dotos(queried_output());
+    round_trip_dotos(current_generation_output());
     round_trip_dotos(legacy_generation_output());
+    round_trip_dotos(completed_test_run_output());
     round_trip_dotos(watching_output());
+}
+
+#[test]
+fn closure_paths_are_optional_for_legacy_generations_and_canonical_when_supplied() {
+    let Output::Queried(legacy) = legacy_generation_output() else {
+        panic!("legacy fixture must be a generation listing");
+    };
+    assert_eq!(
+        legacy.payload().generation_vector[0].optional_closure_path,
+        None
+    );
+
+    let Output::Queried(current) = current_generation_output() else {
+        panic!("current fixture must be a generation listing");
+    };
+    let Some(current_path) = &current.payload().generation_vector[0].optional_closure_path else {
+        panic!("current-v3 generation must carry its canonical closure root");
+    };
+    assert_canonical_store_root(current_path.payload());
+
+    let Output::TestRunsQueried(test_runs) = completed_test_run_output() else {
+        panic!("test fixture must be a test-run listing");
+    };
+    let Some(test_path) = &test_runs.payload().test_run_record_vector[0].optional_closure_path
+    else {
+        panic!("completed test run must carry its canonical closure root");
+    };
+    assert_canonical_store_root(test_path.payload());
 }
 
 #[test]
@@ -182,5 +282,11 @@ fn ordinary_dotos_heads_are_contract_local_verbs() {
     assert!(query_input().to_dotos().contains("Query"));
     assert!(watch_input().to_dotos().contains("WatchCacheRetention"));
     assert!(queried_output().to_dotos().contains("Queried"));
+    assert!(current_generation_output().to_dotos().contains("Queried"));
+    assert!(
+        completed_test_run_output()
+            .to_dotos()
+            .contains("TestRunsQueried")
+    );
     assert!(watching_output().to_dotos().contains("Watching"));
 }
