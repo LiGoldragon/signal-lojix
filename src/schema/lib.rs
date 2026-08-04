@@ -364,19 +364,6 @@ pub enum SourceRevisionPolicy {
     feature = "nota-text",
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct SourceRevisionRecord {
-    pub source_revision_policy: SourceRevisionPolicy,
-    pub requested_ref: FlakeReference,
-    pub resolved_ref: FlakeReference,
-    pub string: String,
-}
-
-#[rustfmt::skip]
-#[cfg_attr(
-    feature = "nota-text",
-    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
-)]
 #[derive(
     rkyv::Archive,
     rkyv::Serialize,
@@ -475,7 +462,7 @@ pub struct Generation {
     pub activation_effect: ActivationEffect,
     pub generation_slot: GenerationSlot,
     pub closure_path: ClosurePath,
-    pub optional_source_revision_record: Option<SourceRevisionRecord>,
+    pub optional_immutable_revision: Option<ImmutableRevision>,
 }
 
 #[rustfmt::skip]
@@ -487,6 +474,7 @@ pub struct Generation {
 pub enum DeploymentEnvironment {
     HostEnvironment,
     UserEnvironment(UserName),
+    LegacyUnknownEnvironment,
 }
 
 #[rustfmt::skip]
@@ -989,7 +977,7 @@ pub struct DeploymentPhaseEvent {
     pub deployment_phase: DeploymentPhase,
     pub event_log_position: EventLogPosition,
     pub optional_phase_detail: Option<PhaseDetail>,
-    pub optional_source_revision_record: Option<SourceRevisionRecord>,
+    pub optional_immutable_revision: Option<ImmutableRevision>,
 }
 
 #[rustfmt::skip]

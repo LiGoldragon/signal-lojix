@@ -67,7 +67,6 @@
   HostDeployAction.[Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce]
   UserEnvironmentAction.[Realize SetProfile ActivateNow]
   SourceRevisionPolicy.[RequireImmutable ResolveAndRecord]
-  SourceRevisionRecord.{ SourceRevisionPolicy requested_ref.FlakeReference resolved_ref.FlakeReference String }
   ActivationEffect.[LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly]
   GenerationSlot.[Current BootPending Rollback Pinned Recent]
   DatabaseMarker.{ CommitSequence StateDigest }
@@ -93,7 +92,7 @@
     ActivationEffect
     GenerationSlot
     ClosurePath
-    Optional.SourceRevisionRecord
+    Optional.ImmutableRevision
   }
   ;; A deployment is admitted before any effect runs and remains queryable until
   ;; its terminal record.  This record is the correlation boundary: a reader
@@ -101,7 +100,7 @@
   ;; eventual result without relying on daemon logs or a transient connection.
   ;; The environment is a tagged identity, not an optional user field, so an
   ;; invalid host-with-user / user-environment-without-user row cannot exist.
-  DeploymentEnvironment.[HostEnvironment (UserEnvironment UserName)]
+  DeploymentEnvironment.[HostEnvironment (UserEnvironment UserName) LegacyUnknownEnvironment]
   ;; The request action is preserved exactly.  ActivationEffect is a derived
   ;; execution mode and cannot distinguish, for example, Evaluate from
   ;; ActivateNow or Realize from SetProfile.
@@ -195,7 +194,7 @@
     DeploymentPhase
     EventLogPosition
     Optional.PhaseDetail
-    Optional.SourceRevisionRecord
+    Optional.ImmutableRevision
   }
   CacheRetentionTransition.[Pinned Unpinned Promoted Demoted Retired Evicted]
   CacheRetentionTransitionEvent.{
