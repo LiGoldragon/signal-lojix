@@ -62,6 +62,31 @@
   ProposalSource.String
   ImmutableRevision.String
   FlakeReference.String
+  ;; Deployment routing is never inferred from cluster or node identity. The
+  ;; owner supplies the exact Nix store transport URI and the exact SSH
+  ;; destination independently; the daemon passes each to its corresponding
+  ;; command unchanged and keeps both off the ordinary egress surface.
+  NixStoreUri.String
+  SshDestination.String
+  DeploymentTransport.{ NixStoreUri SshDestination }
+  ;; Every deployment states whether it needs the typed Horizon input
+  ;; materialization and names the exact flake output to build. No target
+  ;; attribute or input shape is synthesized by the deploy daemon.
+  DeploymentInputMode.[Direct Horizon]
+  FlakeAttribute.String
+  DeploymentOutputSelector.{ FlakeAttribute }
+  ;; Platform command paths are legal only behind an explicit, versioned
+  ;; backend selection. The daemon rejects backend/action combinations that do
+  ;; not match the deployment environment.
+  ActivationBackend.[NixosSystemdBootV1 HomeManagerNixProfileV1]
+  ;; A complete Nix `--builders` value. It is passed verbatim when selected;
+  ;; there is no daemon-local builder registry or machine-file fallback.
+  NixBuilderSpec.String
+  ;; The test execution convention is likewise an explicit profile. A live
+  ;; profile carries a transport; hermetic execution uses its supplied Nix
+  ;; system and output selector without choosing either from daemon defaults.
+  NixSystem.String
+  TestExecutionProfile.{ TestMode NixSystem DeploymentOutputSelector Optional.DeploymentTransport }
   EventLogPosition.Integer
   PinLabel.String
 
