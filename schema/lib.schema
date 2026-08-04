@@ -185,7 +185,6 @@
   KeyMaterialReport.{ NodeName Vector.KeyMaterialMismatch DatabaseMarker }
 
   DeploymentPhase.[Submitted Building Built Copying Activating Activated Rejected Failed]
-  PhaseDetail.String
   DeploymentPhaseEvent.{
     DeploymentIdentifier
     GenerationIdentifier
@@ -193,8 +192,8 @@
     NodeName
     DeploymentPhase
     EventLogPosition
-    Optional.PhaseDetail
     Optional.ImmutableRevision
+    Optional.DeploymentTerminal
   }
   CacheRetentionTransition.[Pinned Unpinned Promoted Demoted Retired Evicted]
   CacheRetentionTransitionEvent.{

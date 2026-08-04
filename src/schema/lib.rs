@@ -961,14 +961,6 @@ pub enum DeploymentPhase {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct PhaseDetail(String);
-
-#[rustfmt::skip]
-#[cfg_attr(
-    feature = "nota-text",
-    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
-)]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DeploymentPhaseEvent {
     pub deployment_identifier: DeploymentIdentifier,
     pub generation_identifier: GenerationIdentifier,
@@ -976,8 +968,8 @@ pub struct DeploymentPhaseEvent {
     pub node_name: NodeName,
     pub deployment_phase: DeploymentPhase,
     pub event_log_position: EventLogPosition,
-    pub optional_phase_detail: Option<PhaseDetail>,
     pub optional_immutable_revision: Option<ImmutableRevision>,
+    pub optional_deployment_terminal: Option<DeploymentTerminal>,
 }
 
 #[rustfmt::skip]
@@ -1859,25 +1851,6 @@ impl OperatorHint {
 }
 #[rustfmt::skip]
 impl From<String> for OperatorHint {
-    fn from(payload: String) -> Self {
-        Self::new(payload)
-    }
-}
-
-#[rustfmt::skip]
-impl PhaseDetail {
-    pub fn new(payload: impl Into<String>) -> Self {
-        Self(payload.into())
-    }
-    pub fn payload(&self) -> &String {
-        &self.0
-    }
-    pub fn into_payload(self) -> String {
-        self.0
-    }
-}
-#[rustfmt::skip]
-impl From<String> for PhaseDetail {
     fn from(payload: String) -> Self {
         Self::new(payload)
     }
