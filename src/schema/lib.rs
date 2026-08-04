@@ -227,14 +227,6 @@ pub struct ProposalSource(String);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct SourceFingerprint(String);
-
-#[rustfmt::skip]
-#[cfg_attr(
-    feature = "nota-text",
-    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
-)]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct RequestedFlakeReference(String);
 
 #[rustfmt::skip]
@@ -520,7 +512,6 @@ pub struct DeploymentRequestIdentity {
     pub node_name: NodeName,
     pub generation_artifact: GenerationArtifact,
     pub activation_effect: ActivationEffect,
-    pub source_fingerprint: SourceFingerprint,
     pub deployment_requested_source: DeploymentRequestedSource,
     pub optional_source_revision_record: Option<SourceRevisionRecord>,
 }
@@ -1689,25 +1680,6 @@ impl ProposalSource {
 }
 #[rustfmt::skip]
 impl From<String> for ProposalSource {
-    fn from(payload: String) -> Self {
-        Self::new(payload)
-    }
-}
-
-#[rustfmt::skip]
-impl SourceFingerprint {
-    pub fn new(payload: impl Into<String>) -> Self {
-        Self(payload.into())
-    }
-    pub fn payload(&self) -> &String {
-        &self.0
-    }
-    pub fn into_payload(self) -> String {
-        self.0
-    }
-}
-#[rustfmt::skip]
-impl From<String> for SourceFingerprint {
     fn from(payload: String) -> Self {
         Self::new(payload)
     }

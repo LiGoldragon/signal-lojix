@@ -57,7 +57,6 @@
   UserName.String
   ClosurePath.String
   ProposalSource.String
-  SourceFingerprint.String
   RequestedFlakeReference.String
   FlakeReference.String
   EventLogPosition.Integer
@@ -110,10 +109,6 @@
     NodeName
     GenerationArtifact
     ActivationEffect
-    ;; A stable opaque correlator for the daemon-private proposal source.  The
-    ;; raw source can contain local topology and is intentionally not exposed
-    ;; on the ordinary peer surface.
-    SourceFingerprint
     DeploymentRequestedSource
     Optional.SourceRevisionRecord
   }
