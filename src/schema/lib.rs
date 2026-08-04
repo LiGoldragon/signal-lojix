@@ -227,7 +227,7 @@ pub struct ProposalSource(String);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct RequestedFlakeReference(String);
+pub struct ImmutableRevision(String);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -495,9 +495,9 @@ pub enum DeploymentEnvironment {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct DeploymentRequestedSource {
-    pub source_revision_policy: SourceRevisionPolicy,
-    pub requested_flake_reference: RequestedFlakeReference,
+pub enum RequestedDeploymentAction {
+    Host(HostDeployAction),
+    UserEnvironment(UserEnvironmentAction),
 }
 
 #[rustfmt::skip]
@@ -511,9 +511,10 @@ pub struct DeploymentRequestIdentity {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
     pub generation_artifact: GenerationArtifact,
+    pub requested_deployment_action: RequestedDeploymentAction,
     pub activation_effect: ActivationEffect,
-    pub deployment_requested_source: DeploymentRequestedSource,
-    pub optional_source_revision_record: Option<SourceRevisionRecord>,
+    pub source_revision_policy: SourceRevisionPolicy,
+    pub optional_immutable_revision: Option<ImmutableRevision>,
 }
 
 #[rustfmt::skip]
@@ -1686,7 +1687,7 @@ impl From<String> for ProposalSource {
 }
 
 #[rustfmt::skip]
-impl RequestedFlakeReference {
+impl ImmutableRevision {
     pub fn new(payload: impl Into<String>) -> Self {
         Self(payload.into())
     }
@@ -1698,7 +1699,7 @@ impl RequestedFlakeReference {
     }
 }
 #[rustfmt::skip]
-impl From<String> for RequestedFlakeReference {
+impl From<String> for ImmutableRevision {
     fn from(payload: String) -> Self {
         Self::new(payload)
     }
@@ -1928,6 +1929,16 @@ impl DeploymentEnvironment {
 }
 
 #[rustfmt::skip]
+impl RequestedDeploymentAction {
+    pub fn host(payload: HostDeployAction) -> Self {
+        Self::Host(payload)
+    }
+    pub fn user_environment(payload: UserEnvironmentAction) -> Self {
+        Self::UserEnvironment(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl DeploymentTerminal {
     pub fn rejected(payload: DeploymentTerminalReason) -> Self {
         Self::Rejected(payload)
@@ -2026,6 +2037,20 @@ impl From<NodeName> for HostSelection {
 #[rustfmt::skip]
 impl From<UserName> for DeploymentEnvironment {
     fn from(payload: UserName) -> Self {
+        Self::UserEnvironment(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<HostDeployAction> for RequestedDeploymentAction {
+    fn from(payload: HostDeployAction) -> Self {
+        Self::Host(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<UserEnvironmentAction> for RequestedDeploymentAction {
+    fn from(payload: UserEnvironmentAction) -> Self {
         Self::UserEnvironment(payload)
     }
 }

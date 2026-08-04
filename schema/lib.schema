@@ -57,7 +57,7 @@
   UserName.String
   ClosurePath.String
   ProposalSource.String
-  RequestedFlakeReference.String
+  ImmutableRevision.String
   FlakeReference.String
   EventLogPosition.Integer
   PinLabel.String
@@ -102,15 +102,21 @@
   ;; The environment is a tagged identity, not an optional user field, so an
   ;; invalid host-with-user / user-environment-without-user row cannot exist.
   DeploymentEnvironment.[HostEnvironment (UserEnvironment UserName)]
-  DeploymentRequestedSource.{ SourceRevisionPolicy RequestedFlakeReference }
+  ;; The request action is preserved exactly.  ActivationEffect is a derived
+  ;; execution mode and cannot distinguish, for example, Evaluate from
+  ;; ActivateNow or Realize from SetProfile.
+  RequestedDeploymentAction.[(Host HostDeployAction) (UserEnvironment UserEnvironmentAction)]
   DeploymentRequestIdentity.{
     DeploymentEnvironment
     ClusterName
     NodeName
     GenerationArtifact
+    RequestedDeploymentAction
     ActivationEffect
-    DeploymentRequestedSource
-    Optional.SourceRevisionRecord
+    SourceRevisionPolicy
+    ;; Never expose a raw flake reference.  This is present only after strict
+    ;; admission/resolution has proved an allowed immutable revision syntax.
+    Optional.ImmutableRevision
   }
   ;; Completed is terminal for every successful request, including Evaluate and
   ;; Realize; Activated is an intermediate effect phase only.
