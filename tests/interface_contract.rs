@@ -19,3 +19,10 @@ fn strict_rust_projection_uses_only_encoded_object_coordinates() {
     }
     assert!(bootstrap_manifest::DECLARATION_SEATS.len() > 100);
 }
+
+#[test]
+fn retired_schema_source_directory_is_absent() {
+    let crate_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    assert!(!crate_root.join("schema").exists());
+    assert!(crate_root.join("ethos/lib.ethos").is_file());
+}

@@ -1,6 +1,6 @@
 //! Ordinary Signal contract for the lojix deploy orchestrator component.
 //!
-//! `schema/lib.schema` is the canonical textual projection of one
+//! `ethos/lib.ethos` is the canonical textual projection of one
 //! authority-verified, role-free bootstrap Interface. Its checked Rust
 //! projection carries only encoded identities. The operational ordinary
 //! Input/Output role seating and Signal frame behavior remain handwritten Rust
@@ -10,7 +10,7 @@ pub mod bootstrap_manifest;
 pub mod schema;
 
 /// Canonical textual projection of the ordinary Lojix Interface.
-pub const LOJIX_INTERFACE_SOURCE: &str = include_str!("../schema/lib.schema");
+pub const LOJIX_INTERFACE_SOURCE: &str = include_str!("../ethos/lib.ethos");
 
 /// Checked-in Rust projection of the same verified Interface transaction.
 pub const LOJIX_INTERFACE_RUST: &str = include_str!("schema/lib/generated.rs");

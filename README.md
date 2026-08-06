@@ -4,7 +4,7 @@ The ordinary Lojix Interface: a strict Protos bootstrap document, its
 authority-verified encoded Rust projection, and the operational behavior that
 the current role-free bootstrap file kind cannot yet express.
 
-The canonical source is `schema/lib.schema`. Build-time authority assembly
+The canonical source is `ethos/lib.ethos`. Build-time authority assembly
 verifies that source and keeps `src/schema/lib/generated.rs` exactly fresh.
 The generated Rust names are opaque encoded object coordinates; readable
 contract heads remain visible through Dotos and the handwritten ordinary

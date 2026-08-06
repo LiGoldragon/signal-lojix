@@ -7,7 +7,7 @@ the Interface.
 
 ## Authority boundary
 
-`schema/lib.schema` is the canonical `Interface.{1 0 0}` document. It is a
+`ethos/lib.ethos` is the canonical `Interface.{1 0 0}` document. It is a
 strict, role-free bootstrap document: imports, Nexus, Sema, and roles are
 empty, and the Types section contains the whole ordinary vocabulary.
 
