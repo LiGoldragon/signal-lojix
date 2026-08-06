@@ -28,9 +28,13 @@ pub enum WireValue {
 
 #[derive(Debug, thiserror::Error)]
 #[error("structural wire value does not match the authority-verified Interface")]
-struct WireShapeError;
+#[doc(hidden)]
+pub struct WireShapeError;
 
-trait WireShape: Sized {
+/// Current-stage structural behavior shared by Interfaces that import these
+/// producer-owned types.
+#[doc(hidden)]
+pub trait WireShape: Sized {
     fn to_wire(&self) -> WireValue;
     fn from_wire(value: WireValue) -> Result<Self, WireShapeError>;
 }
