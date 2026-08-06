@@ -1,29 +1,25 @@
 # signal-lojix
 
-Typed Signal contract for the lojix deploy orchestrator. Defines the
-ordinary peer-callable records exchanged between operator clients and
-`lojix-daemon` over the daemon's ordinary Unix socket.
+The ordinary Lojix Interface: a strict Protos bootstrap document, its
+authority-verified encoded Rust projection, and the operational behavior that
+the current role-free bootstrap file kind cannot yet express.
 
-**Status: implemented contract.** The repo contains the schema,
-generated Rust records/codecs, and contract witnesses. Runtime deploy
-behavior lives in `lojix`.
+The canonical source is `schema/lib.schema`. Build-time authority assembly
+verifies that source and keeps `src/schema/lib/generated.rs` exactly fresh.
+The generated Rust names are opaque encoded object coordinates; readable
+contract heads remain visible through Dotos and the handwritten ordinary
+request/reply role layer.
 
-## Closure paths
+The crate publishes its explicit `schema/` directory through Cargo's
+`ethos-source-dir` metadata protocol so downstream Interfaces consume the
+producer-owned source directly. Runtime consumers do not depend on the
+bootstrap compiler train.
 
-Every current generation records `Some(ClosurePath)`, validated by the producer
-as the canonical realized
-`/nix/store/<hash>-<name>` root. `TestRunRecord.optional_closure_path` follows
-the same path rule whenever present, while remaining absent until a test has a
-known built closure.
+Related repositories:
 
-## Related
-
-- `lojix-daemon` — the daemon that consumes this ordinary contract.
-- `meta-signal-lojix` — owner-only policy contract for deploy and
-  retention mutations.
-- `signal-frame` — frame kernel used by this contract.
-- `signal-persona-mind`, `signal-persona-message` — structural
-  precedents for the contract-crate shape.
+- `meta-signal-lojix` owns the owner-only Lojix Interface.
+- `lojix` consumes both Interfaces and owns operational execution.
+- `signal-frame` is the current binary frame substrate.
 
 ## License
 

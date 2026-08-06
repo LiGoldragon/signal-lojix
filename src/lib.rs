@@ -1,10 +1,16 @@
 //! Ordinary Signal contract for the lojix deploy orchestrator component.
 //!
-//! Wire-only: the rkyv + NOTA codec and the signal-frame mail envelope for the
-//! peer-callable read / observe / subscribe surface. Owner-only mutations
-//! (Deploy/Pin/Unpin/Retire) live in `meta-signal-lojix`.
-//!
-//! This crate DEFINES the shared record types ONCE; `meta-signal-lojix`
-//! cross-imports them via `signal-lojix:lib:TypeName`.
+//! `schema/lib.schema` is the canonical textual projection of one
+//! authority-verified, role-free bootstrap Interface. Its checked Rust
+//! projection carries only encoded identities. The operational ordinary
+//! Input/Output role seating and Signal frame behavior remain handwritten Rust
+//! until the language train reaches that behavior slice.
 
+pub mod bootstrap_manifest;
 pub mod schema;
+
+/// Canonical textual projection of the ordinary Lojix Interface.
+pub const LOJIX_INTERFACE_SOURCE: &str = include_str!("../schema/lib.schema");
+
+/// Checked-in Rust projection of the same verified Interface transaction.
+pub const LOJIX_INTERFACE_RUST: &str = include_str!("schema/lib/generated.rs");
