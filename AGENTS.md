@@ -14,3 +14,9 @@
   `signal-persona-mind`, `signal-persona-message`.
 
 - **Spec.** `ARCHITECTURE.md` is the local source of truth.
+
+## Protos estate status
+
+Stack: correct-new destination
+Status: active component contract, current checkout legacy-wired
+This checkout is not proof of correct-new adoption.
