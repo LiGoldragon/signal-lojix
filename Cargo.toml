@@ -20,7 +20,7 @@ rkyv         = { version = "0.8", default-features = false, features = ["std", "
 signal-frame = { git = "https://github.com/LiGoldragon/signal-frame.git", rev = "80f70d929ae6d72707052f097be2264872913983", default-features = false }
 
 [build-dependencies]
-ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero.git", rev = "a0c0548a73f1" }
+ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero.git", rev = "bcf728bbe4521e663f4773d3c1fd4ebb643df32e" }
 protos     = { git = "https://github.com/LiGoldragon/protos", rev = "2d999f173334" }
 
 [lints.rust]

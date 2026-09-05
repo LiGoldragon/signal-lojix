@@ -320,6 +320,76 @@ impl protos::Conceivable<datom_codec::Datom> for DeploymentWatch {
 }
 pub type WatchRejectedPayload = RejectedWatch;
 pub type ProposalSource = protos::Text;
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SecretsInput {
+    NoSecrets,
+    SecretsDirectory(SecretsDirectory),
+}
+impl datom_codec::Datomic for SecretsInput {
+    fn incorporate(
+        site: datom_codec::Site<'_>,
+    ) -> std::result::Result<Self, datom_codec::Fault> {
+        let v = datom_codec::Sited::variant(site)?;
+        match v.name {
+            "NoSecrets" => {
+                datom_codec::Headed::nothing(v)?;
+                std::result::Result::Ok(Self::NoSecrets)
+            }
+            "SecretsDirectory" => {
+                std::result::Result::Ok(
+                    Self::SecretsDirectory(datom_codec::Carrying::body(v)?),
+                )
+            }
+            _ => {
+                std::result::Result::Err(
+                    datom_codec::Headed::reject(
+                        &v,
+                        datom_codec::Problem::UnknownVariant(
+                            protos::Word::try_from(v.name).expect("variant name"),
+                        ),
+                    ),
+                )
+            }
+        }
+    }
+}
+impl protos::Conceivable<datom_codec::Datom> for SecretsInput {
+    type Fault = std::convert::Infallible;
+    fn conceive(
+        &self,
+    ) -> std::result::Result<protos::Situated<datom_codec::Datom>, Self::Fault> {
+        std::result::Result::Ok(
+            protos::Situated(
+                protos::Situation {
+                    extent: protos::Extent(0, 0),
+                    children: vec![],
+                },
+                match self {
+                    Self::NoSecrets => {
+                        datom_codec::Datom::Word(
+                            datom_codec::DatomWord::try_from(
+                                    protos::Word::try_from("NoSecrets").expect("static variant"),
+                                )
+                                .expect("stable variant"),
+                        )
+                    }
+                    Self::SecretsDirectory(p0) => {
+                        datom_codec::Datom::Variant(
+                            protos::Symbol::try_from("SecretsDirectory")
+                                .expect("static variant"),
+                            std::boxed::Box::new(
+                                protos::Conceivable::conceive(p0)
+                                    .expect("infallible datom ascent")
+                                    .1,
+                            ),
+                        )
+                    }
+                },
+            ),
+        )
+    }
+}
+pub type SecretsDirectory = protos::Text;
 pub type WatchingPayload = SubscriptionOpened;
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RequestedDeploymentAction {
@@ -4579,6 +4649,12 @@ pub struct DeploymentWatchWire(
 );
 pub type WatchRejectedPayloadWire = RejectedWatchWire;
 pub type ProposalSourceWire = std::string::String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum SecretsInputWire {
+    NoSecrets,
+    SecretsDirectory(SecretsDirectoryWire),
+}
+pub type SecretsDirectoryWire = std::string::String;
 pub type WatchingPayloadWire = SubscriptionOpenedWire;
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum RequestedDeploymentActionWire {
@@ -5083,6 +5159,29 @@ impl WireConversion for DeploymentWatch {
                     .transpose()?,
             ),
         )
+    }
+}
+impl WireConversion for SecretsInput {
+    type Wire = SecretsInputWire;
+    fn into_wire(self) -> Self::Wire {
+        match self {
+            SecretsInput::NoSecrets => SecretsInputWire::NoSecrets,
+            SecretsInput::SecretsDirectory(value) => {
+                SecretsInputWire::SecretsDirectory(value.to_string())
+            }
+        }
+    }
+    fn try_from_wire(wire: Self::Wire) -> std::result::Result<Self, WireFault> {
+        match wire {
+            SecretsInputWire::NoSecrets => Ok(SecretsInput::NoSecrets),
+            SecretsInputWire::SecretsDirectory(value) => {
+                Ok(
+                    SecretsInput::SecretsDirectory(
+                        protos::Text::try_from(value).map_err(|_| WireFault::Text)?,
+                    ),
+                )
+            }
+        }
     }
 }
 impl WireConversion for RequestedDeploymentAction {

@@ -10,6 +10,30 @@ pub use generated::*;
 
 pub const LOJIX_SIGNAL_SOURCE: &str = include_str!("../ethos/lib.ethos");
 
+// Imported Ethos contracts convert these intrinsic carriers through this
+// contract's generated wire trait. The wire representation is already the
+// structural scalar, so recovery validates text and leaves numeric/boolean
+// values unchanged.
+impl WireConversion for protos::Text {
+    type Wire = String;
+    fn into_wire(self) -> Self::Wire { self.to_string() }
+    fn try_from_wire(wire: Self::Wire) -> Result<Self, WireFault> {
+        protos::Text::try_from(wire).map_err(|_| WireFault::Text)
+    }
+}
+
+impl WireConversion for i64 {
+    type Wire = i64;
+    fn into_wire(self) -> Self::Wire { self }
+    fn try_from_wire(wire: Self::Wire) -> Result<Self, WireFault> { Ok(wire) }
+}
+
+impl WireConversion for bool {
+    type Wire = bool;
+    fn into_wire(self) -> Self::Wire { self }
+    fn try_from_wire(wire: Self::Wire) -> Result<Self, WireFault> { Ok(wire) }
+}
+
 /// The allocated ordinary Lojix wire contract: seat 1, structural revision 4.
 pub enum LojixWire {}
 
