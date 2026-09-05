@@ -16,7 +16,8 @@
         pkgs = import nixpkgs { inherit system; };
         rust = rust-build.lib.${system}.fromPkgs pkgs;
         inherit (rust) craneLib toolchain;
-        src = rust.cleanSource { root = ./.; };
+        ethosFilter = path: type: type == "regular" && pkgs.lib.hasSuffix ".ethos" path;
+        src = rust.cleanSource { root = ./.; extraFilters = [ ethosFilter ]; };
         common = { inherit src; strictDeps = true; };
         cargoArtifacts = craneLib.buildDepsOnly common;
       in {
