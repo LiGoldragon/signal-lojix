@@ -34,12 +34,14 @@ impl WireConversion for bool {
     fn try_from_wire(wire: Self::Wire) -> Result<Self, WireFault> { Ok(wire) }
 }
 
-/// The allocated ordinary Lojix wire contract: seat 1, structural revision 4.
+/// The allocated ordinary Lojix wire contract: stable seat 5, structural revision 4.
 pub enum LojixWire {}
 
 impl signal_frame::WireContract for LojixWire {
     const BINDING: signal_frame::ContractBinding = signal_frame::ContractBinding::new(
-        signal_frame::ContractId::new(core::num::NonZeroU32::MIN),
+        signal_frame::ContractId::new(
+            core::num::NonZeroU32::new(5).expect("the Lojix wire seat is nonzero"),
+        ),
         signal_frame::WireRevision::new(
             core::num::NonZeroU16::new(4).expect("the Lojix structural revision is nonzero"),
         ),

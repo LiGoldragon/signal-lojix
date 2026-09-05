@@ -56,7 +56,7 @@ impl WireContract for WrongContract {
 struct WrongRevision;
 impl WireContract for WrongRevision {
     const BINDING: ContractBinding = ContractBinding::new(
-        ContractId::new(NonZeroU32::new(1).unwrap()),
+        ContractId::new(NonZeroU32::new(5).unwrap()),
         WireRevision::new(NonZeroU16::new(5).unwrap()),
     );
 }
