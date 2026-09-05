@@ -48,7 +48,7 @@ fn bound_structural_request_round_trips_with_its_contract_route() {
 struct WrongContract;
 impl WireContract for WrongContract {
     const BINDING: ContractBinding = ContractBinding::new(
-        ContractId::new(NonZeroU32::new(2).unwrap()),
+        ContractId::new(NonZeroU32::new(1).unwrap()),
         WireRevision::new(NonZeroU16::new(4).unwrap()),
     );
 }
