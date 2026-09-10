@@ -1,15 +1,18 @@
 ; Ordinary Lojix query and observation contract.
 Signal
 
-[]
+[ horizon_lib:[ HorizonDefinition ] ]
 
-[ CheckHostKeyMaterial.KeyMaterialQuery
+[ Configure.LojixNexusConfiguration
+  CheckHostKeyMaterial.KeyMaterialQuery
   WatchDeployments.DeploymentWatch
   Query.Selection
   WatchCacheRetention.CacheRetentionWatch
   Unwatch.SubscriptionClose ]
 
-[ TestRunsQueried.TestRunListing
+[ Configured.ConfigurationReceipt
+  ConfigurationRejected.ConfigurationRejection
+  TestRunsQueried.TestRunListing
   UnwatchRejected.RejectedUnwatch
   QueryRejected.RejectedQuery
   Watching.SubscriptionOpened
@@ -20,7 +23,20 @@ Signal
   KeyMaterialChecked.KeyMaterialReport
   WatchRejected.RejectedWatch ]
 
-[ UserEnvironmentAction.[ ActivateNow Realize SetProfile ]
+[ OrdinarySocketPath.String
+  OrdinarySocketMode.Integer
+  OwnerSocketPath.String
+  OwnerSocketMode.Integer
+  StateDirectoryPath.String
+  DaemonHost.String
+  MetaConfigureOccurred.Boolean
+  TestDefaultsChoice.[ NoTestDefaults TestDefaults.TestDefaults ]
+  TestDefaults.{ ClusterName NodeName TestMode FlakeReference NixSystem DeploymentOutputSelector Option<HorizonDefinition> }
+  LojixNexusConfiguration.{ OrdinarySocketPath OrdinarySocketMode OwnerSocketPath OwnerSocketMode StateDirectoryPath DaemonHost TestDefaultsChoice }
+  ConfigurationReceipt.{ LojixNexusConfiguration MetaConfigureOccurred }
+  ConfigurationRejectionReason.[ OrdinaryConfigureClosed InvalidConfiguration ]
+  ConfigurationRejection.{ ConfigurationRejectionReason }
+  UserEnvironmentAction.[ ActivateNow Realize SetProfile ]
   GenerationIdentifier.Integer
   CacheRetentionTransition.[ Demoted Retired Pinned Promoted Unpinned Evicted ]
   CommitSequence.Integer

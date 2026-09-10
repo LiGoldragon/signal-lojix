@@ -1,6 +1,6 @@
 [package]
 name = "signal-lojix"
-version = "1.0.1"
+version = "1.1.0"
 edition = "2024"
 rust-version = "1.89"
 description = "Ordinary Signal contract for the Lojix deployment Nexus."
@@ -9,12 +9,13 @@ build = "build.rs"
 
 [features]
 default = []
-datom = ["dep:datom-codec", "dep:protos"]
+datom = ["dep:datom-codec", "dep:protos", "horizon-lib/datom"]
 
 [dependencies]
 datom-codec = { git = "https://github.com/LiGoldragon/datom-codec", rev = "f2cc06858d38a4028c928d33323a6d682e7c222f", optional = true }
 protos = { git = "https://github.com/LiGoldragon/protos", rev = "b543678cfc8609529cea7174eb4af8a64daa54ad", optional = true }
 rkyv = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
+horizon-lib = { git = "https://github.com/LiGoldragon/horizon-rs", rev = "e48712203b7aad4bfb03088a4bda0a87ae064692", default-features = false }
 
 [build-dependencies]
 ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "4695ee0c1f5d00dcf5cceba08f5fa00412b92184" }
@@ -23,3 +24,8 @@ ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "4695ee0
 unsafe_code = "forbid"
 unused = { level = "warn", priority = -1 }
 dead_code = "warn"
+
+[lints.clippy]
+# Contract variants preserve authored named payloads, including the complete
+# typed configuration. Portable rkyv values must not gain heap indirection.
+large_enum_variant = "allow"

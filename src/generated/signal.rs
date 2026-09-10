@@ -1,5 +1,88 @@
 #![allow(dead_code, non_camel_case_types, non_snake_case)]
 #[rustfmt::skip]
+pub type OrdinarySocketPath = String;
+#[rustfmt::skip]
+pub type OrdinarySocketMode = i64;
+#[rustfmt::skip]
+pub type OwnerSocketPath = String;
+#[rustfmt::skip]
+pub type OwnerSocketMode = i64;
+#[rustfmt::skip]
+pub type StateDirectoryPath = String;
+#[rustfmt::skip]
+pub type DaemonHost = String;
+#[rustfmt::skip]
+pub type MetaConfigureOccurred = bool;
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub enum TestDefaultsChoice {
+    NoTestDefaults,
+    TestDefaults(TestDefaults),
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct TestDefaults {
+    pub cluster_name: ClusterName,
+    pub node_name: NodeName,
+    pub test_mode: TestMode,
+    pub flake_reference: FlakeReference,
+    pub nix_system: NixSystem,
+    pub deployment_output_selector: DeploymentOutputSelector,
+    pub horizon_definition_option: Option<horizon_lib::HorizonDefinition>,
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct LojixNexusConfiguration {
+    pub ordinary_socket_path: OrdinarySocketPath,
+    pub ordinary_socket_mode: OrdinarySocketMode,
+    pub owner_socket_path: OwnerSocketPath,
+    pub owner_socket_mode: OwnerSocketMode,
+    pub state_directory_path: StateDirectoryPath,
+    pub daemon_host: DaemonHost,
+    pub test_defaults_choice: TestDefaultsChoice,
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct ConfigurationReceipt {
+    pub lojix_nexus_configuration: LojixNexusConfiguration,
+    pub meta_configure_occurred: MetaConfigureOccurred,
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub enum ConfigurationRejectionReason {
+    OrdinaryConfigureClosed,
+    InvalidConfiguration,
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct ConfigurationRejection {
+    pub configuration_rejection_reason: ConfigurationRejectionReason,
+}
+#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -777,6 +860,7 @@ pub struct KeyMaterialReport {
     derive(datom_codec::Datomizable, datom_codec::Compositional)
 )]
 pub enum Query {
+    Configure(LojixNexusConfiguration),
     CheckHostKeyMaterial(KeyMaterialQuery),
     WatchDeployments(DeploymentWatch),
     Query(Selection),
@@ -790,6 +874,8 @@ pub enum Query {
     derive(datom_codec::Datomizable, datom_codec::Compositional)
 )]
 pub enum Response {
+    Configured(ConfigurationReceipt),
+    ConfigurationRejected(ConfigurationRejection),
     TestRunsQueried(TestRunListing),
     UnwatchRejected(RejectedUnwatch),
     QueryRejected(RejectedQuery),

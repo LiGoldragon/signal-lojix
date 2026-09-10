@@ -1,8 +1,21 @@
 #[cfg(feature = "datom")]
 use signal_lojix::DatabaseMarker;
 use signal_lojix::{
-    ByteViewable, KeyMaterialQuery, Query, Response, Restorable, Signal, Signalizable,
+    ByteViewable, ConfigurationReceipt, KeyMaterialQuery, LojixNexusConfiguration, Query, Response,
+    Restorable, Signal, Signalizable, TestDefaultsChoice,
 };
+
+fn configuration() -> LojixNexusConfiguration {
+    LojixNexusConfiguration {
+        ordinary_socket_path: "/run/lojix/ordinary.sock".into(),
+        ordinary_socket_mode: 0o660,
+        owner_socket_path: "/run/lojix/meta.sock".into(),
+        owner_socket_mode: 0o600,
+        state_directory_path: "/var/lib/lojix".into(),
+        daemon_host: "deployment.host".into(),
+        test_defaults_choice: TestDefaultsChoice::NoTestDefaults,
+    }
+}
 
 #[test]
 fn peer_bytes_restore_typed_query_and_response() {
@@ -22,6 +35,22 @@ fn peer_bytes_restore_typed_query_and_response() {
     let sent = response.signalize().expect("signalize response");
     let received = Signal::<Response>::from(sent.bytes().to_vec());
     assert_eq!(received.restore().expect("restore response"), response);
+}
+
+#[test]
+fn configure_query_and_desired_state_receipt_cross_fresh_peer_bytes() {
+    let query = Query::Configure(configuration());
+    let sent = query.signalize().expect("signalize Configure query");
+    let received = Signal::<Query>::from(sent.bytes().to_vec());
+    assert_eq!(received.restore().expect("restore Configure query"), query);
+
+    let response = Response::Configured(ConfigurationReceipt {
+        lojix_nexus_configuration: configuration(),
+        meta_configure_occurred: false,
+    });
+    let sent = response.signalize().expect("signalize receipt");
+    let received = Signal::<Response>::from(sent.bytes().to_vec());
+    assert_eq!(received.restore().expect("restore receipt"), response);
 }
 
 #[cfg(feature = "datom")]
