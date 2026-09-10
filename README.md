@@ -1,25 +1,20 @@
 # signal-lojix
 
-The ordinary Lojix Interface: a strict Protos bootstrap document, its
-authority-verified encoded Rust projection, and the operational behavior that
-the current role-free bootstrap file kind cannot yet express.
+The ordinary Signal contract for the Lojix deployment Nexus. The authored
+contract is `ethos/signal.ethos`; Ethos Zero generates the public `Query`,
+`Response`, and named payload types and the build rejects stale generated Rust.
 
-The canonical source is `ethos/lib.ethos`. Build-time authority assembly
-verifies that source and keeps `src/schema/lib/generated.rs` exactly fresh.
-The generated Rust names are opaque encoded object coordinates; readable
-contract heads remain visible through Dotos and the handwritten ordinary
-request/reply role layer.
-
-The crate publishes its explicit `schema/` directory through Cargo's
-`ethos-source-dir` metadata protocol so downstream Interfaces consume the
-producer-owned source directly. Runtime consumers do not depend on the
-bootstrap compiler train.
+`Signalizable::signalize` archives a query or response into portable rkyv
+bytes. A receiver constructs `Signal<T>` from owned peer bytes and restores
+the typed value with `Restorable::restore`. Transport length framing belongs
+to the Nexus. The optional `datom` feature enables the authored text chain for
+clients while the default contract has no Datom dependency.
 
 Related repositories:
 
 - `meta-signal-lojix` owns the owner-only Lojix Interface.
 - `lojix` consumes both Interfaces and owns operational execution.
-- `signal-frame` is the current binary frame substrate.
+- `meta-signal-lojix` owns the privileged Lojix Signal contract.
 
 ## License
 
