@@ -1,6 +1,6 @@
 [package]
 name = "signal-lojix"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 rust-version = "1.89"
 description = "Ordinary Signal contract for the Lojix deployment Nexus."
@@ -17,7 +17,7 @@ protos = { git = "https://github.com/LiGoldragon/protos", rev = "b543678cfc86095
 rkyv = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 
 [build-dependencies]
-ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "79efacaff9c6384d1637491eba9082c49d0a8897" }
+ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "4695ee0c1f5d00dcf5cceba08f5fa00412b92184" }
 
 [lints.rust]
 unsafe_code = "forbid"

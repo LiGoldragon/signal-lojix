@@ -70,8 +70,8 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "ethos-zero"
-version = "6.1.5"
-source = "git+https://github.com/LiGoldragon/ethos-zero?rev=79efacaff9c6384d1637491eba9082c49d0a8897#79efacaff9c6384d1637491eba9082c49d0a8897"
+version = "6.1.6"
+source = "git+https://github.com/LiGoldragon/ethos-zero?rev=4695ee0c1f5d00dcf5cceba08f5fa00412b92184#4695ee0c1f5d00dcf5cceba08f5fa00412b92184"
 dependencies = [
  "datom-codec",
  "prettyplease",
@@ -274,7 +274,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "signal-lojix"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "datom-codec",
  "ethos-zero",

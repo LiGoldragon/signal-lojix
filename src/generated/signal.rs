@@ -41,7 +41,7 @@ pub struct DeploymentPhaseEvent {
     pub node_name: NodeName,
     pub deployment_phase: DeploymentPhase,
     pub event_log_position: EventLogPosition,
-    pub state_marker: StateMarker,
+    pub transition_marker: TransitionMarker,
     pub immutable_revision_option: Option<ImmutableRevision>,
     pub deployment_terminal_option: Option<DeploymentTerminal>,
 }
@@ -90,7 +90,7 @@ pub type NodeName = String;
 )]
 pub struct RejectedQuery {
     pub query_rejection_reason: QueryRejectionReason,
-    pub state_marker: StateMarker,
+    pub database_marker: DatabaseMarker,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
@@ -192,7 +192,7 @@ pub type PinLabel = String;
 pub struct GenerationListing {
     pub generation_vector: std::vec::Vec<Generation>,
     pub deployment_record_vector: std::vec::Vec<DeploymentRecord>,
-    pub state_marker: StateMarker,
+    pub database_marker: DatabaseMarker,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
@@ -268,9 +268,17 @@ pub enum DeploymentPhase {
     Activating,
 }
 #[rustfmt::skip]
-pub type DatabaseMarker = StateMarker;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct DatabaseMarker {
+    pub commit_sequence: CommitSequence,
+    pub state_digest: StateDigest,
+}
 #[rustfmt::skip]
-pub type AdmissionMarker = StateMarker;
+pub type AdmissionMarker = DatabaseMarker;
 #[rustfmt::skip]
 pub type SshDestination = String;
 #[rustfmt::skip]
@@ -292,11 +300,18 @@ pub struct DeploymentRequestIdentity {
     pub immutable_revision_option: Option<ImmutableRevision>,
 }
 #[rustfmt::skip]
-pub type TransitionMarker = StateMarker;
+pub type TransitionMarker = DatabaseMarker;
 #[rustfmt::skip]
 pub type EventLogPosition = i64;
 #[rustfmt::skip]
-pub type RejectedWatch = WatchRejectionReason;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct RejectedWatch {
+    pub watch_rejection_reason: WatchRejectionReason,
+}
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
@@ -425,12 +440,19 @@ pub struct EventLogPage {
     pub cache_retention_transition_event_vector: std::vec::Vec<
         CacheRetentionTransitionEvent,
     >,
-    pub state_marker: StateMarker,
+    pub database_marker: DatabaseMarker,
 }
 #[rustfmt::skip]
-pub type SubscriptionClose = SubscriptionToken;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct SubscriptionClose {
+    pub subscription_token: SubscriptionToken,
+}
 #[rustfmt::skip]
-pub type TerminalMarker = StateMarker;
+pub type TerminalMarker = DatabaseMarker;
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
@@ -496,7 +518,14 @@ pub enum ActivationEffect {
     BootProfile,
 }
 #[rustfmt::skip]
-pub type SubscriptionClosed = SubscriptionToken;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct SubscriptionClosed {
+    pub subscription_token: SubscriptionToken,
+}
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
@@ -603,7 +632,7 @@ pub enum DeploymentFailureStage {
 )]
 pub struct RejectedKeyMaterialCheck {
     pub key_material_check_rejection_reason: KeyMaterialCheckRejectionReason,
-    pub state_marker: StateMarker,
+    pub database_marker: DatabaseMarker,
 }
 #[rustfmt::skip]
 pub type FlakeReference = String;
@@ -645,9 +674,10 @@ pub enum Selection {
     feature = "datom",
     derive(datom_codec::Datomizable, datom_codec::Compositional)
 )]
-pub struct StateMarker {
-    pub commit_sequence: CommitSequence,
-    pub state_digest: StateDigest,
+pub enum RequestedGenerationArtifact {
+    UserEnvironment,
+    CompleteHost,
+    BaseHost,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
@@ -658,7 +688,7 @@ pub struct StateMarker {
 pub struct NodeSelector {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub generation_artifact_option: Option<GenerationArtifact>,
+    pub requested_generation_artifact_option: Option<RequestedGenerationArtifact>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
@@ -738,7 +768,7 @@ pub struct KeyMaterialMismatch {
 pub struct KeyMaterialReport {
     pub node_name: NodeName,
     pub key_material_mismatch_vector: std::vec::Vec<KeyMaterialMismatch>,
-    pub state_marker: StateMarker,
+    pub database_marker: DatabaseMarker,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]

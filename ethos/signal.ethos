@@ -24,14 +24,14 @@ Signal
   GenerationIdentifier.Integer
   CacheRetentionTransition.[ Demoted Retired Pinned Promoted Unpinned Evicted ]
   CommitSequence.Integer
-  DeploymentPhaseEvent.{ DeploymentIdentifier GenerationIdentifier ClusterName NodeName DeploymentPhase EventLogPosition StateMarker Option<ImmutableRevision> Option<DeploymentTerminal> }
+  DeploymentPhaseEvent.{ DeploymentIdentifier GenerationIdentifier ClusterName NodeName DeploymentPhase EventLogPosition TransitionMarker Option<ImmutableRevision> Option<DeploymentTerminal> }
   DeploymentWatch.{ Option<DeploymentIdentifier> Option<ClusterName> Option<NodeName> }
   ProposalSource.String
   SecretsDirectory.String
   SecretsInput.[ NoSecrets SecretsDirectory.SecretsDirectory ]
   RequestedDeploymentAction.[ Host.HostDeployAction UserEnvironment.UserEnvironmentAction ]
   NodeName.String
-  RejectedQuery.{ QueryRejectionReason StateMarker }
+  RejectedQuery.{ QueryRejectionReason DatabaseMarker }
   GenerationLookup.{ GenerationIdentifier }
   TestOutcome.[ Pending Passed Failed.FailureStage ]
   KeyMaterialCheckRejectionReason.[ ProposalSourceUnreachable HostUnreachable PublicationMalformed NodeUnknown ]
@@ -42,7 +42,7 @@ Signal
   FailureStage.[ HermeticCheck BringUp Assert Deploy TearDown ]
   HostDeployAction.[ TestActivation ScheduleBootOnce Realize SetBootProfile Evaluate ActivateNow ]
   PinLabel.String
-  GenerationListing.{ Vector<Generation> Vector<DeploymentRecord> StateMarker }
+  GenerationListing.{ Vector<Generation> Vector<DeploymentRecord> DatabaseMarker }
   DeploymentLookup.{ DeploymentIdentifier }
   UnwatchRejectionReason.[ SubscriptionTokenUnknown SubscriptionAlreadyClosed ]
   GenerationSlot.[ Pinned Recent Rollback BootPending Current ]
@@ -51,14 +51,14 @@ Signal
   CacheRetentionWatch.{ Option<ClusterName> Option<NodeName> }
   FlakeAttribute.String
   DeploymentPhase.[ Built Completed Failed Copying Rejected Activated Submitted Building Activating ]
-  DatabaseMarker.StateMarker
-  AdmissionMarker.StateMarker
+  DatabaseMarker.{ CommitSequence StateDigest }
+  AdmissionMarker.DatabaseMarker
   SshDestination.String
   UserName.String
   DeploymentRequestIdentity.{ DeploymentEnvironment ClusterName NodeName GenerationArtifact RequestedDeploymentAction ActivationEffect SourceRevisionPolicy Option<ImmutableRevision> }
-  TransitionMarker.StateMarker
+  TransitionMarker.DatabaseMarker
   EventLogPosition.Integer
-  RejectedWatch.WatchRejectionReason
+  RejectedWatch.{ WatchRejectionReason }
   CacheRetentionTransitionEvent.{ GenerationIdentifier ClusterName NodeName CacheRetentionTransition GenerationSlot Option<GenerationSlot> Option<PinLabel> EventLogPosition }
   NixBuilderSpec.String
   DeploymentInputMode.[ Horizon Direct ]
@@ -70,9 +70,9 @@ Signal
   ActivationBackend.[ HomeManagerNixProfileV1 NixosSystemdBootV1 ]
   GenerationArtifact.[ BaseHost CompleteHost UserEnvironment ]
   RejectedUnwatch.{ UnwatchRejectionReason SubscriptionToken }
-  EventLogPage.{ Vector<DeploymentPhaseEvent> Vector<CacheRetentionTransitionEvent> StateMarker }
-  SubscriptionClose.SubscriptionToken
-  TerminalMarker.StateMarker
+  EventLogPage.{ Vector<DeploymentPhaseEvent> Vector<CacheRetentionTransitionEvent> DatabaseMarker }
+  SubscriptionClose.{ SubscriptionToken }
+  TerminalMarker.DatabaseMarker
   DeploymentEnvironment.[ HostEnvironment UserEnvironment.UserName ]
   ImmutableRevision.String
   HostSelection.[ DefaultHost OnHost.NodeName ]
@@ -80,7 +80,7 @@ Signal
   DeploymentLifecycle.[ Failed Rejected Completed Building Activating Submitted Copying Activated Built ]
   ClosurePath.String
   ActivationEffect.[ ProfileOnly BootOnceProfile TestActivation LiveActivation BootProfile ]
-  SubscriptionClosed.SubscriptionToken
+  SubscriptionClosed.{ SubscriptionToken }
   TestMode.[ Hermetic Live ]
   StateDigest.Integer
   QueryRejectionReason.[ MalformedSelector EventLogPositionOutOfRange GenerationUnknown NodeUnknown ]
@@ -93,12 +93,12 @@ Signal
   DeploymentIdentifier.Integer
   DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason }
   DeploymentFailureStage.[ Build Eval MaterializeHorizon Daemon Activate CopyClosure Admission FlakeAuth ]
-  RejectedKeyMaterialCheck.{ KeyMaterialCheckRejectionReason StateMarker }
+  RejectedKeyMaterialCheck.{ KeyMaterialCheckRejectionReason DatabaseMarker }
   FlakeReference.String
   DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable ]
   Selection.[ ByNode.NodeSelector ByTestRun.TestRunLookup ByDeployment.DeploymentLookup ByGeneration.GenerationLookup ByEventLog.EventLogRange ]
-  StateMarker.{ CommitSequence StateDigest }
-  NodeSelector.{ ClusterName NodeName Option<GenerationArtifact> }
+  RequestedGenerationArtifact.[ UserEnvironment CompleteHost BaseHost ]
+  NodeSelector.{ ClusterName NodeName Option<RequestedGenerationArtifact> }
   DeploymentOutputSelector.{ FlakeAttribute }
   Generation.{ GenerationIdentifier DeploymentIdentifier ClusterName NodeName GenerationArtifact ActivationEffect GenerationSlot Option<ClosurePath> Option<ImmutableRevision> }
   TestRunRecord.{ TestRunIdentifier ClusterName NodeName NodeName TestMode TestRunPhase TestOutcome Option<ClosurePath> }
@@ -106,4 +106,4 @@ Signal
   MismatchValue.String
   OperatorHint.String
   KeyMaterialMismatch.{ KeyMaterialConcern MismatchValue MismatchValue OperatorHint }
-  KeyMaterialReport.{ NodeName Vector<KeyMaterialMismatch> StateMarker } ]
+  KeyMaterialReport.{ NodeName Vector<KeyMaterialMismatch> DatabaseMarker } ]

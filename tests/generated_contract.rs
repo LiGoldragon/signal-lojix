@@ -1,5 +1,5 @@
 #[cfg(feature = "datom")]
-use signal_lojix::StateMarker;
+use signal_lojix::DatabaseMarker;
 use signal_lojix::{
     ByteViewable, KeyMaterialQuery, Query, Response, Restorable, Signal, Signalizable,
 };
@@ -16,7 +16,9 @@ fn peer_bytes_restore_typed_query_and_response() {
     let received = Signal::<Query>::from(sent.bytes().to_vec());
     assert_eq!(received.restore().expect("restore query"), query);
 
-    let response = Response::Unwatched(41);
+    let response = Response::Unwatched(signal_lojix::SubscriptionClosed {
+        subscription_token: 41,
+    });
     let sent = response.signalize().expect("signalize response");
     let received = Signal::<Response>::from(sent.bytes().to_vec());
     assert_eq!(received.restore().expect("restore response"), response);
@@ -59,7 +61,7 @@ fn datom_round_trip_preserves_named_response_payload() {
     let response = Response::KeyMaterialChecked(signal_lojix::KeyMaterialReport {
         node_name: "host.example".into(),
         key_material_mismatch_vector: vec![],
-        state_marker: StateMarker {
+        database_marker: DatabaseMarker {
             commit_sequence: 9,
             state_digest: 17,
         },
