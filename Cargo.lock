@@ -114,8 +114,8 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
 name = "horizon-lib"
-version = "0.8.0"
-source = "git+https://github.com/LiGoldragon/horizon-rs?rev=e48712203b7aad4bfb03088a4bda0a87ae064692#e48712203b7aad4bfb03088a4bda0a87ae064692"
+version = "0.9.0"
+source = "git+https://github.com/LiGoldragon/horizon-rs?rev=cd3c8a944609f97b0ff800a54fb384c9f21be9ca#cd3c8a944609f97b0ff800a54fb384c9f21be9ca"
 dependencies = [
  "datom-codec",
  "ethos-zero",
