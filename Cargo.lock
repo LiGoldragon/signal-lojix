@@ -48,8 +48,27 @@ name = "datom-codec"
 version = "0.25.6"
 source = "git+https://github.com/LiGoldragon/datom-codec?rev=f2cc06858d38a4028c928d33323a6d682e7c222f#f2cc06858d38a4028c928d33323a6d682e7c222f"
 dependencies = [
- "datom-codec-derive",
+ "datom-codec-derive 0.25.6 (git+https://github.com/LiGoldragon/datom-codec?rev=f2cc06858d38a4028c928d33323a6d682e7c222f)",
  "protos",
+]
+
+[[package]]
+name = "datom-codec"
+version = "0.25.7"
+source = "git+https://github.com/LiGoldragon/datom-codec?rev=9bffbf14f8de54a9d8f25a9fcf9120061401ded2#9bffbf14f8de54a9d8f25a9fcf9120061401ded2"
+dependencies = [
+ "datom-codec-derive 0.25.6 (git+https://github.com/LiGoldragon/datom-codec?rev=9bffbf14f8de54a9d8f25a9fcf9120061401ded2)",
+ "protos",
+]
+
+[[package]]
+name = "datom-codec-derive"
+version = "0.25.6"
+source = "git+https://github.com/LiGoldragon/datom-codec?rev=9bffbf14f8de54a9d8f25a9fcf9120061401ded2#9bffbf14f8de54a9d8f25a9fcf9120061401ded2"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -73,7 +92,7 @@ name = "ethos-zero"
 version = "6.1.6"
 source = "git+https://github.com/LiGoldragon/ethos-zero?rev=4695ee0c1f5d00dcf5cceba08f5fa00412b92184#4695ee0c1f5d00dcf5cceba08f5fa00412b92184"
 dependencies = [
- "datom-codec",
+ "datom-codec 0.25.6",
  "prettyplease",
  "proc-macro2",
  "protos",
@@ -115,9 +134,9 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 [[package]]
 name = "horizon-lib"
 version = "0.9.0"
-source = "git+https://github.com/LiGoldragon/horizon-rs?rev=28cd1c3791f24a74e6726fd293d6d415b7899767#28cd1c3791f24a74e6726fd293d6d415b7899767"
+source = "git+https://github.com/LiGoldragon/horizon-rs?rev=28614f33cc7f8c5be07a5dcd788fff1fc00872aa#28614f33cc7f8c5be07a5dcd788fff1fc00872aa"
 dependencies = [
- "datom-codec",
+ "datom-codec 0.25.7",
  "ethos-zero",
  "protos",
  "rkyv",
@@ -319,7 +338,7 @@ dependencies = [
 name = "signal-lojix"
 version = "1.2.0"
 dependencies = [
- "datom-codec",
+ "datom-codec 0.25.6",
  "ethos-zero",
  "horizon-lib",
  "protos",
