@@ -4,7 +4,6 @@ Signal
 [ horizon_lib:[ HorizonDefinition ] ]
 
 [ Configure.LojixNexusConfiguration
-  CheckHostKeyMaterial.KeyMaterialQuery
   WatchDeployments.DeploymentWatch
   Query.Selection
   WatchCacheRetention.CacheRetentionWatch
@@ -16,11 +15,9 @@ Signal
   UnwatchRejected.RejectedUnwatch
   QueryRejected.RejectedQuery
   Watching.SubscriptionOpened
-  KeyMaterialCheckRejected.RejectedKeyMaterialCheck
   Queried.GenerationListing
   DeploymentEventsQueried.EventLogPage
   Unwatched.SubscriptionClosed
-  KeyMaterialChecked.KeyMaterialReport
   WatchRejected.RejectedWatch ]
 
 [ OrdinarySocketPath.String
@@ -50,7 +47,6 @@ Signal
   RejectedQuery.{ QueryRejectionReason DatabaseMarker }
   GenerationLookup.{ GenerationIdentifier }
   TestOutcome.[ Pending Passed Failed.FailureStage ]
-  KeyMaterialCheckRejectionReason.[ ProposalSourceUnreachable HostUnreachable PublicationMalformed NodeUnknown ]
   TestRunLookup.{ ClusterName NodeName Option<TestRunIdentifier> }
   SubscriptionToken.Integer
   NixSystem.String
@@ -104,22 +100,21 @@ Signal
   TestRunListing.{ Vector<TestRunRecord> DatabaseMarker }
   DeploymentTerminal.[ Succeeded Failed.DeploymentFailure Rejected.DeploymentTerminalReason ]
   SourceRevisionPolicy.[ ResolveAndRecord RequireImmutable ]
-  KeyMaterialQuery.{ ClusterName NodeName ProposalSource }
   ClusterName.String
   DeploymentIdentifier.Integer
-  DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason }
+  DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason Option<FailureEvidence> }
+  FailureEvidence.{ CommandProgram Vector<CommandArgument> Option<ExitCode> FailureDetail DetailTruncated }
+  CommandProgram.String
+  CommandArgument.String
+  ExitCode.Integer
+  FailureDetail.String
   DeploymentFailureStage.[ Build Eval MaterializeHorizon Daemon Activate CopyClosure Admission FlakeAuth ]
-  RejectedKeyMaterialCheck.{ KeyMaterialCheckRejectionReason DatabaseMarker }
   FlakeReference.String
-  DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable ]
+  DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable EvaluationFailed BuildFailed ]
   Selection.[ ByNode.NodeSelector ByTestRun.TestRunLookup ByDeployment.DeploymentLookup ByGeneration.GenerationLookup ByEventLog.EventLogRange ]
   RequestedGenerationArtifact.[ UserEnvironment CompleteHost BaseHost ]
   NodeSelector.{ ClusterName NodeName Option<RequestedGenerationArtifact> }
   DeploymentOutputSelector.{ FlakeAttribute }
   Generation.{ GenerationIdentifier DeploymentIdentifier ClusterName NodeName GenerationArtifact ActivationEffect GenerationSlot Option<ClosurePath> Option<ImmutableRevision> }
   TestRunRecord.{ TestRunIdentifier ClusterName NodeName NodeName TestMode TestRunPhase TestOutcome Option<ClosurePath> }
-  KeyMaterialConcern.[ SecureShellPublicKey YggdrasilPublicKey YggdrasilAddress ]
-  MismatchValue.String
-  OperatorHint.String
-  KeyMaterialMismatch.{ KeyMaterialConcern MismatchValue MismatchValue OperatorHint }
-  KeyMaterialReport.{ NodeName Vector<KeyMaterialMismatch> DatabaseMarker } ]
+  DetailTruncated.Boolean ]

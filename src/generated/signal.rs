@@ -201,18 +201,6 @@ pub enum TestOutcome {
     feature = "datom",
     derive(datom_codec::Datomizable, datom_codec::Compositional)
 )]
-pub enum KeyMaterialCheckRejectionReason {
-    ProposalSourceUnreachable,
-    HostUnreachable,
-    PublicationMalformed,
-    NodeUnknown,
-}
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
 pub struct TestRunLookup {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
@@ -667,17 +655,6 @@ pub enum SourceRevisionPolicy {
     RequireImmutable,
 }
 #[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
-pub struct KeyMaterialQuery {
-    pub cluster_name: ClusterName,
-    pub node_name: NodeName,
-    pub proposal_source: ProposalSource,
-}
-#[rustfmt::skip]
 pub type ClusterName = String;
 #[rustfmt::skip]
 pub type DeploymentIdentifier = i64;
@@ -690,7 +667,29 @@ pub type DeploymentIdentifier = i64;
 pub struct DeploymentFailure {
     pub deployment_failure_stage: DeploymentFailureStage,
     pub deployment_terminal_reason: DeploymentTerminalReason,
+    pub failure_evidence_option: Option<FailureEvidence>,
 }
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct FailureEvidence {
+    pub command_program: CommandProgram,
+    pub command_argument_vector: std::vec::Vec<CommandArgument>,
+    pub exit_code_option: Option<ExitCode>,
+    pub failure_detail: FailureDetail,
+    pub detail_truncated: DetailTruncated,
+}
+#[rustfmt::skip]
+pub type CommandProgram = String;
+#[rustfmt::skip]
+pub type CommandArgument = String;
+#[rustfmt::skip]
+pub type ExitCode = i64;
+#[rustfmt::skip]
+pub type FailureDetail = String;
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
@@ -706,16 +705,6 @@ pub enum DeploymentFailureStage {
     CopyClosure,
     Admission,
     FlakeAuth,
-}
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
-pub struct RejectedKeyMaterialCheck {
-    pub key_material_check_rejection_reason: KeyMaterialCheckRejectionReason,
-    pub database_marker: DatabaseMarker,
 }
 #[rustfmt::skip]
 pub type FlakeReference = String;
@@ -737,6 +726,8 @@ pub enum DeploymentTerminalReason {
     ActivationFailed,
     BuilderUnreachable,
     SubstituterUnreachable,
+    EvaluationFailed,
+    BuildFailed,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
@@ -816,43 +807,7 @@ pub struct TestRunRecord {
     pub closure_path_option: Option<ClosurePath>,
 }
 #[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
-pub enum KeyMaterialConcern {
-    SecureShellPublicKey,
-    YggdrasilPublicKey,
-    YggdrasilAddress,
-}
-#[rustfmt::skip]
-pub type MismatchValue = String;
-#[rustfmt::skip]
-pub type OperatorHint = String;
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
-pub struct KeyMaterialMismatch {
-    pub key_material_concern: KeyMaterialConcern,
-    pub first_mismatch_value: MismatchValue,
-    pub second_mismatch_value: MismatchValue,
-    pub operator_hint: OperatorHint,
-}
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
-pub struct KeyMaterialReport {
-    pub node_name: NodeName,
-    pub key_material_mismatch_vector: std::vec::Vec<KeyMaterialMismatch>,
-    pub database_marker: DatabaseMarker,
-}
+pub type DetailTruncated = bool;
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
@@ -861,7 +816,6 @@ pub struct KeyMaterialReport {
 )]
 pub enum Query {
     Configure(LojixNexusConfiguration),
-    CheckHostKeyMaterial(KeyMaterialQuery),
     WatchDeployments(DeploymentWatch),
     Query(Selection),
     WatchCacheRetention(CacheRetentionWatch),
@@ -880,10 +834,8 @@ pub enum Response {
     UnwatchRejected(RejectedUnwatch),
     QueryRejected(RejectedQuery),
     Watching(SubscriptionOpened),
-    KeyMaterialCheckRejected(RejectedKeyMaterialCheck),
     Queried(GenerationListing),
     DeploymentEventsQueried(EventLogPage),
     Unwatched(SubscriptionClosed),
-    KeyMaterialChecked(KeyMaterialReport),
     WatchRejected(RejectedWatch),
 }
