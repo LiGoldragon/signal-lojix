@@ -1,5 +1,14 @@
 # Upgrades
 
+# 4.0.0 to 4.1.0
+
+`horizon-lib` moves to 0.10.0 (`a56330451934d682ae15612acd49924356ec0205`),
+which rehomes its free decode/compose/project functions onto traits. No type
+in this crate changed, but `HorizonDefinition` is re-exported through the
+contract, so a consumer pinning this crate pins that horizon-lib and must
+import `DatomDecoding` and `Projecting` where it called the old free
+functions. See horizon-rs UPGRADES.md.
+
 # 2.0.0 to 4.0.0
 
 Three changes to the ordinary contract, all breaking.
