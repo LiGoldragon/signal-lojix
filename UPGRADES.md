@@ -1,6 +1,6 @@
 # Upgrades
 
-# 2.0.0 to 3.0.0
+# 2.0.0 to 4.0.0
 
 Three changes to the ordinary contract, all breaking.
 
@@ -11,22 +11,27 @@ Three changes to the ordinary contract, all breaking.
 ```
 -DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason }
 +DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason Option<FailureEvidence> }
-+FailureEvidence.{ CommandProgram Vector<CommandArgument> Option<ExitCode> FailureDetail DetailTruncated }
++FailureEvidence.{ Option<FailedCommand> FailureDetail DetailTruncated }
++FailedCommand.{ CommandProgram Vector<CommandArgument> Option<ExitCode> }
 ```
 
 Until now a failed deployment reported only a stage and one of eleven generic
 reasons. The subprocess stderr that named the actual cause was captured by the
 runtime and thrown away, so `Query.ByDeployment` could say *what phase* broke
-and never *what broke*. `FailureEvidence` carries the failed command's program
-and arguments, its exit code when the process reported one, and the bounded
-tail of its stderr. `detail_truncated` says whether the detail was cut.
+and never *what broke*. `FailureEvidence` always carries the bounded tail of what the
+failing stage printed, and `detail_truncated` says whether it was cut. The
+command is optional within it: a stage that ran a subprocess names the
+program, its arguments, and its exit code when the process reported one
+(a process killed by a signal reports none); a stage that failed without
+running one — a Horizon projection, an internal invariant — carries the
+detail and no command.
 
 The detail is redacted by the producer: any line containing a credential term
 is dropped rather than stored. It is bounded, not a log stream — a Nexus does
 not become a journal.
 
-`None` is the honest value where a failure has no subprocess behind it (an
-admission rejection, an internal invariant).
+`None` for the whole evidence is the honest value where a failure carries
+nothing to report — an admission rejection decided before any stage ran.
 
 ## The reason enum stops conflating evaluation with build
 

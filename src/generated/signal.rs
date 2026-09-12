@@ -676,11 +676,20 @@ pub struct DeploymentFailure {
     derive(datom_codec::Datomizable, datom_codec::Compositional)
 )]
 pub struct FailureEvidence {
+    pub failed_command_option: Option<FailedCommand>,
+    pub failure_detail: FailureDetail,
+    pub detail_truncated: DetailTruncated,
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
+#[cfg_attr(
+    feature = "datom",
+    derive(datom_codec::Datomizable, datom_codec::Compositional)
+)]
+pub struct FailedCommand {
     pub command_program: CommandProgram,
     pub command_argument_vector: std::vec::Vec<CommandArgument>,
     pub exit_code_option: Option<ExitCode>,
-    pub failure_detail: FailureDetail,
-    pub detail_truncated: DetailTruncated,
 }
 #[rustfmt::skip]
 pub type CommandProgram = String;

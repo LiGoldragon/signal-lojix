@@ -103,7 +103,8 @@ Signal
   ClusterName.String
   DeploymentIdentifier.Integer
   DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason Option<FailureEvidence> }
-  FailureEvidence.{ CommandProgram Vector<CommandArgument> Option<ExitCode> FailureDetail DetailTruncated }
+  FailureEvidence.{ Option<FailedCommand> FailureDetail DetailTruncated }
+  FailedCommand.{ CommandProgram Vector<CommandArgument> Option<ExitCode> }
   CommandProgram.String
   CommandArgument.String
   ExitCode.Integer

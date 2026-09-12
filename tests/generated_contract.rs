@@ -104,8 +104,9 @@ fn failed_deployment_response() -> Response {
     use signal_lojix::{
         ActivationEffect, DatabaseMarker, DeploymentEnvironment, DeploymentFailure,
         DeploymentFailureStage, DeploymentLifecycle, DeploymentRecord, DeploymentRequestIdentity,
-        DeploymentTerminal, DeploymentTerminalReason, FailureEvidence, GenerationArtifact,
-        GenerationListing, RequestedDeploymentAction, SourceRevisionPolicy, UserEnvironmentAction,
+        DeploymentTerminal, DeploymentTerminalReason, FailedCommand, FailureEvidence,
+        GenerationArtifact, GenerationListing, RequestedDeploymentAction, SourceRevisionPolicy,
+        UserEnvironmentAction,
     };
     let marker = DatabaseMarker {
         commit_sequence: 9,
@@ -135,12 +136,14 @@ fn failed_deployment_response() -> Response {
                 deployment_failure_stage: DeploymentFailureStage::Activate,
                 deployment_terminal_reason: DeploymentTerminalReason::ActivationFailed,
                 failure_evidence_option: Some(FailureEvidence {
-                    command_program: "ssh".into(),
-                    command_argument_vector: vec![
-                        "li@ouranos".into(),
-                        "nix-env --profile /nix/var/nix/profiles/per-user/li/home-manager --set /nix/store/x-home".into(),
-                    ],
-                    exit_code_option: Some(1),
+                    failed_command_option: Some(FailedCommand {
+                        command_program: "ssh".into(),
+                        command_argument_vector: vec![
+                            "li@ouranos".into(),
+                            "nix-env --profile /nix/var/nix/profiles/per-user/li/home-manager --set /nix/store/x-home".into(),
+                        ],
+                        exit_code_option: Some(1),
+                    }),
                     failure_detail: "Activating vscodium: managed extensions inconsistent".into(),
                     detail_truncated: false,
                 }),
