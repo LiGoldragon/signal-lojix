@@ -152,3 +152,98 @@ fn failed_deployment_response() -> Response {
         database_marker: marker,
     })
 }
+
+/// A closure copy that failed. `nix copy` engages no builder, so the copy
+/// stage names itself rather than borrowing `BuilderUnreachable`. This example
+/// is the falsifiable specification of that reason's place on the wire.
+fn failed_closure_copy_response() -> Response {
+    use signal_lojix::{
+        ActivationEffect, DatabaseMarker, DeploymentEnvironment, DeploymentFailure,
+        DeploymentFailureStage, DeploymentLifecycle, DeploymentRecord, DeploymentRequestIdentity,
+        DeploymentTerminal, DeploymentTerminalReason, FailedCommand, FailureEvidence,
+        GenerationArtifact, GenerationListing, HostDeployAction, RequestedDeploymentAction,
+        SourceRevisionPolicy,
+    };
+    let marker = DatabaseMarker {
+        commit_sequence: 31,
+        state_digest: 44,
+    };
+    Response::Queried(GenerationListing {
+        generation_vector: vec![],
+        deployment_record_vector: vec![DeploymentRecord {
+            deployment_identifier: 212,
+            generation_identifier: 57,
+            deployment_request_identity: DeploymentRequestIdentity {
+                deployment_environment: DeploymentEnvironment::HostEnvironment,
+                cluster_name: "goldragon".into(),
+                node_name: "ouranos".into(),
+                generation_artifact: GenerationArtifact::CompleteHost,
+                requested_deployment_action: RequestedDeploymentAction::Host(
+                    HostDeployAction::ActivateNow,
+                ),
+                activation_effect: ActivationEffect::LiveActivation,
+                source_revision_policy: SourceRevisionPolicy::RequireImmutable,
+                immutable_revision_option: None,
+            },
+            admission_marker_option: Some(marker.clone()),
+            deployment_lifecycle: DeploymentLifecycle::Failed,
+            terminal_marker_option: Some(marker.clone()),
+            deployment_terminal_option: Some(DeploymentTerminal::Failed(DeploymentFailure {
+                deployment_failure_stage: DeploymentFailureStage::CopyClosure,
+                deployment_terminal_reason: DeploymentTerminalReason::ClosureCopyFailed,
+                failure_evidence_option: Some(FailureEvidence {
+                    failed_command_option: Some(FailedCommand {
+                        command_program: "nix".into(),
+                        command_argument_vector: vec![
+                            "copy".into(),
+                            "--substitute-on-destination".into(),
+                            "--to".into(),
+                            "ssh-ng://root@ouranos".into(),
+                            "/nix/store/x-nixos-system".into(),
+                        ],
+                        exit_code_option: Some(1),
+                    }),
+                    failure_detail: "error: cannot open connection to remote store".into(),
+                    detail_truncated: false,
+                }),
+            })),
+        }],
+        database_marker: marker,
+    })
+}
+
+#[test]
+fn a_failed_closure_copy_crosses_peer_bytes_naming_its_own_stage() {
+    let response = failed_closure_copy_response();
+    let sent = response.signalize().expect("signalize copy failure");
+    let received = Signal::<Response>::from(sent.bytes().to_vec());
+    assert_eq!(received.restore().expect("restore copy failure"), response);
+}
+
+#[cfg(feature = "datom")]
+#[test]
+fn a_failed_closure_copy_renders_its_own_reason_in_datom() {
+    use datom_codec::{Actualizing, Budget, Datomizable, Potential};
+    use protos::{Protosizable, ReaderBudget, Textualizable};
+
+    let response = failed_closure_copy_response();
+    let rendered = response.clone().datomize(vec![]).protosize().textualize();
+    assert!(
+        rendered.contains("ClosureCopyFailed"),
+        "a copy failure names the copy stage, not a builder: {rendered}"
+    );
+    assert!(
+        !rendered.contains("BuilderUnreachable"),
+        "no builder is engaged by a copy: {rendered}"
+    );
+    let mut pending = Potential::<Response>::from(rendered);
+    let restored = pending
+        .actualize(&mut Budget {
+            remaining: 4_096,
+            reader: ReaderBudget { remaining: 4_096 },
+            depth: 0,
+            maximum_depth: 256,
+        })
+        .expect("restore datom copy failure");
+    assert_eq!(restored, response);
+}

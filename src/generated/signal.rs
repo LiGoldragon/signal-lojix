@@ -737,6 +737,7 @@ pub enum DeploymentTerminalReason {
     SubstituterUnreachable,
     EvaluationFailed,
     BuildFailed,
+    ClosureCopyFailed,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]

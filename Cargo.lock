@@ -327,7 +327,7 @@ dependencies = [
 
 [[package]]
 name = "signal-lojix"
-version = "4.1.1"
+version = "5.0.0"
 dependencies = [
  "datom-codec",
  "ethos-zero",

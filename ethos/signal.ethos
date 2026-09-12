@@ -111,7 +111,7 @@ Signal
   FailureDetail.String
   DeploymentFailureStage.[ Build Eval MaterializeHorizon Daemon Activate CopyClosure Admission FlakeAuth ]
   FlakeReference.String
-  DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable EvaluationFailed BuildFailed ]
+  DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable EvaluationFailed BuildFailed ClosureCopyFailed ]
   Selection.[ ByNode.NodeSelector ByTestRun.TestRunLookup ByDeployment.DeploymentLookup ByGeneration.GenerationLookup ByEventLog.EventLogRange ]
   RequestedGenerationArtifact.[ UserEnvironment CompleteHost BaseHost ]
   NodeSelector.{ ClusterName NodeName Option<RequestedGenerationArtifact> }

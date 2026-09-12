@@ -1,5 +1,20 @@
 # Upgrades
 
+# 4.1.1 to 5.0.0
+
+`DeploymentTerminalReason` gains `ClosureCopyFailed`.
+
+A closure copy that fails was reported as `BuilderUnreachable`. A copy runs
+`nix copy --substitute-on-destination --to <store-uri> <path>`: it engages no
+builder at all, so that reason was false whatever the cause — an unreachable
+target store, a refused signature, a full disk, or a malformed transport.
+`BuilderUnreachable` and `SubstituterUnreachable` keep their own meanings; the
+copy stage now names itself, exactly as `EvaluationFailed` and `BuildFailed`
+were split out of `FlakeReferenceMalformed` in 3.0.0.
+
+Breaking: the enum gains a variant, so its rkyv archive changes. Consumers
+repin and add the arm.
+
 # 4.1.0 to 4.1.1
 
 A repin only. The producer chain settles on its final heads: `protos` 0.30.1

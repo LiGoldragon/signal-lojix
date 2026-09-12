@@ -1,6 +1,6 @@
 [package]
 name = "signal-lojix"
-version = "4.1.1"
+version = "5.0.0"
 edition = "2024"
 rust-version = "1.89"
 description = "Ordinary Signal contract for the Lojix deployment Nexus."
