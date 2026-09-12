@@ -1,5 +1,20 @@
 # Upgrades
 
+# 4.1.0 to 4.1.1
+
+A repin only. The producer chain settles on its final heads: `protos` 0.30.1
+(`171b21f65337983ab624b7b906397a4f1f92c5a3`), `datom-codec` 0.26.3
+(`627db67f2655efd9f786864009955005fd8ab2ad`), `ethos-zero` 8.0.1
+(`de3d9928b156f2e1a92d060b7817af201abfdbef`), `signal` 3.0.2
+(`8f9a0deb701cebbea518679548df4a795affc918`), `horizon-lib` 0.10.1
+(`40d04d2504fee619e9b2b2564b8a769a3a9d6049`).
+
+No type in this contract changed, and `src/generated/signal.rs` regenerates
+byte-identical under ethos-zero 8.0.1 — `build.rs` asserts it on every build.
+`Cargo.lock` carries exactly one revision of each of our crates.
+
+Consumers repin the revision and change nothing else.
+
 # 4.0.0 to 4.1.0
 
 `horizon-lib` moves to 0.10.0 (`a56330451934d682ae15612acd49924356ec0205`),
