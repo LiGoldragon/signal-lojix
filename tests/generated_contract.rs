@@ -1,8 +1,9 @@
+use signal::{ByteViewable, Restorable, Signal, Signalizable};
 #[cfg(feature = "datom")]
 use signal_lojix::DatabaseMarker;
 use signal_lojix::{
-    ByteViewable, ConfigurationReceipt, KeyMaterialQuery, LojixNexusConfiguration, Query, Response,
-    Restorable, Signal, Signalizable, TestDefaultsChoice,
+    ConfigurationReceipt, KeyMaterialQuery, LojixNexusConfiguration, Query, Response,
+    TestDefaultsChoice,
 };
 
 fn configuration() -> LojixNexusConfiguration {
