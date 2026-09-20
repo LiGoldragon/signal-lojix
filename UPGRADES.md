@@ -1,5 +1,13 @@
 # Upgrades
 
+# 4.1.1 to 5.0.0
+
+`horizon-lib` now pins Gold Horizon
+`ee8d6f8d27eb6e200504807971ffdd26aaca7ed1`. Its `HorizonDefinition` gains
+the `OpenCodeTesting` node capability, which can cross this contract in
+`TestDefaults`. This changes the encoded wire shape, so peers must repin to
+this major release.
+
 # 4.1.0 to 4.1.1
 
 A repin only. The producer chain settles on its final heads: `protos` 0.30.1
