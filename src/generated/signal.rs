@@ -30,7 +30,7 @@ pub struct TestDefaults {
     pub flake_reference: FlakeReference,
     pub nix_system: NixSystem,
     pub deployment_output_selector: DeploymentOutputSelector,
-    pub horizon_definition_option: Option<horizon_lib::HorizonDefinition>,
+    pub cluster_proposal_wire_option: Option<crate::ClusterProposalWire>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]

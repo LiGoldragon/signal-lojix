@@ -1,7 +1,7 @@
 ; Ordinary Lojix query and observation contract.
 Signal
 
-[ horizon_lib:[ HorizonDefinition ] ]
+[ crate:[ ClusterProposalWire ] ]
 
 [ Configure.LojixNexusConfiguration
   WatchDeployments.DeploymentWatch
@@ -28,7 +28,7 @@ Signal
   DaemonHost.String
   MetaConfigureOccurred.Boolean
   TestDefaultsChoice.[ NoTestDefaults TestDefaults.TestDefaults ]
-  TestDefaults.{ ClusterName NodeName TestMode FlakeReference NixSystem DeploymentOutputSelector Option<HorizonDefinition> }
+  TestDefaults.{ ClusterName NodeName TestMode FlakeReference NixSystem DeploymentOutputSelector Option<ClusterProposalWire> }
   LojixNexusConfiguration.{ OrdinarySocketPath OrdinarySocketMode OwnerSocketPath OwnerSocketMode StateDirectoryPath DaemonHost TestDefaultsChoice }
   ConfigurationReceipt.{ LojixNexusConfiguration MetaConfigureOccurred }
   ConfigurationRejectionReason.[ OrdinaryConfigureClosed InvalidConfiguration ]
