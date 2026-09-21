@@ -47,12 +47,15 @@ fn proposal() -> ClusterProposalWire {
                 wants_hw_video_accel: false,
                 router_interfaces: None,
                 online: None,
-                services: vec![NodeServiceWire::UsbIpv4Gateway {
-                    downstream: InterfaceWire("enp0s20f0u1c2".into()),
-                    downstream_mac: MacAddressWire("00:0e:c6:33:4f:97".into()),
-                    gateway: Ipv4CidrWire("10.44.0.1/24".into()),
-                    uplink: InterfaceWire("enp0s31f6".into()),
-                }],
+                services: vec![
+                    NodeServiceWire::OpenCodeTesting,
+                    NodeServiceWire::UsbIpv4Gateway {
+                        downstream: InterfaceWire("enp0s20f0u1c2".into()),
+                        downstream_mac: MacAddressWire("00:0e:c6:33:4f:97".into()),
+                        gateway: Ipv4CidrWire("10.44.0.1/24".into()),
+                        uplink: InterfaceWire("enp0s31f6".into()),
+                    },
+                ],
             },
         }],
         users: vec![],
@@ -79,7 +82,10 @@ fn converts_typed_usb_gateway_without_projection_context() {
         .unwrap();
     assert!(matches!(
         node.services.as_slice(),
-        [NodeService::UsbIpv4Gateway { .. }]
+        [
+            NodeService::OpenCodeTesting {},
+            NodeService::UsbIpv4Gateway { .. }
+        ]
     ));
 }
 

@@ -128,6 +128,7 @@ wire_type! {
         TailnetController,
         NixBuilder { maximum_jobs: Option<i64> },
         NixCache,
+        OpenCodeTesting,
         PersonaDevelopment { capabilities: Vec<PersonaDevelopmentCapabilityWire> },
         VmHost {
             guest_subnet: TapSubnetWire,

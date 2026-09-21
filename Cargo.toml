@@ -16,7 +16,7 @@ datom-codec = { git = "https://github.com/LiGoldragon/datom-codec", rev = "09e2a
 protos = { git = "https://github.com/LiGoldragon/protos", rev = "1febca7836bf8d5f5973a302fdd50aa9c84c159b", optional = true }
 rkyv = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 signal = { git = "https://github.com/LiGoldragon/signal", rev = "8f9a0deb701cebbea518679548df4a795affc918", default-features = false }
-horizon-current = { package = "horizon-lib", git = "https://github.com/LiGoldragon/horizon-rs", rev = "37416e10c00cc6a22c73528759df5b15bd6d8428", default-features = false }
+horizon-current = { package = "horizon-lib", git = "https://github.com/LiGoldragon/horizon-rs", rev = "b45d6ad48b5ee5d28eb0127f17c6e0084b696e60", default-features = false }
 
 [build-dependencies]
 ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "4bf73cae8d4f5a2072c76a11cd2f00aa3fe9f8e3" }

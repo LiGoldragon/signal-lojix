@@ -316,6 +316,7 @@ fn service(v: NodeServiceWire) -> Result<NodeService> {
                 .transpose()?,
         },
         NodeServiceWire::NixCache => NodeService::NixCache {},
+        NodeServiceWire::OpenCodeTesting => NodeService::OpenCodeTesting {},
         NodeServiceWire::PersonaDevelopment { capabilities } => NodeService::PersonaDevelopment {
             capabilities: capabilities
                 .into_iter()

@@ -170,7 +170,7 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 [[package]]
 name = "horizon-lib"
 version = "0.5.1"
-source = "git+https://github.com/LiGoldragon/horizon-rs?rev=37416e10c00cc6a22c73528759df5b15bd6d8428#37416e10c00cc6a22c73528759df5b15bd6d8428"
+source = "git+https://github.com/LiGoldragon/horizon-rs?rev=b45d6ad48b5ee5d28eb0127f17c6e0084b696e60#b45d6ad48b5ee5d28eb0127f17c6e0084b696e60"
 dependencies = [
  "datomic",
  "ethos-zero 0.7.1",
