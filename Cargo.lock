@@ -28,7 +28,7 @@ checksum = "46d07918caa9eeaaf06b7873925c53a61daac173539b4f7715090745e44e4e69"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -39,23 +39,43 @@ checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
 
 [[package]]
 name = "cfg-if"
-version = "1.0.4"
+version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
+checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "datom-codec"
 version = "0.26.3"
 source = "git+https://github.com/LiGoldragon/datom-codec?rev=627db67f2655efd9f786864009955005fd8ab2ad#627db67f2655efd9f786864009955005fd8ab2ad"
 dependencies = [
- "datom-codec-derive",
- "protos",
+ "datom-codec-derive 0.26.0",
+ "protos 0.30.1",
+]
+
+[[package]]
+name = "datom-codec"
+version = "0.31.0"
+source = "git+https://github.com/LiGoldragon/datom-codec?rev=09e2a9d52bf7f2f11e51d15cb6c3177f72c6c927#09e2a9d52bf7f2f11e51d15cb6c3177f72c6c927"
+dependencies = [
+ "datom-codec-derive 0.31.0",
+ "protos 0.31.0",
+ "rkyv",
 ]
 
 [[package]]
 name = "datom-codec-derive"
 version = "0.26.0"
 source = "git+https://github.com/LiGoldragon/datom-codec?rev=627db67f2655efd9f786864009955005fd8ab2ad#627db67f2655efd9f786864009955005fd8ab2ad"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "datom-codec-derive"
+version = "0.31.0"
+source = "git+https://github.com/LiGoldragon/datom-codec?rev=09e2a9d52bf7f2f11e51d15cb6c3177f72c6c927#09e2a9d52bf7f2f11e51d15cb6c3177f72c6c927"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -73,13 +93,27 @@ name = "ethos-zero"
 version = "8.0.1"
 source = "git+https://github.com/LiGoldragon/ethos-zero?rev=de3d9928b156f2e1a92d060b7817af201abfdbef#de3d9928b156f2e1a92d060b7817af201abfdbef"
 dependencies = [
- "datom-codec",
+ "datom-codec 0.26.3",
  "prettyplease",
  "proc-macro2",
- "protos",
+ "protos 0.30.1",
  "quote",
  "rkyv",
- "syn 3.0.5",
+ "syn 3.0.6",
+]
+
+[[package]]
+name = "ethos-zero"
+version = "10.0.0"
+source = "git+https://github.com/LiGoldragon/ethos-zero?rev=4bf73cae8d4f5a2072c76a11cd2f00aa3fe9f8e3#4bf73cae8d4f5a2072c76a11cd2f00aa3fe9f8e3"
+dependencies = [
+ "datom-codec 0.31.0",
+ "prettyplease",
+ "proc-macro2",
+ "protos 0.31.0",
+ "quote",
+ "rkyv",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -114,12 +148,12 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
 name = "horizon-lib"
-version = "0.10.1"
-source = "git+https://github.com/LiGoldragon/horizon-rs?rev=40d04d2504fee619e9b2b2564b8a769a3a9d6049#40d04d2504fee619e9b2b2564b8a769a3a9d6049"
+version = "0.12.0"
+source = "git+https://github.com/LiGoldragon/horizon-rs?rev=ee8d6f8d27eb6e200504807971ffdd26aaca7ed1#ee8d6f8d27eb6e200504807971ffdd26aaca7ed1"
 dependencies = [
- "datom-codec",
- "ethos-zero",
- "protos",
+ "datom-codec 0.31.0",
+ "ethos-zero 10.0.0",
+ "protos 0.31.0",
  "rkyv",
  "serde",
  "thiserror",
@@ -185,7 +219,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2bfe0f4c752e450fc2faf62654f1c134747922825d5b04ca717b8874f41a40c0"
 dependencies = [
  "proc-macro2",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -201,6 +235,11 @@ dependencies = [
 name = "protos"
 version = "0.30.1"
 source = "git+https://github.com/LiGoldragon/protos?rev=171b21f65337983ab624b7b906397a4f1f92c5a3#171b21f65337983ab624b7b906397a4f1f92c5a3"
+
+[[package]]
+name = "protos"
+version = "0.31.0"
+source = "git+https://github.com/LiGoldragon/protos?rev=1febca7836bf8d5f5973a302fdd50aa9c84c159b#1febca7836bf8d5f5973a302fdd50aa9c84c159b"
 
 [[package]]
 name = "ptr_meta"
@@ -219,7 +258,7 @@ checksum = "1c8d9ca532f185d5d4db7a7c9d51420b452168ea1c2b913953281bd6fe1fcbd0"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -276,7 +315,7 @@ checksum = "1c25ef604ac7dd839d44d64648952ea23c97866f124ff671b0ed2cf3ad9bb06e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -312,7 +351,7 @@ checksum = "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -320,7 +359,7 @@ name = "signal"
 version = "3.0.2"
 source = "git+https://github.com/LiGoldragon/signal?rev=8f9a0deb701cebbea518679548df4a795affc918#8f9a0deb701cebbea518679548df4a795affc918"
 dependencies = [
- "ethos-zero",
+ "ethos-zero 8.0.1",
  "rkyv",
  "thiserror",
 ]
@@ -329,10 +368,10 @@ dependencies = [
 name = "signal-lojix"
 version = "5.0.0"
 dependencies = [
- "datom-codec",
- "ethos-zero",
+ "datom-codec 0.31.0",
+ "ethos-zero 10.0.0",
  "horizon-lib",
- "protos",
+ "protos 0.31.0",
  "rkyv",
  "signal",
 ]
@@ -362,9 +401,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "3.0.5"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12df2e0110f65b775f769bb17ef989067a1d931b2eb822bd4346631eeada89f9"
+checksum = "8593e8e72159ed2257d083c7a454a85cbf854f37a0966d8d483aff8c8a3ebcee"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -388,29 +427,20 @@ checksum = "bc04cd3e1236dd4a98afca4569f2deb3f120e5422a4023be2cb683f8486292af"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
 name = "tinyvec"
-version = "1.13.2"
+version = "1.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cf0ded5c4e56918d8f8a339e1bb67d038d3bc6d144ac407904015ba2e4cde9b"
-dependencies = [
- "tinyvec_macros",
-]
-
-[[package]]
-name = "tinyvec_macros"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
+checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.24"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
+checksum = "d245f478577f809a851594d02313b640fb437e0bb33866753cff937863096954"
 
 [[package]]
 name = "uuid"
@@ -454,7 +484,7 @@ dependencies = [
  "bumpalo",
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
  "wasm-bindgen-shared",
 ]
 

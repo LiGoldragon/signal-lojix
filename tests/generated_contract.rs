@@ -24,6 +24,76 @@ fn configuration() -> LojixNexusConfiguration {
     }
 }
 
+#[cfg(feature = "datom")]
+fn gold_horizon_definition() -> horizon_lib::HorizonDefinition {
+    use datom_codec::Decimal;
+
+    horizon_lib::HorizonDefinition {
+        horizon_configuration: horizon_lib::HorizonConfiguration {
+            generic_nodes: vec![horizon_lib::NodeDefinition {
+                node_name: "opencode-test".into(),
+                node_variant: horizon_lib::NodeVariant::Live(horizon_lib::LiveDefinition {}),
+                first_magnitude: horizon_lib::Magnitude::Min,
+                second_magnitude: horizon_lib::Magnitude::Min,
+                machine_definition: horizon_lib::MachineDefinition::Metal(horizon_lib::Metal_Data {
+                    architecture: horizon_lib::Architecture::X86_64,
+                    hardware: horizon_lib::Hardware {
+                        integer: 1,
+                        model_name_option: None,
+                        mother_board_option: None,
+                        first_integer_option: None,
+                        second_integer_option: None,
+                        location_option: None,
+                    },
+                }),
+                node_environment: horizon_lib::NodeEnvironment {
+                    keyboard: horizon_lib::Keyboard::Qwerty,
+                    compressed_swap_option: None,
+                },
+                node_network: horizon_lib::NodeNetwork {
+                    link_local_ip_vector: vec![],
+                    node_ip_option: None,
+                    wireguard_pub_key_option: None,
+                    wireguard_proxy_vector: vec![],
+                    router_interfaces_option: None,
+                },
+                node_keys: horizon_lib::NodeKeys {
+                    ssh_pub_key: "ssh-ed25519 AAAAfixture".into(),
+                    nix_pub_key_option: None,
+                    yggdrasil_key_option: None,
+                },
+                boolean_option: None,
+                capabilities: vec![horizon_lib::NodeCapability::OpenCodeTesting(
+                    horizon_lib::NoSettings {},
+                )],
+                fixed_location_option: Some(horizon_lib::FixedLocation {
+                    first_decimal: Decimal::try_from(19.4326).expect("finite latitude"),
+                    second_decimal: Decimal::try_from(-99.1332).expect("finite longitude"),
+                    third_decimal: Decimal::try_from(2_240.0).expect("finite altitude"),
+                    fourth_decimal: Decimal::try_from(3.5).expect("finite accuracy"),
+                }),
+            }],
+            domain_configuration: horizon_lib::DomainConfiguration {
+                string: "internal.invalid".into(),
+                domain_name_vector: vec![],
+            },
+        },
+        cluster_definition: horizon_lib::ClusterDefinition {
+            cluster_name: "production.eu".into(),
+            cluster_nodes: vec![],
+            generic_node_names: vec!["opencode-test".into()],
+            users: vec![],
+            domains: vec![],
+            cluster_trust: horizon_lib::ClusterTrust {
+                magnitude: horizon_lib::Magnitude::Zero,
+                cluster_trust_entry_vector: vec![],
+                node_trust_entry_vector: vec![],
+                user_trust_entry_vector: vec![],
+            },
+        },
+    }
+}
+
 #[test]
 fn peer_bytes_restore_typed_query_and_response() {
     let query = node_selection();
@@ -52,6 +122,41 @@ fn configure_query_and_desired_state_receipt_cross_fresh_peer_bytes() {
     let sent = response.signalize().expect("signalize receipt");
     let received = Signal::<Response>::from(sent.bytes().to_vec());
     assert_eq!(received.restore().expect("restore receipt"), response);
+}
+
+#[cfg(feature = "datom")]
+#[test]
+fn peer_bytes_restore_gold_opencode_testing_horizon_definition() {
+    use datom_codec::{Actualizing, Budget, Datomizable, Potential};
+    use protos::{Protosizable, ReaderBudget, Textualizable};
+
+    let configuration = LojixNexusConfiguration {
+        test_defaults_choice: TestDefaultsChoice::TestDefaults(signal_lojix::TestDefaults {
+            cluster_name: "production.eu".into(),
+            node_name: "opencode-test".into(),
+            test_mode: signal_lojix::TestMode::Hermetic,
+            flake_reference: "github:LiGoldragon/CriomOS".into(),
+            nix_system: "x86_64-linux".into(),
+            deployment_output_selector: signal_lojix::DeploymentOutputSelector {
+                flake_attribute: "checks.x86_64-linux.contract".into(),
+            },
+            horizon_definition_option: Some(gold_horizon_definition()),
+        }),
+        ..configuration()
+    };
+    let sent = configuration.signalize().expect("signalize Gold definition");
+    let received = Signal::<LojixNexusConfiguration>::from(sent.bytes().to_vec());
+    assert_eq!(received.restore().expect("restore Gold definition"), configuration);
+    let rendered = configuration.clone().datomize(vec![]).protosize().textualize();
+    let restored = Potential::<LojixNexusConfiguration>::from(rendered)
+        .actualize(&mut Budget {
+            remaining: 4_096,
+            reader: ReaderBudget { remaining: 4_096 },
+            depth: 0,
+            maximum_depth: 256,
+        })
+        .expect("restore Gold definition from Datom");
+    assert_eq!(restored, configuration);
 }
 
 #[cfg(feature = "datom")]
