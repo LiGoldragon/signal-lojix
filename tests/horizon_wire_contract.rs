@@ -90,6 +90,23 @@ fn converts_typed_usb_gateway_without_projection_context() {
 }
 
 #[test]
+fn authored_domain_roundtrips_through_typed_binary_input() {
+    let authored = ClusterProposal::try_from(proposal()).expect("domain input");
+    let expected = proposal();
+    let wire = ClusterProposalWire::try_from(authored).expect("wire input");
+    assert_eq!(wire, expected);
+    let recovered = ClusterProposal::try_from(wire).expect("recovered domain input");
+    let node = recovered.nodes.get(&"ouranos".parse().unwrap()).unwrap();
+    assert!(matches!(
+        node.services.as_slice(),
+        [
+            NodeService::OpenCodeTesting {},
+            NodeService::UsbIpv4Gateway { .. }
+        ]
+    ));
+}
+
+#[test]
 fn rejects_duplicate_node_names() {
     let mut input = proposal();
     input.nodes.push(input.nodes[0].clone());
