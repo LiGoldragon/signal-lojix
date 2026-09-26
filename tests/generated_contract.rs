@@ -35,17 +35,19 @@ fn gold_horizon_definition() -> horizon_lib::HorizonDefinition {
                 node_variant: horizon_lib::NodeVariant::Live(horizon_lib::LiveDefinition {}),
                 first_magnitude: horizon_lib::Magnitude::Min,
                 second_magnitude: horizon_lib::Magnitude::Min,
-                machine_definition: horizon_lib::MachineDefinition::Metal(horizon_lib::Metal_Data {
-                    architecture: horizon_lib::Architecture::X86_64,
-                    hardware: horizon_lib::Hardware {
-                        integer: 1,
-                        model_name_option: None,
-                        mother_board_option: None,
-                        first_integer_option: None,
-                        second_integer_option: None,
-                        location_option: None,
+                machine_definition: horizon_lib::MachineDefinition::Metal(
+                    horizon_lib::Metal_Data {
+                        architecture: horizon_lib::Architecture::X86_64,
+                        hardware: horizon_lib::Hardware {
+                            integer: 1,
+                            model_name_option: None,
+                            mother_board_option: None,
+                            first_integer_option: None,
+                            second_integer_option: None,
+                            location_option: None,
+                        },
                     },
-                }),
+                ),
                 node_environment: horizon_lib::NodeEnvironment {
                     keyboard: horizon_lib::Keyboard::Qwerty,
                     compressed_swap_option: None,
@@ -55,7 +57,18 @@ fn gold_horizon_definition() -> horizon_lib::HorizonDefinition {
                     node_ip_option: None,
                     wireguard_pub_key_option: None,
                     wireguard_proxy_vector: vec![],
-                    router_interfaces_option: None,
+                    router_interfaces_option: Some(horizon_lib::RouterInterfaces {
+                        first_interface: "enp1s0".into(),
+                        second_interface: "wlp2s0".into(),
+                        wlan_band: horizon_lib::WlanBand::FiveG,
+                        integer: 36,
+                        wlan_standard: horizon_lib::WlanStandard::Wifi6,
+                        secret_reference_option: Some(horizon_lib::SecretReference {
+                            secret_name: "router-wifi-password".into(),
+                        }),
+                        backup_wireless_option: None,
+                        country_code: "MX".into(),
+                    }),
                 },
                 node_keys: horizon_lib::NodeKeys {
                     ssh_pub_key: "ssh-ed25519 AAAAfixture".into(),
@@ -63,9 +76,29 @@ fn gold_horizon_definition() -> horizon_lib::HorizonDefinition {
                     yggdrasil_key_option: None,
                 },
                 boolean_option: None,
-                capabilities: vec![horizon_lib::NodeCapability::OpenCodeTesting(
-                    horizon_lib::NoSettings {},
-                )],
+                capabilities: vec![
+                    horizon_lib::NodeCapability::OpenCodeTesting(horizon_lib::NoSettings {}),
+                    horizon_lib::NodeCapability::Router(horizon_lib::NoSettings {}),
+                    horizon_lib::NodeCapability::TailnetController(
+                        horizon_lib::TailnetController_Data {
+                            certificate_authority_option: Some(
+                                "-----BEGIN CERTIFICATE-----fixture".into(),
+                            ),
+                            tls_certificate_reference: horizon_lib::TlsCertificateReference {
+                                secret_name: "headscale-tls-certificate".into(),
+                            },
+                            tls_key_reference: horizon_lib::TlsKeyReference {
+                                secret_name: "headscale-tls-key".into(),
+                            },
+                        },
+                    ),
+                    horizon_lib::NodeCapability::TailnetClient(horizon_lib::SecretReference {
+                        secret_name: "tailnet-preauth-key".into(),
+                    }),
+                    horizon_lib::NodeCapability::UsbDownlink(horizon_lib::UsbDownlink_Data {
+                        ipv4_cidr: "10.47.0.1/24".into(),
+                    }),
+                ],
                 fixed_location_option: Some(horizon_lib::FixedLocation {
                     first_decimal: Decimal::try_from(19.4326).expect("finite latitude"),
                     second_decimal: Decimal::try_from(-99.1332).expect("finite longitude"),
@@ -144,10 +177,19 @@ fn peer_bytes_restore_gold_opencode_testing_horizon_definition() {
         }),
         ..configuration()
     };
-    let sent = configuration.signalize().expect("signalize Gold definition");
+    let sent = configuration
+        .signalize()
+        .expect("signalize Gold definition");
     let received = Signal::<LojixNexusConfiguration>::from(sent.bytes().to_vec());
-    assert_eq!(received.restore().expect("restore Gold definition"), configuration);
-    let rendered = configuration.clone().datomize(vec![]).protosize().textualize();
+    assert_eq!(
+        received.restore().expect("restore Gold definition"),
+        configuration
+    );
+    let rendered = configuration
+        .clone()
+        .datomize(vec![])
+        .protosize()
+        .textualize();
     let restored = Potential::<LojixNexusConfiguration>::from(rendered)
         .actualize(&mut Budget {
             remaining: 4_096,
