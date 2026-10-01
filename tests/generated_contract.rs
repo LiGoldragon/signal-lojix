@@ -58,8 +58,7 @@ fn gold_horizon_definition() -> horizon_lib::HorizonDefinition {
                     wireguard_pub_key_option: None,
                     wireguard_proxy_vector: vec![],
                     router_interfaces_option: Some(horizon_lib::RouterInterfaces {
-                        first_interface: "enp1s0".into(),
-                        second_interface: "wlp2s0".into(),
+                        interface: "wlp2s0".into(),
                         wlan_band: horizon_lib::WlanBand::FiveG,
                         integer: 36,
                         wlan_standard: horizon_lib::WlanStandard::Wifi6,
