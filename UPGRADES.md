@@ -1,5 +1,15 @@
 # Upgrades
 
+## 6.0.0 to 7.0.0
+
+Horizon moves to 0.14 and removes the wired/WAN field from
+`RouterInterfaces`. Messages embedding a `HorizonDefinition`, including test
+defaults, have a new rkyv layout. Repin all ordinary/meta clients, Nexus and
+offline tools together with meta-signal-lojix 8 and Lojix 9. Regenerate typed
+startup/message archives with the new producer; an old archive is not accepted
+as the new shape. Existing Lojix state is converted only through its separately
+qualified schema-5-to-6 process, documented in Lojix's `UPGRADES.md`.
+
 # 5.0.0 to 6.0.0
 
 `horizon-lib` moves from 0.12.0 (`ee8d6f8d27eb6e200504807971ffdd26aaca7ed1`)
