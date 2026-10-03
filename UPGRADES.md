@@ -1,5 +1,25 @@
 # Upgrades
 
+# 6.0.0 to 7.0.0
+
+One step onto ethos-zero 16.0.0 and the 0.32.2 substrate:
+
+- `signal` 3.0.2 (`8f9a0deb…`) to 8.0.0 (`f35460de930943ea1a8a972453ccf3a092a655b5`);
+- `horizon-lib` 0.13.0 (`a3ddaf86…`) to 0.14.0 (`2e09ebbdc725f64fd9ee102b5758bab85be217e1`);
+- `datom-codec` 0.31.0 (`09e2a9d5…`) to 0.32.2 (`4dff16b4f7412febc3b71aac8b49680cd20988cb`);
+- `protos` 0.31.0 (`1febca78…`) to 0.32.2 (`15b41da8f2579e73ead59bc0c2b97529b8ac32d3`);
+- `ethos-zero` 10.0.0 (`4bf73cae…`) to 16.0.0 (`c2653dd82adbdb1f1f2f654405c6620e0d06fd58`).
+
+`src/generated/signal.rs` is regenerated (options as `std::option::Option`,
+`#[rustfmt::skip]` on every item); no field, variant or archived layout of
+this contract changed. What breaks is the trait identity under `datom`: every
+type now implements datom-codec 0.32.2's `Datomizable` and `Composing`, and
+`HorizonDefinition` comes from horizon-lib 0.14.0. A consumer (meta-signal-lojix,
+Lojix) repins this revision together with signal 8.0.0, horizon-lib 0.14.0,
+datom-codec and protos 0.32.2 in one step; `cargo tree -d` then shows one
+datom-codec. The signal frame itself is whatever signal 8.0.0 defines; a
+Nexus and its clients move together.
+
 # 5.0.0 to 6.0.0
 
 `horizon-lib` moves from 0.12.0 (`ee8d6f8d27eb6e200504807971ffdd26aaca7ed1`)

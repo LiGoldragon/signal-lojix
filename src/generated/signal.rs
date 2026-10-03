@@ -30,7 +30,7 @@ pub struct TestDefaults {
     pub flake_reference: FlakeReference,
     pub nix_system: NixSystem,
     pub deployment_output_selector: DeploymentOutputSelector,
-    pub horizon_definition_option: Option<horizon_lib::HorizonDefinition>,
+    pub horizon_definition_option: std::option::Option<horizon_lib::HorizonDefinition>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -98,16 +98,16 @@ pub struct DeploymentPhaseEvent {
     pub deployment_phase: DeploymentPhase,
     pub event_log_position: EventLogPosition,
     pub transition_marker: TransitionMarker,
-    pub immutable_revision_option: Option<ImmutableRevision>,
-    pub deployment_terminal_option: Option<DeploymentTerminal>,
+    pub immutable_revision_option: std::option::Option<ImmutableRevision>,
+    pub deployment_terminal_option: std::option::Option<DeploymentTerminal>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct DeploymentWatch {
-    pub deployment_identifier_option: Option<DeploymentIdentifier>,
-    pub cluster_name_option: Option<ClusterName>,
-    pub node_name_option: Option<NodeName>,
+    pub deployment_identifier_option: std::option::Option<DeploymentIdentifier>,
+    pub cluster_name_option: std::option::Option<ClusterName>,
+    pub node_name_option: std::option::Option<NodeName>,
 }
 #[rustfmt::skip]
 pub type ProposalSource = String;
@@ -156,7 +156,7 @@ pub enum TestOutcome {
 pub struct TestRunLookup {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub test_run_identifier_option: Option<TestRunIdentifier>,
+    pub test_run_identifier_option: std::option::Option<TestRunIdentifier>,
 }
 #[rustfmt::skip]
 pub type SubscriptionToken = i64;
@@ -169,10 +169,10 @@ pub struct DeploymentRecord {
     pub deployment_identifier: DeploymentIdentifier,
     pub generation_identifier: GenerationIdentifier,
     pub deployment_request_identity: DeploymentRequestIdentity,
-    pub admission_marker_option: Option<AdmissionMarker>,
+    pub admission_marker_option: std::option::Option<AdmissionMarker>,
     pub deployment_lifecycle: DeploymentLifecycle,
-    pub terminal_marker_option: Option<TerminalMarker>,
-    pub deployment_terminal_option: Option<DeploymentTerminal>,
+    pub terminal_marker_option: std::option::Option<TerminalMarker>,
+    pub deployment_terminal_option: std::option::Option<DeploymentTerminal>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -241,8 +241,8 @@ pub enum HostComposition {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct CacheRetentionWatch {
-    pub cluster_name_option: Option<ClusterName>,
-    pub node_name_option: Option<NodeName>,
+    pub cluster_name_option: std::option::Option<ClusterName>,
+    pub node_name_option: std::option::Option<NodeName>,
 }
 #[rustfmt::skip]
 pub type FlakeAttribute = String;
@@ -284,7 +284,7 @@ pub struct DeploymentRequestIdentity {
     pub requested_deployment_action: RequestedDeploymentAction,
     pub activation_effect: ActivationEffect,
     pub source_revision_policy: SourceRevisionPolicy,
-    pub immutable_revision_option: Option<ImmutableRevision>,
+    pub immutable_revision_option: std::option::Option<ImmutableRevision>,
 }
 #[rustfmt::skip]
 pub type TransitionMarker = DatabaseMarker;
@@ -305,8 +305,8 @@ pub struct CacheRetentionTransitionEvent {
     pub node_name: NodeName,
     pub cache_retention_transition: CacheRetentionTransition,
     pub generation_slot: GenerationSlot,
-    pub generation_slot_option: Option<GenerationSlot>,
-    pub pin_label_option: Option<PinLabel>,
+    pub generation_slot_option: std::option::Option<GenerationSlot>,
+    pub pin_label_option: std::option::Option<PinLabel>,
     pub event_log_position: EventLogPosition,
 }
 #[rustfmt::skip]
@@ -344,7 +344,7 @@ pub struct TestExecutionProfile {
     pub test_mode: TestMode,
     pub nix_system: NixSystem,
     pub deployment_output_selector: DeploymentOutputSelector,
-    pub deployment_transport_option: Option<DeploymentTransport>,
+    pub deployment_transport_option: std::option::Option<DeploymentTransport>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -508,13 +508,13 @@ pub type DeploymentIdentifier = i64;
 pub struct DeploymentFailure {
     pub deployment_failure_stage: DeploymentFailureStage,
     pub deployment_terminal_reason: DeploymentTerminalReason,
-    pub failure_evidence_option: Option<FailureEvidence>,
+    pub failure_evidence_option: std::option::Option<FailureEvidence>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub struct FailureEvidence {
-    pub failed_command_option: Option<FailedCommand>,
+    pub failed_command_option: std::option::Option<FailedCommand>,
     pub failure_detail: FailureDetail,
     pub detail_truncated: DetailTruncated,
 }
@@ -524,7 +524,7 @@ pub struct FailureEvidence {
 pub struct FailedCommand {
     pub command_program: CommandProgram,
     pub command_argument_vector: std::vec::Vec<CommandArgument>,
-    pub exit_code_option: Option<ExitCode>,
+    pub exit_code_option: std::option::Option<ExitCode>,
 }
 #[rustfmt::skip]
 pub type CommandProgram = String;
@@ -592,7 +592,9 @@ pub enum RequestedGenerationArtifact {
 pub struct NodeSelector {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub requested_generation_artifact_option: Option<RequestedGenerationArtifact>,
+    pub requested_generation_artifact_option: std::option::Option<
+        RequestedGenerationArtifact,
+    >,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -611,8 +613,8 @@ pub struct Generation {
     pub generation_artifact: GenerationArtifact,
     pub activation_effect: ActivationEffect,
     pub generation_slot: GenerationSlot,
-    pub closure_path_option: Option<ClosurePath>,
-    pub immutable_revision_option: Option<ImmutableRevision>,
+    pub closure_path_option: std::option::Option<ClosurePath>,
+    pub immutable_revision_option: std::option::Option<ImmutableRevision>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -625,7 +627,7 @@ pub struct TestRunRecord {
     pub test_mode: TestMode,
     pub test_run_phase: TestRunPhase,
     pub test_outcome: TestOutcome,
-    pub closure_path_option: Option<ClosurePath>,
+    pub closure_path_option: std::option::Option<ClosurePath>,
 }
 #[rustfmt::skip]
 pub type DetailTruncated = bool;
