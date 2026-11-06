@@ -158,8 +158,7 @@ fn configure_query_and_desired_state_receipt_cross_fresh_peer_bytes() {
 }
 
 #[cfg(feature = "datom")]
-#[test]
-fn peer_bytes_restore_gold_opencode_testing_horizon_definition() {
+fn assert_horizon_definition_crosses_archive_and_datom(definition: horizon_lib::HorizonDefinition) {
     use datom_codec::{Actualizing, Budget, Datomizable, Potential};
     use protos::{Protosizable, ReaderBudget, Textualizable};
 
@@ -173,7 +172,7 @@ fn peer_bytes_restore_gold_opencode_testing_horizon_definition() {
             deployment_output_selector: signal_lojix::DeploymentOutputSelector {
                 flake_attribute: "checks.x86_64-linux.contract".into(),
             },
-            horizon_definition_option: Some(gold_horizon_definition()),
+            horizon_definition_option: Some(definition),
         }),
         ..configuration()
     };
@@ -199,6 +198,36 @@ fn peer_bytes_restore_gold_opencode_testing_horizon_definition() {
         })
         .expect("restore Gold definition from Datom");
     assert_eq!(restored, configuration);
+}
+
+#[cfg(feature = "datom")]
+#[test]
+fn peer_bytes_restore_gold_opencode_testing_horizon_definition() {
+    assert_horizon_definition_crosses_archive_and_datom(gold_horizon_definition());
+}
+
+#[cfg(feature = "datom")]
+#[test]
+fn a_user_key_carrying_agent_stack_crosses_archive_and_datom() {
+    let mut definition = gold_horizon_definition();
+    definition.cluster_definition.users = vec![horizon_lib::UserDefinition {
+        user_name: "li".into(),
+        user_role: horizon_lib::UserRole::Code,
+        magnitude: horizon_lib::Magnitude::Max,
+        keyboard: horizon_lib::Keyboard::Colemak,
+        style: horizon_lib::Style::Emacs,
+        github_id_option: Some("li".into()),
+        boolean_option: Some(true),
+        user_pub_key_vector: vec![horizon_lib::UserPubKey {
+            node_name: "opencode-test".into(),
+            ssh_pub_key: "AAAAuser".into(),
+            keygrip: "keygrip".into(),
+            user_capability_vector: vec![horizon_lib::UserCapability::AgentStack],
+        }],
+        editor_option: Some(horizon_lib::Editor::Emacs),
+        text_size_option: Some(horizon_lib::TextSize::Large),
+    }];
+    assert_horizon_definition_crosses_archive_and_datom(definition);
 }
 
 #[cfg(feature = "datom")]

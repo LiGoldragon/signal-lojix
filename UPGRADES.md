@@ -1,5 +1,23 @@
 # Upgrades
 
+# 7.0.0 to 0.8.0
+
+The numbering rule changes: the major number is only for a full rewrite, and
+the past majors were wrong. A change to a stored or archived layout is a
+subversion. This contract is now numbered in the 0.x scheme; 0.8.0 is the next
+subversion after 7.0.0, and the next full rewrite is 1.0.0.
+
+`horizon-lib` moves from 0.14.0 (`2e09ebbdc725f64fd9ee102b5758bab85be217e1`)
+to 0.15.0 (`91abfd754fe09e296bb4de074204885b1e209b0d`). `UserPubKey` gains a
+fourth position, `Vector<UserCapability>`, with
+`UserCapability.[ AgentStack CodexCandidate ]`.
+
+Any message holding a `HorizonDefinition` changes archive layout because
+`UserPubKey` gained a position; `TestDefaults` carries
+`Option<HorizonDefinition>`. Clients and daemon move together. `signal`,
+`protos`, `datom-codec` and `ethos-zero` are unchanged, and
+`src/generated/signal.rs` is byte-identical.
+
 # 6.0.0 to 7.0.0
 
 One step onto ethos-zero 16.0.0 and the 0.32.2 substrate:
