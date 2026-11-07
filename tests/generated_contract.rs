@@ -77,7 +77,7 @@ fn gold_horizon_definition() -> horizon_lib::HorizonDefinition {
                 },
                 boolean_option: None,
                 capabilities: vec![
-                    horizon_lib::NodeCapability::OpenCodeTesting(horizon_lib::NoSettings {}),
+                    horizon_lib::NodeCapability::OpenCodeTesting("li".into()),
                     horizon_lib::NodeCapability::Router(horizon_lib::NoSettings {}),
                     horizon_lib::NodeCapability::TailnetController(
                         horizon_lib::TailnetController_Data {
@@ -208,7 +208,7 @@ fn peer_bytes_restore_gold_opencode_testing_horizon_definition() {
 
 #[cfg(feature = "datom")]
 #[test]
-fn a_user_key_carrying_agent_stack_crosses_archive_and_datom() {
+fn a_user_key_carrying_agent_stack_and_stable_codex_crosses_archive_and_datom() {
     let mut definition = gold_horizon_definition();
     definition.cluster_definition.users = vec![horizon_lib::UserDefinition {
         user_name: "li".into(),
@@ -222,7 +222,10 @@ fn a_user_key_carrying_agent_stack_crosses_archive_and_datom() {
             node_name: "opencode-test".into(),
             ssh_pub_key: "AAAAuser".into(),
             keygrip: "keygrip".into(),
-            user_capability_vector: vec![horizon_lib::UserCapability::AgentStack],
+            user_capability_vector: vec![
+                horizon_lib::UserCapability::AgentStack,
+                horizon_lib::UserCapability::StableCodex,
+            ],
         }],
         editor_option: Some(horizon_lib::Editor::Emacs),
         text_size_option: Some(horizon_lib::TextSize::Large),

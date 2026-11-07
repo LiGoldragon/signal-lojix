@@ -1,5 +1,19 @@
 # Upgrades
 
+# 0.8.0 to 0.9.0
+
+`horizon-lib` moves from 0.15.0 (`91abfd754fe09e296bb4de074204885b1e209b0d`)
+to 0.16.0 (`bd52627b24bf553de45eb639571c1127e44e7f1d`).
+`NodeCapability::OpenCodeTesting` carries a `UserName`, the server's owner,
+where it carried `NoSettings`; `UserCapability` gains `StableCodex`:
+`UserCapability.[ AgentStack CodexCandidate StableCodex ]`.
+
+Any message holding a `HorizonDefinition` changes archive layout because a
+`NodeCapability` payload changed and a `UserCapability` variant was added;
+`TestDefaults` carries `Option<HorizonDefinition>`. Clients and daemon move
+together. `signal`, `protos`, `datom-codec` and `ethos-zero` are unchanged, and
+`src/generated/signal.rs` is byte-identical.
+
 # 7.0.0 to 0.8.0
 
 The numbering rule changes: the major number is only for a full rewrite, and
