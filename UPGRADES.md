@@ -1,5 +1,18 @@
 # Upgrades
 
+# 0.9.0 to 0.10.0
+
+`horizon-lib` moves from 0.16.0 (`bd52627b24bf553de45eb639571c1127e44e7f1d`)
+to 0.17.0 (`187b028a1c1ec6c8926a618a3ca435440d077ae7`).
+`NodeCapability` gains `GitServer.NoSettings`, appended last:
+`NodeCapability.[ … UsbDownlink.{ Ipv4Cidr } GitServer.NoSettings ]`.
+
+Existing records decode unchanged; a cluster definition naming `GitServer` is
+carried by any message holding a `HorizonDefinition` (`TestDefaults` carries
+`Option<HorizonDefinition>`), so clients and daemon move together. `signal`,
+`protos`, `datom-codec` and `ethos-zero` are unchanged, and
+`src/generated/signal.rs` is byte-identical.
+
 # 0.8.0 to 0.9.0
 
 `horizon-lib` moves from 0.15.0 (`91abfd754fe09e296bb4de074204885b1e209b0d`)

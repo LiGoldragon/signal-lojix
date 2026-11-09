@@ -235,6 +235,18 @@ fn a_user_key_carrying_agent_stack_and_stable_codex_crosses_archive_and_datom() 
 
 #[cfg(feature = "datom")]
 #[test]
+fn a_git_server_capability_crosses_archive_and_datom() {
+    let mut definition = gold_horizon_definition();
+    definition.horizon_configuration.generic_nodes[0]
+        .capabilities
+        .push(horizon_lib::NodeCapability::GitServer(
+            horizon_lib::NoSettings {},
+        ));
+    assert_horizon_definition_crosses_archive_and_datom(definition);
+}
+
+#[cfg(feature = "datom")]
+#[test]
 fn datom_round_trip_preserves_bare_punctuation_strings() {
     use datom_codec::{Actualizing, Budget, Datomizable, Potential};
     use protos::{Protosizable, ReaderBudget, Textualizable};
