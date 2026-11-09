@@ -1,5 +1,13 @@
 # Upgrades
 
+# 0.10.0 to 0.10.1
+
+`horizon-lib` moves from 0.17.0 (`187b028a1c1ec6c8926a618a3ca435440d077ae7`)
+to 0.17.1 (`e723ce117104557a6eb88555008a68627adae313`), a revision with no
+type changes: the `isGitServer` gate no longer requires the node's base public
+keys. No signal-lojix type changes, and `src/generated/signal.rs` is
+byte-identical.
+
 # 0.9.0 to 0.10.0
 
 `horizon-lib` moves from 0.16.0 (`bd52627b24bf553de45eb639571c1127e44e7f1d`)
