@@ -1,5 +1,15 @@
 # Upgrades
 
+# 0.10.1 to 0.11.0
+
+`Response` gains `DeploymentPhaseObserved.DeploymentPhaseEvent`, appended
+last: one committed deployment phase event, written by the daemon to a
+`WatchDeployments` subscription whose `DeploymentWatch` it matches, after the
+`Watching` reply. A `Response` archived with the new variant does not decode
+under 0.10.1, so clients and daemon move together. No existing record changes
+layout; `signal`, `horizon-lib`, `protos`, `datom-codec` and `ethos-zero` are
+unchanged.
+
 # 0.10.0 to 0.10.1
 
 `horizon-lib` moves from 0.17.0 (`187b028a1c1ec6c8926a618a3ca435440d077ae7`)

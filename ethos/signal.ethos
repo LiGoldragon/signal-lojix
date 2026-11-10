@@ -18,7 +18,8 @@ Signal
   Queried.GenerationListing
   DeploymentEventsQueried.EventLogPage
   Unwatched.SubscriptionClosed
-  WatchRejected.RejectedWatch ]
+  WatchRejected.RejectedWatch
+  DeploymentPhaseObserved.DeploymentPhaseEvent ]
 
 [ OrdinarySocketPath.String
   OrdinarySocketMode.Integer

@@ -438,3 +438,60 @@ fn a_failed_closure_copy_renders_its_own_reason_in_datom() {
         .expect("restore datom copy failure");
     assert_eq!(restored, response);
 }
+
+/// One committed phase event as a deployment watch writes it: the terminal
+/// event of a deployment that succeeded, carrying its revision and terminal.
+fn observed_phase_event_response() -> Response {
+    use signal_lojix::{DatabaseMarker, DeploymentPhase, DeploymentPhaseEvent, DeploymentTerminal};
+    Response::DeploymentPhaseObserved(DeploymentPhaseEvent {
+        deployment_identifier: 190,
+        generation_identifier: 41,
+        cluster_name: "goldragon".into(),
+        node_name: "ouranos".into(),
+        deployment_phase: DeploymentPhase::Completed,
+        event_log_position: 7,
+        transition_marker: DatabaseMarker {
+            commit_sequence: 12,
+            state_digest: 33,
+        },
+        immutable_revision_option: Some("0123456789abcdef0123456789abcdef01234567".into()),
+        deployment_terminal_option: Some(DeploymentTerminal::Succeeded),
+    })
+}
+
+#[test]
+fn an_observed_phase_event_crosses_peer_bytes() {
+    let response = observed_phase_event_response();
+    let sent = response
+        .signalize()
+        .expect("signalize observed phase event");
+    let received = Signal::<Response>::from(sent.bytes().to_vec());
+    assert_eq!(
+        received.restore().expect("restore observed phase event"),
+        response
+    );
+}
+
+#[cfg(feature = "datom")]
+#[test]
+fn an_observed_phase_event_crosses_datom() {
+    use datom_codec::{Actualizing, Budget, Datomizable, Potential};
+    use protos::{Protosizable, ReaderBudget, Textualizable};
+
+    let response = observed_phase_event_response();
+    let rendered = response.clone().datomize(vec![]).protosize().textualize();
+    assert!(
+        rendered.starts_with("DeploymentPhaseObserved."),
+        "an observed event is headed by its output: {rendered}"
+    );
+    let mut pending = Potential::<Response>::from(rendered);
+    let restored = pending
+        .actualize(&mut Budget {
+            remaining: 4_096,
+            reader: ReaderBudget { remaining: 4_096 },
+            depth: 0,
+            maximum_depth: 256,
+        })
+        .expect("restore datom observed phase event");
+    assert_eq!(restored, response);
+}

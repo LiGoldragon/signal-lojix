@@ -655,4 +655,5 @@ pub enum Response {
     DeploymentEventsQueried(EventLogPage),
     Unwatched(SubscriptionClosed),
     WatchRejected(RejectedWatch),
+    DeploymentPhaseObserved(DeploymentPhaseEvent),
 }
