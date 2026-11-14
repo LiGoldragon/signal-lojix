@@ -1,18 +1,37 @@
-#![allow(dead_code, non_camel_case_types, non_snake_case)]
+#![allow(
+    dead_code,
+    non_camel_case_types,
+    non_snake_case,
+    clippy::type_complexity
+)]
 #[rustfmt::skip]
-pub type OrdinarySocketPath = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct OrdinarySocketPath(pub String);
 #[rustfmt::skip]
-pub type OrdinarySocketMode = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct OrdinarySocketMode(pub i64);
 #[rustfmt::skip]
-pub type OwnerSocketPath = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct OwnerSocketPath(pub String);
 #[rustfmt::skip]
-pub type OwnerSocketMode = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct OwnerSocketMode(pub i64);
 #[rustfmt::skip]
-pub type StateDirectoryPath = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct StateDirectoryPath(pub String);
 #[rustfmt::skip]
-pub type DaemonHost = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct DaemonHost(pub String);
 #[rustfmt::skip]
-pub type MetaConfigureOccurred = bool;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct MetaConfigureOccurred(pub bool);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -68,25 +87,29 @@ pub struct ConfigurationRejection {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum UserEnvironmentAction {
-    ActivateNow,
     Realize,
     SetProfile,
+    ActivateNow,
 }
 #[rustfmt::skip]
-pub type GenerationIdentifier = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct GenerationIdentifier(pub i64);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum CacheRetentionTransition {
+    Pinned,
+    Unpinned,
+    Promoted,
     Demoted,
     Retired,
-    Pinned,
-    Promoted,
-    Unpinned,
     Evicted,
 }
 #[rustfmt::skip]
-pub type CommitSequence = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct CommitSequence(pub i64);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -110,9 +133,13 @@ pub struct DeploymentWatch {
     pub node_name_option: std::option::Option<NodeName>,
 }
 #[rustfmt::skip]
-pub type ProposalSource = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct ProposalSource(pub String);
 #[rustfmt::skip]
-pub type SecretsDirectory = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct SecretsDirectory(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -128,7 +155,9 @@ pub enum RequestedDeploymentAction {
     UserEnvironment(UserEnvironmentAction),
 }
 #[rustfmt::skip]
-pub type NodeName = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct NodeName(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -159,9 +188,13 @@ pub struct TestRunLookup {
     pub test_run_identifier_option: std::option::Option<TestRunIdentifier>,
 }
 #[rustfmt::skip]
-pub type SubscriptionToken = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct SubscriptionToken(pub i64);
 #[rustfmt::skip]
-pub type NixSystem = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct NixSystem(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -170,7 +203,7 @@ pub struct DeploymentRecord {
     pub generation_identifier: GenerationIdentifier,
     pub deployment_request_identity: DeploymentRequestIdentity,
     pub admission_marker_option: std::option::Option<AdmissionMarker>,
-    pub deployment_lifecycle: DeploymentLifecycle,
+    pub deployment_phase: DeploymentPhase,
     pub terminal_marker_option: std::option::Option<TerminalMarker>,
     pub deployment_terminal_option: std::option::Option<DeploymentTerminal>,
 }
@@ -178,25 +211,27 @@ pub struct DeploymentRecord {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum FailureStage {
-    HermeticCheck,
     BringUp,
-    Assert,
     Deploy,
+    Assert,
     TearDown,
+    HermeticCheck,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum HostDeployAction {
-    TestActivation,
-    ScheduleBootOnce,
+    Evaluate,
     Realize,
     SetBootProfile,
-    Evaluate,
     ActivateNow,
+    TestActivation,
+    ScheduleBootOnce,
 }
 #[rustfmt::skip]
-pub type PinLabel = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct PinLabel(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -222,14 +257,16 @@ pub enum UnwatchRejectionReason {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum GenerationSlot {
+    Current,
+    BootPending,
+    Rollback,
     Pinned,
     Recent,
-    Rollback,
-    BootPending,
-    Current,
 }
 #[rustfmt::skip]
-pub type TestRunIdentifier = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct TestRunIdentifier(pub i64);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -238,27 +275,22 @@ pub enum HostComposition {
     BaseHost,
 }
 #[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub struct CacheRetentionWatch {
-    pub cluster_name_option: std::option::Option<ClusterName>,
-    pub node_name_option: std::option::Option<NodeName>,
-}
-#[rustfmt::skip]
-pub type FlakeAttribute = String;
+pub struct FlakeAttribute(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum DeploymentPhase {
-    Built,
-    Completed,
-    Failed,
-    Copying,
-    Rejected,
-    Activated,
     Submitted,
     Building,
+    Built,
+    Copying,
     Activating,
+    Activated,
+    Completed,
+    Rejected,
+    Failed,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -268,11 +300,19 @@ pub struct DatabaseMarker {
     pub state_digest: StateDigest,
 }
 #[rustfmt::skip]
-pub type AdmissionMarker = DatabaseMarker;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct AdmissionMarker {
+    pub database_marker: DatabaseMarker,
+}
 #[rustfmt::skip]
-pub type SshDestination = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct SshDestination(pub String);
 #[rustfmt::skip]
-pub type UserName = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct UserName(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -287,9 +327,15 @@ pub struct DeploymentRequestIdentity {
     pub immutable_revision_option: std::option::Option<ImmutableRevision>,
 }
 #[rustfmt::skip]
-pub type TransitionMarker = DatabaseMarker;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct TransitionMarker {
+    pub database_marker: DatabaseMarker,
+}
 #[rustfmt::skip]
-pub type EventLogPosition = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct EventLogPosition(pub i64);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -310,13 +356,15 @@ pub struct CacheRetentionTransitionEvent {
     pub event_log_position: EventLogPosition,
 }
 #[rustfmt::skip]
-pub type NixBuilderSpec = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct NixBuilderSpec(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum DeploymentInputMode {
-    Horizon,
     Direct,
+    Horizon,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -324,10 +372,10 @@ pub enum DeploymentInputMode {
 pub enum TestRunPhase {
     Submitted,
     BringingUp,
-    TearingDown,
-    Completed,
     Deploying,
     Asserting,
+    TearingDown,
+    Completed,
     Failed,
 }
 #[rustfmt::skip]
@@ -357,23 +405,23 @@ pub struct SubscriptionOpened {
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum WatchRejectionReason {
-    MalformedWatch,
     SubscriptionLimitReached,
+    MalformedWatch,
     StreamUnavailable,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum ActivationBackend {
-    HomeManagerNixProfileV1,
     NixosSystemdBootV1,
+    HomeManagerNixProfileV1,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum GenerationArtifact {
-    BaseHost,
     CompleteHost,
+    BaseHost,
     UserEnvironment,
 }
 #[rustfmt::skip]
@@ -400,7 +448,11 @@ pub struct SubscriptionClose {
     pub subscription_token: SubscriptionToken,
 }
 #[rustfmt::skip]
-pub type TerminalMarker = DatabaseMarker;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct TerminalMarker {
+    pub database_marker: DatabaseMarker,
+}
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -409,7 +461,9 @@ pub enum DeploymentEnvironment {
     UserEnvironment(UserName),
 }
 #[rustfmt::skip]
-pub type ImmutableRevision = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct ImmutableRevision(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -425,30 +479,18 @@ pub struct EventLogRange {
     pub second_event_log_position: EventLogPosition,
 }
 #[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub enum DeploymentLifecycle {
-    Failed,
-    Rejected,
-    Completed,
-    Building,
-    Activating,
-    Submitted,
-    Copying,
-    Activated,
-    Built,
-}
-#[rustfmt::skip]
-pub type ClosurePath = String;
+pub struct ClosurePath(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum ActivationEffect {
-    ProfileOnly,
-    BootOnceProfile,
-    TestActivation,
     LiveActivation,
     BootProfile,
+    TestActivation,
+    BootOnceProfile,
+    ProfileOnly,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -464,18 +506,22 @@ pub enum TestMode {
     Live,
 }
 #[rustfmt::skip]
-pub type StateDigest = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct StateDigest(pub i64);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum QueryRejectionReason {
-    MalformedSelector,
-    EventLogPositionOutOfRange,
     GenerationUnknown,
     NodeUnknown,
+    EventLogPositionOutOfRange,
+    MalformedSelector,
 }
 #[rustfmt::skip]
-pub type NixStoreUri = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct NixStoreUri(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -488,20 +534,24 @@ pub struct TestRunListing {
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum DeploymentTerminal {
     Succeeded,
-    Failed(DeploymentFailure),
     Rejected(DeploymentTerminalReason),
+    Failed(DeploymentFailure),
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum SourceRevisionPolicy {
-    ResolveAndRecord,
     RequireImmutable,
+    ResolveAndRecord,
 }
 #[rustfmt::skip]
-pub type ClusterName = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct ClusterName(pub String);
 #[rustfmt::skip]
-pub type DeploymentIdentifier = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct DeploymentIdentifier(pub i64);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
@@ -527,43 +577,53 @@ pub struct FailedCommand {
     pub exit_code_option: std::option::Option<ExitCode>,
 }
 #[rustfmt::skip]
-pub type CommandProgram = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct CommandProgram(pub String);
 #[rustfmt::skip]
-pub type CommandArgument = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct CommandArgument(pub String);
 #[rustfmt::skip]
-pub type ExitCode = i64;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct ExitCode(pub i64);
 #[rustfmt::skip]
-pub type FailureDetail = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct FailureDetail(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum DeploymentFailureStage {
-    Build,
-    Eval,
-    MaterializeHorizon,
-    Daemon,
-    Activate,
-    CopyClosure,
     Admission,
     FlakeAuth,
+    MaterializeHorizon,
+    Eval,
+    Build,
+    CopyClosure,
+    Activate,
+    Daemon,
 }
 #[rustfmt::skip]
-pub type FlakeReference = String;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct FlakeReference(pub String);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum DeploymentTerminalReason {
-    NodeUnknown,
-    FlakeReferenceMalformed,
-    ProposalSourceUnreachable,
-    DeploymentInFlight,
-    InvalidDeploymentRouting,
-    UnsupportedDeployAction,
-    InternalError,
     ClusterUnknown,
-    ActivationFailed,
+    NodeUnknown,
+    ProposalSourceUnreachable,
+    FlakeReferenceMalformed,
+    InvalidDeploymentRouting,
     BuilderUnreachable,
     SubstituterUnreachable,
+    DeploymentInFlight,
+    UnsupportedDeployAction,
+    InternalError,
+    ActivationFailed,
     EvaluationFailed,
     BuildFailed,
     ClosureCopyFailed,
@@ -573,18 +633,8 @@ pub enum DeploymentTerminalReason {
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
 pub enum Selection {
     ByNode(NodeSelector),
-    ByTestRun(TestRunLookup),
-    ByDeployment(DeploymentLookup),
     ByGeneration(GenerationLookup),
-    ByEventLog(EventLogRange),
-}
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub enum RequestedGenerationArtifact {
-    UserEnvironment,
-    CompleteHost,
-    BaseHost,
+    ByDeployment(DeploymentLookup),
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -592,9 +642,7 @@ pub enum RequestedGenerationArtifact {
 pub struct NodeSelector {
     pub cluster_name: ClusterName,
     pub node_name: NodeName,
-    pub requested_generation_artifact_option: std::option::Option<
-        RequestedGenerationArtifact,
-    >,
+    pub generation_artifact_option: std::option::Option<GenerationArtifact>,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -630,30 +678,105 @@ pub struct TestRunRecord {
     pub closure_path_option: std::option::Option<ClosurePath>,
 }
 #[rustfmt::skip]
-pub type DetailTruncated = bool;
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub struct DetailTruncated(pub bool);
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub enum Query {
+pub enum Refusal {
+    Store(String),
+}
+#[rustfmt::skip]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
+pub enum Input {
     Configure(LojixNexusConfiguration),
     WatchDeployments(DeploymentWatch),
     Query(Selection),
-    WatchCacheRetention(CacheRetentionWatch),
+    QueryDeploymentEvents(EventLogRange),
+    QueryTestRuns(TestRunLookup),
     Unwatch(SubscriptionClose),
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "datom", derive(datom_codec::Datomizable, datom_codec::Composing))]
-pub enum Response {
+pub enum Output {
     Configured(ConfigurationReceipt),
-    ConfigurationRejected(ConfigurationRejection),
-    TestRunsQueried(TestRunListing),
-    UnwatchRejected(RejectedUnwatch),
-    QueryRejected(RejectedQuery),
-    Watching(SubscriptionOpened),
+    DeploymentsWatched(SubscriptionOpened),
     Queried(GenerationListing),
     DeploymentEventsQueried(EventLogPage),
+    TestRunsQueried(TestRunListing),
     Unwatched(SubscriptionClosed),
+    ConfigurationRejected(ConfigurationRejection),
     WatchRejected(RejectedWatch),
+    QueryRejected(RejectedQuery),
+    UnwatchRejected(RejectedUnwatch),
     DeploymentPhaseObserved(DeploymentPhaseEvent),
+    Refused(Refusal),
+}
+#[rustfmt::skip]
+#[allow(clippy::result_large_err, clippy::ptr_arg, clippy::borrowed_box)]
+pub trait Answering {
+    fn configure(
+        &self,
+        lojix_nexus_configuration: &LojixNexusConfiguration,
+    ) -> std::result::Result<ConfigurationReceipt, Output>;
+    fn watch_deployments(
+        &self,
+        deployment_watch: &DeploymentWatch,
+    ) -> std::result::Result<SubscriptionOpened, Output>;
+    fn query(
+        &self,
+        selection: &Selection,
+    ) -> std::result::Result<GenerationListing, Output>;
+    fn query_deployment_events(
+        &self,
+        event_log_range: &EventLogRange,
+    ) -> std::result::Result<EventLogPage, Output>;
+    fn query_test_runs(
+        &self,
+        test_run_lookup: &TestRunLookup,
+    ) -> std::result::Result<TestRunListing, Output>;
+    fn unwatch(
+        &self,
+        subscription_close: &SubscriptionClose,
+    ) -> std::result::Result<SubscriptionClosed, Output>;
+}
+#[rustfmt::skip]
+pub trait Answerable {
+    fn answer<Nexus: Answering>(&self, nexus: &Nexus) -> Output;
+}
+#[rustfmt::skip]
+impl Answerable for Input {
+    fn answer<Nexus: Answering>(&self, nexus: &Nexus) -> Output {
+        match self {
+            Input::Configure(carried) => {
+                nexus
+                    .configure(carried)
+                    .map_or_else(|refusal| refusal, Output::Configured)
+            }
+            Input::WatchDeployments(carried) => {
+                nexus
+                    .watch_deployments(carried)
+                    .map_or_else(|refusal| refusal, Output::DeploymentsWatched)
+            }
+            Input::Query(carried) => {
+                nexus.query(carried).map_or_else(|refusal| refusal, Output::Queried)
+            }
+            Input::QueryDeploymentEvents(carried) => {
+                nexus
+                    .query_deployment_events(carried)
+                    .map_or_else(|refusal| refusal, Output::DeploymentEventsQueried)
+            }
+            Input::QueryTestRuns(carried) => {
+                nexus
+                    .query_test_runs(carried)
+                    .map_or_else(|refusal| refusal, Output::TestRunsQueried)
+            }
+            Input::Unwatch(carried) => {
+                nexus.unwatch(carried).map_or_else(|refusal| refusal, Output::Unwatched)
+            }
+        }
+    }
 }

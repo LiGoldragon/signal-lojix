@@ -1,5 +1,163 @@
 # Upgrades
 
+# 0.11.0 to 0.12.0
+
+The build reads `ethos/signal.ethos` with ethos-zero 28.0.0
+(`970459d100ddee5f62a76c05642ecfabefba6329`, was `c2653dd8…` / 16.0.0), which
+reads a Signal's first two sections as `Input` and `Output` and pairs them by
+position. One wire break carries every change below; clients and daemon move
+together.
+
+- `Query` is `Input` and `Response` is `Output`. The file also generates
+  `Answering`, one capability per input, and `impl Answerable for Input`: a
+  Nexus answers an input with `input.answer(&nexus)`.
+- `Output` is ordered so the n-th output answers the n-th input:
+  `Configured`, `DeploymentsWatched`, `Queried`, `DeploymentEventsQueried`,
+  `TestRunsQueried`, `Unwatched`; then the rejections in input order,
+  `ConfigurationRejected`, `WatchRejected`, `QueryRejected`,
+  `UnwatchRejected`; then the reaction `DeploymentPhaseObserved`; then
+  `Refused`.
+- `Query` has one answer. `Query.Selection` keeps `ByNode`, `ByGeneration` and
+  `ByDeployment` and is answered `Queried`. The event log and the test runs are
+  inputs of their own: `QueryDeploymentEvents.EventLogRange`, answered
+  `DeploymentEventsQueried`, and `QueryTestRuns.TestRunLookup`, answered
+  `TestRunsQueried`. `Selection.ByEventLog` and `Selection.ByTestRun` are gone;
+  their text is now `QueryDeploymentEvents.{ … }` and `QueryTestRuns.{ … }`.
+  `Query.ByNode.{ … }` and `Query.ByDeployment.{ … }` read as before.
+- `Watching` is `DeploymentsWatched`, the past tense of `WatchDeployments`.
+  `WatchCacheRetention` and `CacheRetentionWatch` are removed: the input
+  registered no watcher and nothing streamed from it. `CacheRetentionTransition`
+  and its event stay, in `EventLogPage`.
+- `Refused.Refusal`, with `Refusal.[ Store.String ]`, answers any input the
+  Nexus store could not carry out, with the store's own words. Its text is
+  `Refused.Store.«…»`.
+- Every enumeration lists its variants in the order Lojix stores them (lojix
+  `src/runtime_model.rs` at `da0ad8a`), so a stored value keeps its archived
+  tag. `tests/representation.rs` checks the tag of every variant of the 21
+  enumerations Lojix's Memory holds.
+- `DeploymentLifecycle` is `DeploymentPhase`: the two had the same nine
+  variants. `DeploymentRecord` holds a `DeploymentPhase`, its field now
+  `deployment_phase`.
+- `RequestedGenerationArtifact` is folded into `GenerationArtifact`:
+  `NodeSelector.{ ClusterName NodeName Option<GenerationArtifact> }`.
+- `AdmissionMarker`, `TransitionMarker` and `TerminalMarker` are each a
+  one-field struct over `DatabaseMarker` (`X.{ DatabaseMarker }`), which
+  ethos-zero 28 requires in place of a head over a struct. Each archives to the
+  bytes of the `DatabaseMarker` it holds; its Datom text gains a pair of
+  braces, `Some.{ { 9 17 } }` where it was `Some.{ 9 17 }`.
+- The 33 scalar declarations are newtype structs in place of type aliases:
+  `ClusterName("goldragon".into())`, `DeploymentIdentifier(1)`, read through
+  `.0`. Their archive is unchanged, and so is their Datom text, through
+  `datom-codec` 0.32.3 (`eb792265a67b2c6865f9b8c9ed9d2e5ae5a7174c`, was
+  `4dff16b4…` / 0.32.2), whose derive writes a one-field tuple struct as its
+  inner value.
+- `horizon-lib` moves to 0.18.0 (`825a7f09242380a7b3d2609b26e20647db46a8ce`,
+  was `e723ce11…` / 0.17.1), the same Horizon types over ethos-zero 28 and
+  datom-codec 0.32.3; its archive and text are unchanged. `protos` and
+  `signal` are unchanged.
+
+The archived tags that move:
+
+| enumeration | variant | was | now |
+|---|---|---|---|
+| Input | WatchCacheRetention | 3 | removed |
+| Input | Unwatch | 4 | 5 |
+| Input | QueryDeploymentEvents | (new) | 3 |
+| Input | QueryTestRuns | (new) | 4 |
+| Output | ConfigurationRejected | 1 | 6 |
+| Output | TestRunsQueried | 2 | 4 |
+| Output | UnwatchRejected | 3 | 9 |
+| Output | QueryRejected | 4 | 8 |
+| Output | Watching → DeploymentsWatched | 5 | 1 |
+| Output | Queried | 6 | 2 |
+| Output | DeploymentEventsQueried | 7 | 3 |
+| Output | Unwatched | 8 | 5 |
+| Output | WatchRejected | 9 | 7 |
+| Output | Refused | (new) | 11 |
+| UserEnvironmentAction | ActivateNow | 0 | 2 |
+| UserEnvironmentAction | Realize | 1 | 0 |
+| UserEnvironmentAction | SetProfile | 2 | 1 |
+| CacheRetentionTransition | Demoted | 0 | 3 |
+| CacheRetentionTransition | Retired | 1 | 4 |
+| CacheRetentionTransition | Pinned | 2 | 0 |
+| CacheRetentionTransition | Promoted | 3 | 2 |
+| CacheRetentionTransition | Unpinned | 4 | 1 |
+| FailureStage | HermeticCheck | 0 | 4 |
+| FailureStage | BringUp | 1 | 0 |
+| FailureStage | Deploy | 3 | 1 |
+| FailureStage | TearDown | 4 | 3 |
+| HostDeployAction | TestActivation | 0 | 4 |
+| HostDeployAction | ScheduleBootOnce | 1 | 5 |
+| HostDeployAction | Realize | 2 | 1 |
+| HostDeployAction | SetBootProfile | 3 | 2 |
+| HostDeployAction | Evaluate | 4 | 0 |
+| HostDeployAction | ActivateNow | 5 | 3 |
+| GenerationSlot | Pinned | 0 | 3 |
+| GenerationSlot | Recent | 1 | 4 |
+| GenerationSlot | BootPending | 3 | 1 |
+| GenerationSlot | Current | 4 | 0 |
+| DeploymentPhase | Built | 0 | 2 |
+| DeploymentPhase | Completed | 1 | 6 |
+| DeploymentPhase | Failed | 2 | 8 |
+| DeploymentPhase | Rejected | 4 | 7 |
+| DeploymentPhase | Submitted | 6 | 0 |
+| DeploymentPhase | Building | 7 | 1 |
+| DeploymentPhase | Activating | 8 | 4 |
+| DeploymentInputMode | Horizon | 0 | 1 |
+| DeploymentInputMode | Direct | 1 | 0 |
+| TestRunPhase | TearingDown | 2 | 4 |
+| TestRunPhase | Completed | 3 | 5 |
+| TestRunPhase | Deploying | 4 | 2 |
+| TestRunPhase | Asserting | 5 | 3 |
+| WatchRejectionReason | MalformedWatch | 0 | 1 |
+| WatchRejectionReason | SubscriptionLimitReached | 1 | 0 |
+| ActivationBackend | HomeManagerNixProfileV1 | 0 | 1 |
+| ActivationBackend | NixosSystemdBootV1 | 1 | 0 |
+| GenerationArtifact | BaseHost | 0 | 1 |
+| GenerationArtifact | CompleteHost | 1 | 0 |
+| DeploymentLifecycle → DeploymentPhase | Failed | 0 | 8 |
+| DeploymentLifecycle → DeploymentPhase | Rejected | 1 | 7 |
+| DeploymentLifecycle → DeploymentPhase | Completed | 2 | 6 |
+| DeploymentLifecycle → DeploymentPhase | Building | 3 | 1 |
+| DeploymentLifecycle → DeploymentPhase | Submitted | 5 | 0 |
+| DeploymentLifecycle → DeploymentPhase | Copying | 6 | 3 |
+| DeploymentLifecycle → DeploymentPhase | Activated | 7 | 5 |
+| DeploymentLifecycle → DeploymentPhase | Built | 8 | 2 |
+| ActivationEffect | ProfileOnly | 0 | 4 |
+| ActivationEffect | BootOnceProfile | 1 | 3 |
+| ActivationEffect | LiveActivation | 3 | 0 |
+| ActivationEffect | BootProfile | 4 | 1 |
+| QueryRejectionReason | MalformedSelector | 0 | 3 |
+| QueryRejectionReason | EventLogPositionOutOfRange | 1 | 2 |
+| QueryRejectionReason | GenerationUnknown | 2 | 0 |
+| QueryRejectionReason | NodeUnknown | 3 | 1 |
+| DeploymentTerminal | Failed | 1 | 2 |
+| DeploymentTerminal | Rejected | 2 | 1 |
+| SourceRevisionPolicy | ResolveAndRecord | 0 | 1 |
+| SourceRevisionPolicy | RequireImmutable | 1 | 0 |
+| DeploymentFailureStage | Build | 0 | 4 |
+| DeploymentFailureStage | Eval | 1 | 3 |
+| DeploymentFailureStage | Daemon | 3 | 7 |
+| DeploymentFailureStage | Activate | 4 | 6 |
+| DeploymentFailureStage | Admission | 6 | 0 |
+| DeploymentFailureStage | FlakeAuth | 7 | 1 |
+| DeploymentTerminalReason | NodeUnknown | 0 | 1 |
+| DeploymentTerminalReason | FlakeReferenceMalformed | 1 | 3 |
+| DeploymentTerminalReason | DeploymentInFlight | 3 | 7 |
+| DeploymentTerminalReason | UnsupportedDeployAction | 5 | 8 |
+| DeploymentTerminalReason | InternalError | 6 | 9 |
+| DeploymentTerminalReason | ClusterUnknown | 7 | 0 |
+| DeploymentTerminalReason | ActivationFailed | 8 | 10 |
+| DeploymentTerminalReason | BuilderUnreachable | 9 | 5 |
+| DeploymentTerminalReason | SubstituterUnreachable | 10 | 6 |
+| Selection | ByTestRun | 1 | removed |
+| Selection | ByGeneration | 3 | 1 |
+| Selection | ByEventLog | 4 | removed |
+| RequestedGenerationArtifact → GenerationArtifact | UserEnvironment | 0 | 2 |
+| RequestedGenerationArtifact → GenerationArtifact | CompleteHost | 1 | 0 |
+| RequestedGenerationArtifact → GenerationArtifact | BaseHost | 2 | 1 |
+| Refusal | Store | (new) | 0 |
+
 # 0.10.1 to 0.11.0
 
 `Response` gains `DeploymentPhaseObserved.DeploymentPhaseEvent`, appended

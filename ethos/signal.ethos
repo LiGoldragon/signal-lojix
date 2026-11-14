@@ -1,4 +1,19 @@
 ; Ordinary Lojix query and observation contract.
+;
+; Each input's own output is named in its past tense and stands at its
+; position: Configured, DeploymentsWatched, Queried, DeploymentEventsQueried,
+; TestRunsQueried, Unwatched. The rejections follow in the order of the
+; inputs they answer; QueryRejected answers all three queries.
+;
+; WatchDeployments is answered once, DeploymentsWatched, and then each
+; committed phase transition streams on the same connection as a
+; DeploymentPhaseObserved frame, a reaction after the rejections.
+;
+; Refused.Store answers any input the Nexus's store could not carry out,
+; with the store's own words. It stands after every other output.
+;
+; Every enumeration lists its variants in the order Lojix stores them, the
+; lifecycle order, so a stored value keeps its archived tag.
 Signal
 
 [ horizon_lib:[ HorizonDefinition ] ]
@@ -6,20 +21,22 @@ Signal
 [ Configure.LojixNexusConfiguration
   WatchDeployments.DeploymentWatch
   Query.Selection
-  WatchCacheRetention.CacheRetentionWatch
+  QueryDeploymentEvents.EventLogRange
+  QueryTestRuns.TestRunLookup
   Unwatch.SubscriptionClose ]
 
 [ Configured.ConfigurationReceipt
-  ConfigurationRejected.ConfigurationRejection
-  TestRunsQueried.TestRunListing
-  UnwatchRejected.RejectedUnwatch
-  QueryRejected.RejectedQuery
-  Watching.SubscriptionOpened
+  DeploymentsWatched.SubscriptionOpened
   Queried.GenerationListing
   DeploymentEventsQueried.EventLogPage
+  TestRunsQueried.TestRunListing
   Unwatched.SubscriptionClosed
+  ConfigurationRejected.ConfigurationRejection
   WatchRejected.RejectedWatch
-  DeploymentPhaseObserved.DeploymentPhaseEvent ]
+  QueryRejected.RejectedQuery
+  UnwatchRejected.RejectedUnwatch
+  DeploymentPhaseObserved.DeploymentPhaseEvent
+  Refused.Refusal ]
 
 [ OrdinarySocketPath.String
   OrdinarySocketMode.Integer
@@ -34,9 +51,9 @@ Signal
   ConfigurationReceipt.{ LojixNexusConfiguration MetaConfigureOccurred }
   ConfigurationRejectionReason.[ OrdinaryConfigureClosed InvalidConfiguration ]
   ConfigurationRejection.{ ConfigurationRejectionReason }
-  UserEnvironmentAction.[ ActivateNow Realize SetProfile ]
+  UserEnvironmentAction.[ Realize SetProfile ActivateNow ]
   GenerationIdentifier.Integer
-  CacheRetentionTransition.[ Demoted Retired Pinned Promoted Unpinned Evicted ]
+  CacheRetentionTransition.[ Pinned Unpinned Promoted Demoted Retired Evicted ]
   CommitSequence.Integer
   DeploymentPhaseEvent.{ DeploymentIdentifier GenerationIdentifier ClusterName NodeName DeploymentPhase EventLogPosition TransitionMarker Option<ImmutableRevision> Option<DeploymentTerminal> }
   DeploymentWatch.{ Option<DeploymentIdentifier> Option<ClusterName> Option<NodeName> }
@@ -51,56 +68,54 @@ Signal
   TestRunLookup.{ ClusterName NodeName Option<TestRunIdentifier> }
   SubscriptionToken.Integer
   NixSystem.String
-  DeploymentRecord.{ DeploymentIdentifier GenerationIdentifier DeploymentRequestIdentity Option<AdmissionMarker> DeploymentLifecycle Option<TerminalMarker> Option<DeploymentTerminal> }
-  FailureStage.[ HermeticCheck BringUp Assert Deploy TearDown ]
-  HostDeployAction.[ TestActivation ScheduleBootOnce Realize SetBootProfile Evaluate ActivateNow ]
+  DeploymentRecord.{ DeploymentIdentifier GenerationIdentifier DeploymentRequestIdentity Option<AdmissionMarker> DeploymentPhase Option<TerminalMarker> Option<DeploymentTerminal> }
+  FailureStage.[ BringUp Deploy Assert TearDown HermeticCheck ]
+  HostDeployAction.[ Evaluate Realize SetBootProfile ActivateNow TestActivation ScheduleBootOnce ]
   PinLabel.String
   GenerationListing.{ Vector<Generation> Vector<DeploymentRecord> DatabaseMarker }
   DeploymentLookup.{ DeploymentIdentifier }
   UnwatchRejectionReason.[ SubscriptionTokenUnknown SubscriptionAlreadyClosed ]
-  GenerationSlot.[ Pinned Recent Rollback BootPending Current ]
+  GenerationSlot.[ Current BootPending Rollback Pinned Recent ]
   TestRunIdentifier.Integer
   HostComposition.[ CompleteHost BaseHost ]
-  CacheRetentionWatch.{ Option<ClusterName> Option<NodeName> }
   FlakeAttribute.String
-  DeploymentPhase.[ Built Completed Failed Copying Rejected Activated Submitted Building Activating ]
+  DeploymentPhase.[ Submitted Building Built Copying Activating Activated Completed Rejected Failed ]
   DatabaseMarker.{ CommitSequence StateDigest }
-  AdmissionMarker.DatabaseMarker
+  AdmissionMarker.{ DatabaseMarker }
   SshDestination.String
   UserName.String
   DeploymentRequestIdentity.{ DeploymentEnvironment ClusterName NodeName GenerationArtifact RequestedDeploymentAction ActivationEffect SourceRevisionPolicy Option<ImmutableRevision> }
-  TransitionMarker.DatabaseMarker
+  TransitionMarker.{ DatabaseMarker }
   EventLogPosition.Integer
   RejectedWatch.{ WatchRejectionReason }
   CacheRetentionTransitionEvent.{ GenerationIdentifier ClusterName NodeName CacheRetentionTransition GenerationSlot Option<GenerationSlot> Option<PinLabel> EventLogPosition }
   NixBuilderSpec.String
-  DeploymentInputMode.[ Horizon Direct ]
-  TestRunPhase.[ Submitted BringingUp TearingDown Completed Deploying Asserting Failed ]
+  DeploymentInputMode.[ Direct Horizon ]
+  TestRunPhase.[ Submitted BringingUp Deploying Asserting TearingDown Completed Failed ]
   DeploymentTransport.{ NixStoreUri SshDestination }
   TestExecutionProfile.{ TestMode NixSystem DeploymentOutputSelector Option<DeploymentTransport> }
   SubscriptionOpened.{ SubscriptionToken CommitSequence }
-  WatchRejectionReason.[ MalformedWatch SubscriptionLimitReached StreamUnavailable ]
-  ActivationBackend.[ HomeManagerNixProfileV1 NixosSystemdBootV1 ]
-  GenerationArtifact.[ BaseHost CompleteHost UserEnvironment ]
+  WatchRejectionReason.[ SubscriptionLimitReached MalformedWatch StreamUnavailable ]
+  ActivationBackend.[ NixosSystemdBootV1 HomeManagerNixProfileV1 ]
+  GenerationArtifact.[ CompleteHost BaseHost UserEnvironment ]
   RejectedUnwatch.{ UnwatchRejectionReason SubscriptionToken }
   EventLogPage.{ Vector<DeploymentPhaseEvent> Vector<CacheRetentionTransitionEvent> DatabaseMarker }
   SubscriptionClose.{ SubscriptionToken }
-  TerminalMarker.DatabaseMarker
+  TerminalMarker.{ DatabaseMarker }
   DeploymentEnvironment.[ HostEnvironment UserEnvironment.UserName ]
   ImmutableRevision.String
   HostSelection.[ DefaultHost OnHost.NodeName ]
   EventLogRange.{ EventLogPosition EventLogPosition }
-  DeploymentLifecycle.[ Failed Rejected Completed Building Activating Submitted Copying Activated Built ]
   ClosurePath.String
-  ActivationEffect.[ ProfileOnly BootOnceProfile TestActivation LiveActivation BootProfile ]
+  ActivationEffect.[ LiveActivation BootProfile TestActivation BootOnceProfile ProfileOnly ]
   SubscriptionClosed.{ SubscriptionToken }
   TestMode.[ Hermetic Live ]
   StateDigest.Integer
-  QueryRejectionReason.[ MalformedSelector EventLogPositionOutOfRange GenerationUnknown NodeUnknown ]
+  QueryRejectionReason.[ GenerationUnknown NodeUnknown EventLogPositionOutOfRange MalformedSelector ]
   NixStoreUri.String
   TestRunListing.{ Vector<TestRunRecord> DatabaseMarker }
-  DeploymentTerminal.[ Succeeded Failed.DeploymentFailure Rejected.DeploymentTerminalReason ]
-  SourceRevisionPolicy.[ ResolveAndRecord RequireImmutable ]
+  DeploymentTerminal.[ Succeeded Rejected.DeploymentTerminalReason Failed.DeploymentFailure ]
+  SourceRevisionPolicy.[ RequireImmutable ResolveAndRecord ]
   ClusterName.String
   DeploymentIdentifier.Integer
   DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason Option<FailureEvidence> }
@@ -110,13 +125,13 @@ Signal
   CommandArgument.String
   ExitCode.Integer
   FailureDetail.String
-  DeploymentFailureStage.[ Build Eval MaterializeHorizon Daemon Activate CopyClosure Admission FlakeAuth ]
+  DeploymentFailureStage.[ Admission FlakeAuth MaterializeHorizon Eval Build CopyClosure Activate Daemon ]
   FlakeReference.String
-  DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable EvaluationFailed BuildFailed ClosureCopyFailed ]
-  Selection.[ ByNode.NodeSelector ByTestRun.TestRunLookup ByDeployment.DeploymentLookup ByGeneration.GenerationLookup ByEventLog.EventLogRange ]
-  RequestedGenerationArtifact.[ UserEnvironment CompleteHost BaseHost ]
-  NodeSelector.{ ClusterName NodeName Option<RequestedGenerationArtifact> }
+  DeploymentTerminalReason.[ ClusterUnknown NodeUnknown ProposalSourceUnreachable FlakeReferenceMalformed InvalidDeploymentRouting BuilderUnreachable SubstituterUnreachable DeploymentInFlight UnsupportedDeployAction InternalError ActivationFailed EvaluationFailed BuildFailed ClosureCopyFailed ]
+  Selection.[ ByNode.NodeSelector ByGeneration.GenerationLookup ByDeployment.DeploymentLookup ]
+  NodeSelector.{ ClusterName NodeName Option<GenerationArtifact> }
   DeploymentOutputSelector.{ FlakeAttribute }
   Generation.{ GenerationIdentifier DeploymentIdentifier ClusterName NodeName GenerationArtifact ActivationEffect GenerationSlot Option<ClosurePath> Option<ImmutableRevision> }
   TestRunRecord.{ TestRunIdentifier ClusterName NodeName NodeName TestMode TestRunPhase TestOutcome Option<ClosurePath> }
-  DetailTruncated.Boolean ]
+  DetailTruncated.Boolean
+  Refusal.[ Store.String ] ]
