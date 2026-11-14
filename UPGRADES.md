@@ -2,10 +2,10 @@
 
 # 0.11.0 to 0.12.0
 
-The build reads `ethos/signal.ethos` with ethos-zero 28.0.0
-(`970459d100ddee5f62a76c05642ecfabefba6329`, was `c2653dd8…` / 16.0.0), which
+The build reads `ethos/signal.ethos` with ethos-zero 29.0.0
+(`f23eacf338a90ce4a6dea011554724fa6488fcc9`, was `c2653dd8…` / 16.0.0), which
 reads a Signal's first two sections as `Input` and `Output` and pairs them by
-position. One wire break carries every change below; clients and daemon move
+position, and refuses an enumeration of one variant. One wire break carries every change below; clients and daemon move
 together.
 
 - `Query` is `Input` and `Response` is `Output`. The file also generates
@@ -28,9 +28,9 @@ together.
   `WatchCacheRetention` and `CacheRetentionWatch` are removed: the input
   registered no watcher and nothing streamed from it. `CacheRetentionTransition`
   and its event stay, in `EventLogPage`.
-- `Refused.Refusal`, with `Refusal.[ Store.String ]`, answers any input the
+- `Refused.StoreFailure`, with `StoreFailure.String`, answers any input the
   Nexus store could not carry out, with the store's own words. Its text is
-  `Refused.Store.«…»`.
+  `Refused.«…»`.
 - Every enumeration lists its variants in the order Lojix stores them (lojix
   `src/runtime_model.rs` at `da0ad8a`), so a stored value keeps its archived
   tag. `tests/representation.rs` checks the tag of every variant of the 21
@@ -51,9 +51,10 @@ together.
   `datom-codec` 0.32.3 (`eb792265a67b2c6865f9b8c9ed9d2e5ae5a7174c`, was
   `4dff16b4…` / 0.32.2), whose derive writes a one-field tuple struct as its
   inner value.
-- `horizon-lib` moves to 0.18.0 (`825a7f09242380a7b3d2609b26e20647db46a8ce`,
+- `horizon-lib` moves to 0.18.0 (`182f5307962896e95a2a83c45f68785b1f7c84d3`,
   was `e723ce11…` / 0.17.1), the same Horizon types over ethos-zero 28 and
-  datom-codec 0.32.3; its archive and text are unchanged. `protos` and
+  datom-codec 0.32.3; its archive is unchanged, and its text is unchanged but
+  for the one `MotherBoard` variant, `Ondyfaind`, now `Undefined`. `protos` and
   `signal` are unchanged.
 
 The archived tags that move:
@@ -156,7 +157,6 @@ The archived tags that move:
 | RequestedGenerationArtifact → GenerationArtifact | UserEnvironment | 0 | 2 |
 | RequestedGenerationArtifact → GenerationArtifact | CompleteHost | 1 | 0 |
 | RequestedGenerationArtifact → GenerationArtifact | BaseHost | 2 | 1 |
-| Refusal | Store | (new) | 0 |
 
 # 0.10.1 to 0.11.0
 

@@ -16,10 +16,10 @@ datom-codec = { git = "https://github.com/LiGoldragon/datom-codec", rev = "eb792
 protos = { git = "https://github.com/LiGoldragon/protos", rev = "15b41da8f2579e73ead59bc0c2b97529b8ac32d3", optional = true }
 rkyv = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 signal = { git = "https://github.com/LiGoldragon/signal", rev = "f35460de930943ea1a8a972453ccf3a092a655b5", default-features = false }
-horizon-lib = { git = "https://github.com/LiGoldragon/horizon-rs", rev = "825a7f09242380a7b3d2609b26e20647db46a8ce", default-features = false }
+horizon-lib = { git = "https://github.com/LiGoldragon/horizon-rs", rev = "182f5307962896e95a2a83c45f68785b1f7c84d3", default-features = false }
 
 [build-dependencies]
-ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "970459d100ddee5f62a76c05642ecfabefba6329" }
+ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "f23eacf338a90ce4a6dea011554724fa6488fcc9" }
 
 [lints.rust]
 unsafe_code = "forbid"

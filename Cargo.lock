@@ -138,6 +138,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "ethos-zero"
+version = "29.0.0"
+source = "git+https://github.com/LiGoldragon/ethos-zero?rev=f23eacf338a90ce4a6dea011554724fa6488fcc9#f23eacf338a90ce4a6dea011554724fa6488fcc9"
+dependencies = [
+ "datom-codec 0.33.1",
+ "prettyplease",
+ "proc-macro2",
+ "protos 0.33.0",
+ "quote",
+ "rkyv",
+ "syn 3.0.6",
+]
+
+[[package]]
 name = "futures-core"
 version = "0.3.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -170,7 +184,7 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 [[package]]
 name = "horizon-lib"
 version = "0.18.0"
-source = "git+https://github.com/LiGoldragon/horizon-rs?rev=825a7f09242380a7b3d2609b26e20647db46a8ce#825a7f09242380a7b3d2609b26e20647db46a8ce"
+source = "git+https://github.com/LiGoldragon/horizon-rs?rev=182f5307962896e95a2a83c45f68785b1f7c84d3#182f5307962896e95a2a83c45f68785b1f7c84d3"
 dependencies = [
  "datom-codec 0.32.3",
  "ethos-zero 28.0.0",
@@ -396,7 +410,7 @@ name = "signal-lojix"
 version = "0.12.0"
 dependencies = [
  "datom-codec 0.32.3",
- "ethos-zero 28.0.0",
+ "ethos-zero 29.0.0",
  "horizon-lib",
  "protos 0.32.2",
  "rkyv",

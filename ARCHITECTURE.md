@@ -4,7 +4,7 @@
 all contract types, including the `Input` and `Output` roots and the
 `Answering` capabilities. Outputs pair with inputs by position: the n-th
 output answers the n-th input, and the rejections, the deployment phase
-reaction and `Refused.Store` follow. Build-time freshness prevents
+reaction and `Refused`, a store failure in the store's own words, follow. Build-time freshness prevents
 handwritten generated Rust.
 
 The default crate contains only rkyv contract support. `Signal<T>` carries raw

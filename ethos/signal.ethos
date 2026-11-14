@@ -9,8 +9,8 @@
 ; committed phase transition streams on the same connection as a
 ; DeploymentPhaseObserved frame, a reaction after the rejections.
 ;
-; Refused.Store answers any input the Nexus's store could not carry out,
-; with the store's own words. It stands after every other output.
+; Refused answers any input the Nexus's store could not carry out, with the
+; store's own words, its StoreFailure. It stands after every other output.
 ;
 ; Every enumeration lists its variants in the order Lojix stores them, the
 ; lifecycle order, so a stored value keeps its archived tag.
@@ -36,7 +36,7 @@ Signal
   QueryRejected.RejectedQuery
   UnwatchRejected.RejectedUnwatch
   DeploymentPhaseObserved.DeploymentPhaseEvent
-  Refused.Refusal ]
+  Refused.StoreFailure ]
 
 [ OrdinarySocketPath.String
   OrdinarySocketMode.Integer
@@ -134,4 +134,4 @@ Signal
   Generation.{ GenerationIdentifier DeploymentIdentifier ClusterName NodeName GenerationArtifact ActivationEffect GenerationSlot Option<ClosurePath> Option<ImmutableRevision> }
   TestRunRecord.{ TestRunIdentifier ClusterName NodeName NodeName TestMode TestRunPhase TestOutcome Option<ClosurePath> }
   DetailTruncated.Boolean
-  Refusal.[ Store.String ] ]
+  StoreFailure.String ]
