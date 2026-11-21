@@ -43,7 +43,7 @@ Signal
   ProposalSource.String
   SecretsDirectory.String
   SecretsInput.[ NoSecrets SecretsDirectory.SecretsDirectory ]
-  RequestedDeploymentAction.[ Host.HostDeployAction UserEnvironment.UserEnvironmentAction ]
+  RequestedDeploymentAction.[ Host.HostDeployAction UserEnvironment.UserEnvironmentAction UserEnvironmentRetirement ]
   NodeName.String
   RejectedQuery.{ QueryRejectionReason DatabaseMarker }
   GenerationLookup.{ GenerationIdentifier }
@@ -92,7 +92,7 @@ Signal
   EventLogRange.{ EventLogPosition EventLogPosition }
   DeploymentLifecycle.[ Failed Rejected Completed Building Activating Submitted Copying Activated Built ]
   ClosurePath.String
-  ActivationEffect.[ ProfileOnly BootOnceProfile TestActivation LiveActivation BootProfile ]
+  ActivationEffect.[ ProfileOnly BootOnceProfile TestActivation LiveActivation BootProfile UserEnvironmentRetirement ]
   SubscriptionClosed.{ SubscriptionToken }
   TestMode.[ Hermetic Live ]
   StateDigest.Integer
@@ -100,7 +100,7 @@ Signal
   NixStoreUri.String
   TestRunListing.{ Vector<TestRunRecord> DatabaseMarker }
   DeploymentTerminal.[ Succeeded Failed.DeploymentFailure Rejected.DeploymentTerminalReason ]
-  SourceRevisionPolicy.[ ResolveAndRecord RequireImmutable ]
+  SourceRevisionPolicy.[ ResolveAndRecord RequireImmutable NoFlakeSource ]
   ClusterName.String
   DeploymentIdentifier.Integer
   DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason Option<FailureEvidence> }
@@ -112,7 +112,7 @@ Signal
   FailureDetail.String
   DeploymentFailureStage.[ Build Eval MaterializeHorizon Daemon Activate CopyClosure Admission FlakeAuth ]
   FlakeReference.String
-  DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable EvaluationFailed BuildFailed ClosureCopyFailed ]
+  DeploymentTerminalReason.[ NodeUnknown FlakeReferenceMalformed ProposalSourceUnreachable DeploymentInFlight InvalidDeploymentRouting UnsupportedDeployAction InternalError ClusterUnknown ActivationFailed BuilderUnreachable SubstituterUnreachable EvaluationFailed BuildFailed ClosureCopyFailed UnknownEnvironment EnvironmentLive EnvironmentPinned EnvironmentRetirementFailed ]
   Selection.[ ByNode.NodeSelector ByTestRun.TestRunLookup ByDeployment.DeploymentLookup ByGeneration.GenerationLookup ByEventLog.EventLogRange ]
   RequestedGenerationArtifact.[ UserEnvironment CompleteHost BaseHost ]
   NodeSelector.{ ClusterName NodeName Option<RequestedGenerationArtifact> }

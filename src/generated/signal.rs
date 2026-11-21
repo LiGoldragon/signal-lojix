@@ -126,6 +126,7 @@ pub enum SecretsInput {
 pub enum RequestedDeploymentAction {
     Host(HostDeployAction),
     UserEnvironment(UserEnvironmentAction),
+    UserEnvironmentRetirement,
 }
 #[rustfmt::skip]
 pub type NodeName = String;
@@ -449,6 +450,7 @@ pub enum ActivationEffect {
     TestActivation,
     LiveActivation,
     BootProfile,
+    UserEnvironmentRetirement,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
@@ -497,6 +499,7 @@ pub enum DeploymentTerminal {
 pub enum SourceRevisionPolicy {
     ResolveAndRecord,
     RequireImmutable,
+    NoFlakeSource,
 }
 #[rustfmt::skip]
 pub type ClusterName = String;
@@ -567,6 +570,10 @@ pub enum DeploymentTerminalReason {
     EvaluationFailed,
     BuildFailed,
     ClosureCopyFailed,
+    UnknownEnvironment,
+    EnvironmentLive,
+    EnvironmentPinned,
+    EnvironmentRetirementFailed,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq, Hash)]

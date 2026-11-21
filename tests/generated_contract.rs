@@ -142,6 +142,14 @@ fn peer_bytes_restore_typed_query_and_response() {
 }
 
 #[test]
+fn retirement_action_and_terminal_reasons_cross_fresh_peer_bytes() {
+    let response = retirement_deployment_response();
+    let sent = response.signalize().expect("signalize retirement records");
+    let received = Signal::<Response>::from(sent.bytes().to_vec());
+    assert_eq!(received.restore().expect("restore retirement records"), response);
+}
+
+#[test]
 fn configure_query_and_desired_state_receipt_cross_fresh_peer_bytes() {
     let query = Query::Configure(configuration());
     let sent = query.signalize().expect("signalize Configure query");
@@ -286,6 +294,87 @@ fn datom_round_trip_preserves_named_response_payload() {
         })
         .expect("restore datom response");
     assert_eq!(restored, response);
+
+    let retirement_response = retirement_deployment_response();
+    let rendered = retirement_response
+        .clone()
+        .datomize(vec![])
+        .protosize()
+        .textualize();
+    let mut pending = Potential::<Response>::from(rendered);
+    let restored = pending
+        .actualize(&mut Budget {
+            remaining: 4_096,
+            reader: ReaderBudget { remaining: 4_096 },
+            depth: 0,
+            maximum_depth: 256,
+        })
+        .expect("restore retirement Datom response");
+    assert_eq!(restored, retirement_response);
+}
+
+/// Durable retirement uses the same deployment record and terminal family;
+/// its typed action carries the fact that no activation or flake occurred.
+fn retirement_deployment_response() -> Response {
+    use signal_lojix::{
+        ActivationEffect, DatabaseMarker, DeploymentEnvironment, DeploymentLifecycle,
+        DeploymentRecord, DeploymentRequestIdentity, DeploymentTerminal,
+        DeploymentTerminalReason, GenerationArtifact, GenerationListing,
+        RequestedDeploymentAction, SourceRevisionPolicy,
+    };
+
+    let marker = DatabaseMarker {
+        commit_sequence: 53,
+        state_digest: 97,
+    };
+    let outcomes = [
+        (
+            311,
+            DeploymentLifecycle::Completed,
+            DeploymentTerminal::Succeeded,
+        ),
+        (
+            312,
+            DeploymentLifecycle::Rejected,
+            DeploymentTerminal::Rejected(DeploymentTerminalReason::UnknownEnvironment),
+        ),
+        (
+            313,
+            DeploymentLifecycle::Rejected,
+            DeploymentTerminal::Rejected(DeploymentTerminalReason::EnvironmentLive),
+        ),
+        (
+            314,
+            DeploymentLifecycle::Rejected,
+            DeploymentTerminal::Rejected(DeploymentTerminalReason::EnvironmentPinned),
+        ),
+    ];
+    let records = outcomes
+        .into_iter()
+        .map(|(deployment_identifier, lifecycle, terminal)| DeploymentRecord {
+            deployment_identifier,
+            generation_identifier: deployment_identifier + 100,
+            deployment_request_identity: DeploymentRequestIdentity {
+                deployment_environment: DeploymentEnvironment::UserEnvironment("ada".into()),
+                cluster_name: "fixture-cluster".into(),
+                node_name: "fixture-node".into(),
+                generation_artifact: GenerationArtifact::UserEnvironment,
+                requested_deployment_action: RequestedDeploymentAction::UserEnvironmentRetirement,
+                activation_effect: ActivationEffect::UserEnvironmentRetirement,
+                source_revision_policy: SourceRevisionPolicy::NoFlakeSource,
+                immutable_revision_option: None,
+            },
+            admission_marker_option: Some(marker.clone()),
+            deployment_lifecycle: lifecycle,
+            terminal_marker_option: Some(marker.clone()),
+            deployment_terminal_option: Some(terminal),
+        })
+        .collect();
+    Response::Queried(GenerationListing {
+        generation_vector: vec![],
+        deployment_record_vector: records,
+        database_marker: marker,
+    })
 }
 
 /// A terminal deployment record whose failure carries the evidence a retry
