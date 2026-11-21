@@ -1,3 +1,7 @@
+# 0.11.0 to 0.11.1
+
+Pin Horizon 0.17.2 replica-account synchronization validation. Contract schemas and generated Rust remain unchanged; this dependency child stays in the typed Unison archive cohort.
+
 # Upgrades
 
 # 0.10.1 to 0.11.0
