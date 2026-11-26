@@ -1,3 +1,12 @@
+# 0.11.1 to 0.12.0
+
+Pin Horizon 0.18.0, whose appended `RouterUsbParentPowerOn` capability carries
+validated physical USB-parent identities for router runtime-power policy.
+The Horizon `NodeCapability` and archived layout retain their deployed size
+and alignment, and old 0.17.2 definitions and archives decode unchanged.
+Signal-lojix's schema and generated Rust remain byte-identical; clients and
+daemon repin together because `TestDefaults` can carry the new capability.
+
 # 0.11.0 to 0.11.1
 
 Pin Horizon 0.17.2 replica-account synchronization validation. Contract schemas and generated Rust remain unchanged; this dependency child stays in the typed Unison archive cohort.
