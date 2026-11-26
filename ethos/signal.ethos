@@ -55,7 +55,7 @@ Signal
   FailureStage.[ HermeticCheck BringUp Assert Deploy TearDown ]
   HostDeployAction.[ TestActivation ScheduleBootOnce Realize SetBootProfile Evaluate ActivateNow ]
   PinLabel.String
-  GenerationListing.{ Vector<Generation> Vector<DeploymentRecord> DatabaseMarker }
+  GenerationListing.{ ⟦ Generation ⟧ ⟦ DeploymentRecord ⟧ DatabaseMarker }
   DeploymentLookup.{ DeploymentIdentifier }
   UnwatchRejectionReason.[ SubscriptionTokenUnknown SubscriptionAlreadyClosed ]
   GenerationSlot.[ Pinned Recent Rollback BootPending Current ]
@@ -83,7 +83,7 @@ Signal
   ActivationBackend.[ HomeManagerNixProfileV1 NixosSystemdBootV1 ]
   GenerationArtifact.[ BaseHost CompleteHost UserEnvironment ]
   RejectedUnwatch.{ UnwatchRejectionReason SubscriptionToken }
-  EventLogPage.{ Vector<DeploymentPhaseEvent> Vector<CacheRetentionTransitionEvent> DatabaseMarker }
+  EventLogPage.{ ⟦ DeploymentPhaseEvent ⟧ ⟦ CacheRetentionTransitionEvent ⟧ DatabaseMarker }
   SubscriptionClose.{ SubscriptionToken }
   TerminalMarker.DatabaseMarker
   DeploymentEnvironment.[ HostEnvironment UserEnvironment.UserName ]
@@ -98,14 +98,14 @@ Signal
   StateDigest.Integer
   QueryRejectionReason.[ MalformedSelector EventLogPositionOutOfRange GenerationUnknown NodeUnknown ]
   NixStoreUri.String
-  TestRunListing.{ Vector<TestRunRecord> DatabaseMarker }
+  TestRunListing.{ ⟦ TestRunRecord ⟧ DatabaseMarker }
   DeploymentTerminal.[ Succeeded Failed.DeploymentFailure Rejected.DeploymentTerminalReason ]
   SourceRevisionPolicy.[ ResolveAndRecord RequireImmutable NoFlakeSource ]
   ClusterName.String
   DeploymentIdentifier.Integer
   DeploymentFailure.{ DeploymentFailureStage DeploymentTerminalReason Option<FailureEvidence> }
   FailureEvidence.{ Option<FailedCommand> FailureDetail DetailTruncated }
-  FailedCommand.{ CommandProgram Vector<CommandArgument> Option<ExitCode> }
+  FailedCommand.{ CommandProgram ⟦ CommandArgument ⟧ Option<ExitCode> }
   CommandProgram.String
   CommandArgument.String
   ExitCode.Integer
