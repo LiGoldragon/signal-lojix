@@ -267,6 +267,18 @@ fn router_usb_parent_power_capability_crosses_archive_and_datom() {
 
 #[cfg(feature = "datom")]
 #[test]
+fn preferred_wired_internet_capability_crosses_archive_and_datom() {
+    let mut definition = gold_horizon_definition();
+    definition.horizon_configuration.generic_nodes[0]
+        .capabilities
+        .push(horizon_lib::NodeCapability::PreferredWiredInternet(
+            "enp0s31f6".into(),
+        ));
+    assert_horizon_definition_crosses_archive_and_datom(definition);
+}
+
+#[cfg(feature = "datom")]
+#[test]
 fn datom_round_trip_preserves_bare_punctuation_strings() {
     use datom_codec::{Actualizing, Budget, Datomizable, Potential};
     use protos::{Protosizable, ReaderBudget, Textualizable};

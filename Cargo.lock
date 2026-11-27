@@ -115,8 +115,8 @@ checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
 name = "horizon-lib"
-version = "0.18.0"
-source = "git+https://github.com/LiGoldragon/horizon-rs?rev=ae1d4a8904e59cafa46307c248eb7c2b98bb1222#ae1d4a8904e59cafa46307c248eb7c2b98bb1222"
+version = "0.19.0"
+source = "git+https://github.com/LiGoldragon/horizon-rs?rev=8336cb6b2477f08dd2595486cac338a04e9d4f22#8336cb6b2477f08dd2595486cac338a04e9d4f22"
 dependencies = [
  "datom-codec",
  "ethos-zero",
@@ -331,7 +331,7 @@ dependencies = [
 
 [[package]]
 name = "signal-lojix"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "datom-codec",
  "ethos-zero",

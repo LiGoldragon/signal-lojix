@@ -1,3 +1,12 @@
+# 0.12.0 to 0.13.0
+
+Pin Horizon 0.19.0, whose appended `PreferredWiredInternet` capability names
+one validated wired interface for preferred default Internet routes and DNS.
+The Horizon `NodeCapability` and archived layout retain their deployed size
+and alignment, and old definitions and archives decode unchanged.
+Signal-lojix's schema and generated Rust remain byte-identical; clients and
+daemon repin together because `TestDefaults` can carry the new capability.
+
 # 0.11.1 to 0.12.0
 
 Pin Horizon 0.18.0, whose appended `RouterUsbParentPowerOn` capability carries
