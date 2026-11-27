@@ -259,6 +259,28 @@ fn a_git_server_capability_crosses_archive_and_datom() {
 
 #[cfg(feature = "datom")]
 #[test]
+fn wired_repair_capabilities_cross_archive_and_datom() {
+    let mut definition = gold_horizon_definition();
+    definition.horizon_configuration.generic_nodes[0]
+        .capabilities
+        .extend([
+            horizon_lib::NodeCapability::RouterUsbParentPowerOn(vec![
+                horizon_lib::RouterUsbParentPowerIdentity {
+                    pci_controller_address: "0000:c7:00.0".into(),
+                    integer: 2,
+                    usb_vendor_id: "0b95".into(),
+                    usb_product_id: "1790".into(),
+                    usb_device_revision: "0200".into(),
+                    usb_serial_number: "00000000009525".into(),
+                },
+            ]),
+            horizon_lib::NodeCapability::PreferredWiredInternet("enp0s31f6".into()),
+        ]);
+    assert_horizon_definition_crosses_archive_and_datom(definition);
+}
+
+#[cfg(feature = "datom")]
+#[test]
 fn datom_round_trip_preserves_bare_punctuation_strings() {
     use datom_codec::{Actualizing, Budget, Datomizable, Potential};
     use protos::{Protosizable, ReaderBudget, Textualizable};

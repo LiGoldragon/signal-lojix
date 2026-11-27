@@ -1,3 +1,13 @@
+# 0.11.1 to 0.13.0
+
+Pin the live-compatible Horizon 0.19.0 repair line. Its two appended
+capabilities declare one exact router USB parent's runtime-power identity and
+one preferred wired Internet interface. Horizon preserves the deployed
+capability and archive footprint; existing definitions decode unchanged.
+Signal-lojix's schema and generated Rust remain byte-identical, and its old
+and new Horizon transport witnesses pass. Versions 0.12.0 and 0.13.0 were the
+immutable staged producer revisions now integrated together.
+
 # 0.11.0 to 0.11.1
 
 Pin Horizon 0.17.2 replica-account synchronization validation. Contract schemas and generated Rust remain unchanged; this dependency child stays in the typed Unison archive cohort.
